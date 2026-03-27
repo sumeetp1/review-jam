@@ -298,10 +298,22 @@ export default function Home() {
           
           {isLoading ? (
              <div className="text-center p-10 text-slate-400 font-bold animate-pulse">Loading the jam...</div>
-          ) : displayedReviews.length === 0 ? (
-            <div className="text-center p-16 bg-white rounded-3xl border border-dashed border-slate-300 text-slate-500">
-              <p className="font-bold text-lg mb-2">No reviews found.</p>
-              <p className="text-sm">Be the first to write a review in this category!</p>
+         ) : displayedReviews.length === 0 ? (
+            <div className="text-center p-16 bg-white rounded-3xl border border-dashed border-slate-300 shadow-sm flex flex-col items-center">
+              <div className="text-5xl mb-4">🎸</div>
+              <h3 className="font-black text-2xl text-slate-800 mb-3">Welcome to Review Jam</h3>
+              <p className="text-slate-600 mb-6 text-lg leading-relaxed max-w-lg mx-auto">
+                The platform for authentic, AI-verified product feedback. Read genuine experiences from real users, or share your own honest thoughts to start earning rewards.
+              </p>
+              <button 
+                onClick={() => {
+                  if (!user) alert("Please log in to write a review!");
+                  else setShowOrganicModal(true);
+                }}
+                className="bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold px-8 py-3 rounded-full hover:bg-indigo-100 transition-colors shadow-sm"
+              >
+                Write the First Review ✍️
+              </button>
             </div>
           ) : (
             displayedReviews.map(review => (
