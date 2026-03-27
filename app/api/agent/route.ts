@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     const q = query(reviewsRef, where("campaignId", "==", campaignId));
     const snapshot = await getDocs(q);
 
-    const reviews = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const reviews: any[] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     // 3. Calculate the absolute total of all likes across all reviews
     // Using your example: 55 + 5 + 5 + 5... = 100 total likes
