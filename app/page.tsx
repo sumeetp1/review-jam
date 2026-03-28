@@ -29,10 +29,21 @@ export default function Home() {
   const [organicContent, setOrganicContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // LIVE TIMER STATE
   const [currentTime, setCurrentTime] = useState(Date.now());
+  
+  // NEW: Dark Mode State
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
+    // Check if user previously set dark mode on this device
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      setIsDarkMode(true);
+    } else {
+      document.documentElement.classList.remove('dark');
+      setIsDarkMode(false);
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
@@ -51,11 +62,23 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
-  // Update timer every minute
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(Date.now()), 60000);
     return () => clearInterval(timer);
   }, []);
+
+  // NEW: Dark Mode Toggle Function
+  const toggleDarkMode = () => {
+    if (isDarkMode) {
+      document.documentElement.classList.remove('dark');
+      localStorage.theme = 'light';
+      setIsDarkMode(false);
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.theme = 'dark';
+      setIsDarkMode(true);
+    }
+  };
 
   async function fetchInitialData() {
     setIsLoading(true);
@@ -139,22 +162,17 @@ export default function Home() {
     }
   };
 
-  // HELPER FUNCTIONS FOR TIMER AND COUNTS
-  const getReviewCount = (campaignId: string) => {
-    return allReviews.filter(r => r.campaignId === campaignId).length;
-  };
+  const getReviewCount = (campaignId: string) => allReviews.filter(r => r.campaignId === campaignId).length;
 
   const getTimeRemaining = (endDateStr: string) => {
     if (!endDateStr) return "Ongoing";
     const total = Date.parse(endDateStr) - currentTime;
     if (total <= 0) return "Ended";
-    
     const days = Math.floor(total / (1000 * 60 * 60 * 24));
     const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
     const minutes = Math.floor((total / 1000 / 60) % 60);
-    
-    if (days > 0) return `${days}d ${hours}h left`;
-    return `${hours}h ${minutes}m left`;
+    if (days > 0) return `${days}d ${hours}h`;
+    return `${hours}h ${minutes}m`;
   };
 
   const displayedReviews = allReviews.filter(review => {
@@ -169,253 +187,243 @@ export default function Home() {
     return matchesSearch && matchesCategory;
   });
 
+  const trendingInsights = allReviews.filter(r => r.marketingQuote && r.likesCount > 0).slice(0, 3);
+
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+    <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-200">
       
-      {/* ORGANIC REVIEW MODAL */}
+      {/* MODAL */}
       {showOrganicModal && (
-        <div className="fixed inset-0 bg-slate-900/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl p-8 max-w-xl w-full shadow-2xl">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-black text-slate-900">Write a Review</h2>
-              <button onClick={() => setShowOrganicModal(false)} className="text-slate-400 hover:text-slate-700 font-bold text-xl">✕</button>
+        <div className="fixed inset-0 bg-slate-900/60 dark:bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 max-w-lg w-full shadow-2xl border border-transparent dark:border-slate-800">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold dark:text-white">Draft a Review</h2>
+              <button onClick={() => setShowOrganicModal(false)} className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-bold">✕</button>
             </div>
-            
             <form onSubmit={handleSubmitOrganicReview} className="space-y-4">
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1">Product or Service Name</label>
-                <input type="text" value={organicProduct} onChange={(e) => setOrganicProduct(e.target.value)} required placeholder="e.g., Dyson V15 Vacuum" className="w-full border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500 outline-none" />
+                <input type="text" value={organicProduct} onChange={(e) => setOrganicProduct(e.target.value)} required placeholder="Product Name (e.g. Dyson V15)" className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white dark:placeholder-slate-400" />
               </div>
               <div className="flex gap-4">
-                <div className="flex-1">
-                  <label className="block text-sm font-bold text-slate-700 mb-1">Category</label>
-                  <select value={organicCategory} onChange={(e) => setOrganicCategory(e.target.value)} className="w-full border border-slate-300 rounded-xl p-3 outline-none">
-                    {AVAILABLE_CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                  </select>
-                </div>
-                <div className="w-32">
-                  <label className="block text-sm font-bold text-slate-700 mb-1">Rating</label>
-                  <select value={organicRating} onChange={(e) => setOrganicRating(Number(e.target.value))} className="w-full border border-slate-300 rounded-xl p-3 outline-none">
-                    {[5, 4, 3, 2, 1].map(num => <option key={num} value={num}>{num} ★</option>)}
-                  </select>
-                </div>
+                <select value={organicCategory} onChange={(e) => setOrganicCategory(e.target.value)} className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm outline-none dark:text-white">
+                  {AVAILABLE_CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                </select>
+                <select value={organicRating} onChange={(e) => setOrganicRating(Number(e.target.value))} className="w-24 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm outline-none dark:text-white">
+                  {[5, 4, 3, 2, 1].map(num => <option key={num} value={num}>{num} ★</option>)}
+                </select>
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1">Your Review</label>
-                <textarea value={organicContent} onChange={(e) => setOrganicContent(e.target.value)} required placeholder="What are your honest thoughts?" className="w-full border border-slate-300 rounded-xl p-3 h-32 focus:ring-2 focus:ring-indigo-500 outline-none" />
+                <textarea value={organicContent} onChange={(e) => setOrganicContent(e.target.value)} required placeholder="What's your honest take?" className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm h-32 focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white dark:placeholder-slate-400" />
               </div>
-              <button type="submit" disabled={isSubmitting} className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition disabled:bg-indigo-300">
-                {isSubmitting ? "Processing with AI..." : "Publish Review"}
+              <button type="submit" disabled={isSubmitting} className="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold text-sm hover:bg-indigo-700 transition disabled:opacity-50">
+                {isSubmitting ? "AI Quality Check..." : "Post Review"}
               </button>
             </form>
           </div>
         </div>
       )}
 
-      {/* ONBOARDING MODAL */}
-      {showOnboarding && (
-        <div className="fixed inset-0 bg-slate-900/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-           <div className="bg-white rounded-3xl p-10 max-w-lg w-full text-center shadow-2xl border border-slate-100">
-             <h2 className="text-3xl font-black text-slate-900 mb-2">Welcome to Review Jam!</h2>
-             <p className="text-slate-500 mb-8 text-lg">Pick a few categories you love to personalize your feed.</p>
-             <div className="flex flex-wrap justify-center gap-3 mb-10">
-               {AVAILABLE_CATEGORIES.map(cat => (
-                 <button key={cat} onClick={() => setSelectedInterests(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])}
-                   className={`px-5 py-2.5 rounded-full font-bold transition-all duration-200 ${selectedInterests.includes(cat) ? "bg-indigo-600 text-white shadow-md shadow-indigo-200" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
-                 >
-                   {cat}
-                 </button>
-               ))}
-             </div>
-             <button onClick={handleCompleteOnboarding} disabled={selectedInterests.length === 0} className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold text-lg hover:bg-slate-800 disabled:bg-slate-300 transition">Curate My Feed</button>
-           </div>
-        </div>
-      )}
-
-      {/* TOP NAVIGATION */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
-          <div className="flex flex-col">
-            <h1 className="text-2xl font-black text-indigo-600 tracking-tight leading-none">Review Jam</h1>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Genuine Reviews</span>
-          </div>
-          
-          <div>
-            {user ? (
-              <div className="flex items-center gap-5">
-                <Link href="/brands" className="text-sm text-slate-600 hover:text-indigo-600 font-bold transition">For Brands</Link>
-                <Link href="/admin" className="text-sm text-slate-400 hover:text-indigo-600 font-bold transition">Admin</Link>
-                <Link href="/profile" className="text-sm text-slate-600 hover:text-indigo-600 font-bold transition">My Profile</Link>
-                <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
-                  {user.displayName?.charAt(0)}
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-5">
-                <Link href="/brands" className="text-sm text-slate-600 hover:text-indigo-600 font-bold transition">For Brands</Link>
-                <button onClick={handleLogin} className="bg-slate-900 text-white px-5 py-2 rounded-full shadow hover:bg-slate-800 transition font-bold text-sm">Sign In</button>
-              </div>
-            )}
-          </div>
-        </div>
+      {/* MOBILE TOP NAVIGATION */}
+      <nav className="md:hidden bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 px-4 h-14 flex justify-between items-center">
+        <h1 className="text-xl font-black text-indigo-600 dark:text-indigo-400 tracking-tight">Review Jam</h1>
+        {user ? (
+          <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold text-sm">{user.displayName?.charAt(0)}</div>
+        ) : (
+          <button onClick={handleLogin} className="text-sm font-bold text-indigo-600 dark:text-indigo-400">Sign In</button>
+        )}
       </nav>
 
-      {/* 3-COLUMN SOCIAL LAYOUT */}
-      <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
+      {/* MAIN LAYOUT */}
+      <div className="max-w-7xl mx-auto flex justify-center">
         
-        {/* LEFT COLUMN */}
-        <div className="lg:col-span-3 hidden lg:block">
-          <div className="sticky top-24 space-y-2">
-            <button 
-              onClick={() => {
-                if (!user) alert("Please log in to write a review!");
-                else setShowOrganicModal(true);
-              }}
-              className="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-lg hover:bg-indigo-700 hover:shadow-indigo-200 transition-all mb-8 flex justify-center items-center gap-2"
-            >
-              <span>✍️</span> Review Anything
+        {/* LEFT COLUMN: Fixed Navigation */}
+        <aside className="hidden md:flex flex-col w-[275px] h-screen sticky top-0 border-r border-slate-100 dark:border-slate-800 p-4 pt-6 pr-8">
+          <Link href="/" className="mb-8 px-4">
+            <h1 className="text-3xl font-black text-indigo-600 dark:text-indigo-400 tracking-tight">Review Jam</h1>
+          </Link>
+
+          <nav className="flex flex-col gap-2 mb-8">
+            <button onClick={() => setActiveCategoryFilter("All")} className={`flex items-center gap-4 px-4 py-3 rounded-full font-bold text-lg transition ${activeCategoryFilter === "All" ? "font-black dark:bg-slate-800" : "hover:bg-slate-100 dark:hover:bg-slate-800"}`}>
+              <span className="text-2xl">🏠</span> Home
             </button>
-
-            <h3 className="text-sm font-black text-slate-400 uppercase tracking-wider mb-4 px-3">Explore</h3>
-            <button onClick={() => setActiveCategoryFilter("All")} className={`w-full text-left px-4 py-3 rounded-xl font-bold transition-colors ${activeCategoryFilter === "All" ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-100"}`}>🔥 For You</button>
-            {AVAILABLE_CATEGORIES.map(cat => (
-              <button key={cat} onClick={() => setActiveCategoryFilter(cat)} className={`w-full text-left px-4 py-3 rounded-xl font-bold transition-colors ${activeCategoryFilter === cat ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-100"}`}># {cat}</button>
-            ))}
-          </div>
-        </div>
-
-        {/* MIDDLE COLUMN: The Feed */}
-        <div className="lg:col-span-6 space-y-6">
-          <div className="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-3">
-            <span className="pl-4 text-xl">🔍</span>
-            <input type="text" placeholder="Search reviews, products, or quotes..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full bg-transparent border-none focus:ring-0 p-3 text-slate-800 placeholder-slate-400 outline-none" />
-            {searchQuery && <button onClick={() => setSearchQuery("")} className="pr-4 text-slate-400 hover:text-slate-600 font-bold">✕</button>}
-          </div>
-
-          <div className="flex justify-between items-end pb-2 border-b border-slate-200">
-            <h2 className="text-xl font-black text-slate-800">{searchQuery ? "Search Results" : (activeCategoryFilter === "All" ? "Top Reviews" : `${activeCategoryFilter} Reviews`)}</h2>
-          </div>
-          
-          {isLoading ? (
-             <div className="text-center p-10 text-slate-400 font-bold animate-pulse">Loading the jam...</div>
-         ) : displayedReviews.length === 0 ? (
-            <div className="text-center p-16 bg-white rounded-3xl border border-dashed border-slate-300 shadow-sm flex flex-col items-center">
-              <div className="text-5xl mb-4">🎸</div>
-              <h3 className="font-black text-2xl text-slate-800 mb-3">Welcome to Review Jam</h3>
-              <p className="text-slate-600 mb-6 text-lg leading-relaxed max-w-lg mx-auto">
-                The platform for authentic, AI-verified product feedback. Read genuine experiences from real users, or share your own honest thoughts to start earning rewards.
-              </p>
-              <button 
-                onClick={() => {
-                  if (!user) alert("Please log in to write a review!");
-                  else setShowOrganicModal(true);
-                }}
-                className="bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold px-8 py-3 rounded-full hover:bg-indigo-100 transition-colors shadow-sm"
-              >
-                Write the First Review ✍️
-              </button>
-            </div>
-          ) : (
-            displayedReviews.map(review => (
-              <div key={review.id} className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 hover:border-slate-300 transition-colors">
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-600">
-                      {review.reviewerName?.charAt(0) || "A"}
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-900 leading-tight">{review.reviewerName || "Anonymous"}</p>
-                      <div className="flex items-center gap-2">
-                         <p className="text-xs font-bold text-indigo-500 uppercase">{review.category || "General"}</p>
-                         {review.productName && <span className="text-xs text-slate-400 font-medium">• {review.productName}</span>}
-                      </div>
-                    </div>
-                  </div>
-                  <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-md font-black text-xs">★ {review.rating}/5</span>
-                </div>
-                
-                <p className="text-slate-800 text-lg leading-relaxed mb-4">"{review.content}"</p>
-                
-                {review.marketingQuote && (
-                  <div className="bg-indigo-50/50 border border-indigo-100 p-4 rounded-2xl mb-4">
-                    <p className="text-sm text-indigo-900 font-medium">✨ "{review.marketingQuote}"</p>
-                  </div>
-                )}
-                
-                <div className="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
-                  {review.campaignId === "organic" ? (
-                    <span className="text-slate-400 font-medium italic">Organic Review</span>
-                  ) : (
-                    <Link href={`/product/${review.productId}`} className="text-indigo-600 font-bold hover:underline cursor-pointer">
-                      View Campaign →
-                    </Link>
-                  )}
-                  <span className="flex items-center gap-1.5 font-bold text-slate-600 bg-slate-100 px-4 py-1.5 rounded-full">
-                    👍 {review.likesCount || 0}
-                  </span>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-
-        {/* RIGHT COLUMN: Upgraded Layout with Gap and Timers */}
-        {/* RIGHT COLUMN */}
-        <div className="lg:col-span-3 hidden lg:block">
-          <div className="sticky top-24 bg-slate-900 rounded-3xl p-6 text-white shadow-xl">
-            <h3 className="text-lg font-black mb-6 flex items-center gap-2">
-              <span className="text-green-400 animate-pulse">●</span> Active Campaigns
-            </h3>
+            <Link href="/brands" className="flex items-center gap-4 px-4 py-3 rounded-full font-bold text-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+              <span className="text-2xl">🏢</span> For Brands
+            </Link>
+            <Link href="/admin" className="flex items-center gap-4 px-4 py-3 rounded-full font-bold text-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+              <span className="text-2xl">⚡</span> Admin Center
+            </Link>
+            <Link href="/profile" className="flex items-center gap-4 px-4 py-3 rounded-full font-bold text-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+              <span className="text-2xl">👤</span> Profile
+            </Link>
             
-            <div className="flex flex-col gap-5">
-              {products.map((product) => (
-                <Link href={`/product/${product.id}`} key={product.id}>
-                  <div className="group bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-indigo-500 hover:bg-slate-800/80 transition-all cursor-pointer shadow-lg">
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">{product.category}</span>
-                      <div className="text-[10px] font-black text-green-400 bg-green-400/10 px-2 py-1 rounded">💰 Pool Active</div>
-                    </div>
-                    
-                    <h4 className="font-bold text-white mb-1 group-hover:text-indigo-300 transition-colors line-clamp-1">{product.name}</h4>
-                    <p className="text-xs text-slate-400 mb-4">by {product.brandName}</p>
-                    
-                    {/* HERE IS THE NEW TIMEZONE AND TIMER FOOTER */}
-                    <div className="pt-3 border-t border-slate-700/50">
-                      
-                      {/* 1. The Localized Date String */}
-                      <p className="text-[10px] text-slate-400 mb-3 font-medium bg-slate-900/50 inline-block px-2 py-1 rounded">
-                        Ends: {new Date(product.endDate).toLocaleString(undefined, { 
-                          weekday: 'short', 
-                          month: 'short', 
-                          day: 'numeric', 
-                          hour: 'numeric', 
-                          minute: '2-digit' 
-                        })}
-                      </p>
+            {/* DARK MODE TOGGLE */}
+            <button onClick={toggleDarkMode} className="flex items-center gap-4 px-4 py-3 rounded-full font-bold text-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition w-full text-left">
+              <span className="text-2xl">{isDarkMode ? "☀️" : "🌙"}</span> {isDarkMode ? "Light Mode" : "Dark Mode"}
+            </button>
+          </nav>
 
-                      {/* 2. The Live Countdown and Review Count */}
-                      <div className="flex justify-between items-center">
-                        <div className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                          <span className="text-orange-400">⏳</span> {getTimeRemaining(product.endDate)}
-                        </div>
-                        <div className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                          <span className="text-indigo-400">📝</span> {getReviewCount(product.campaignId)} reviews
-                        </div>
-                      </div>
-                      
-                    </div>
+          <button onClick={() => { if (!user) handleLogin(); else setShowOrganicModal(true); }} className="w-full bg-indigo-600 text-white font-bold text-lg py-4 rounded-full shadow-md hover:bg-indigo-700 transition">
+            Post a Review
+          </button>
+
+          {/* User Status at Bottom */}
+          <div className="mt-auto px-4 py-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition flex items-center gap-3" onClick={user ? handleLogout : handleLogin}>
+            <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300">
+              {user ? user.displayName?.charAt(0) : "?"}
+            </div>
+            <div className="flex-1">
+              <p className="font-bold text-[15px] leading-tight text-slate-900 dark:text-slate-100">{user ? user.displayName : "Guest Account"}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{user ? "Log out" : "Click to sign in"}</p>
+            </div>
+          </div>
+        </aside>
+
+        {/* CENTER COLUMN: The Feed */}
+        <main className="w-full md:w-[600px] border-r border-slate-100 dark:border-slate-800 min-h-screen pb-20 md:pb-0">
+          
+          {/* Sticky Header & Search */}
+          <div className="sticky top-0 z-30 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 p-4">
+            <input type="text" placeholder="Search products, brands, or reviews..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full bg-slate-100 dark:bg-slate-900 rounded-full px-5 py-2.5 text-sm outline-none focus:bg-white dark:focus:bg-slate-800 focus:ring-1 focus:ring-indigo-500 transition dark:text-white dark:placeholder-slate-500 border border-transparent dark:border-slate-800" />
+            
+            {/* Categories */}
+            <div className="flex gap-2 overflow-x-auto pt-4 snap-x no-scrollbar">
+              <button onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-4 py-1.5 rounded-full font-bold text-sm border transition snap-start ${activeCategoryFilter === "All" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900"}`}>For You</button>
+              {AVAILABLE_CATEGORIES.map(cat => (
+                <button key={cat} onClick={() => setActiveCategoryFilter(cat)} className={`whitespace-nowrap px-4 py-1.5 rounded-full font-bold text-sm border transition snap-start ${activeCategoryFilter === cat ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900"}`}>{cat}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Mobile Only: Active Campaigns Swipe Row */}
+          <div className="lg:hidden border-b border-slate-100 dark:border-slate-800 p-4 bg-slate-50 dark:bg-slate-900/50">
+            <h3 className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">🔥 Active Reward Pools</h3>
+            <div className="flex gap-3 overflow-x-auto snap-x no-scrollbar pb-2">
+              {products.map(product => (
+                <Link href={`/product/${product.id}`} key={product.id} className="min-w-[240px] snap-start bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+                  <div className="flex justify-between items-start mb-1">
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-1">{product.name}</h4>
+                    <span className="text-[10px] font-bold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-1.5 rounded">Pool</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-2">
+                    <span>⏳ {getTimeRemaining(product.endDate)}</span>
+                    <span>📝 {getReviewCount(product.campaignId)} revs</span>
                   </div>
                 </Link>
               ))}
-              
-              {products.length === 0 && (
-                <div className="text-center p-6 border border-dashed border-slate-700 rounded-2xl">
-                  <p className="text-slate-500 text-sm font-bold">No active campaigns.</p>
+            </div>
+          </div>
+
+          {/* Feed Content */}
+          <div className="divide-y divide-slate-100 dark:divide-slate-800">
+            {isLoading ? (
+               <div className="p-8 text-center text-slate-400 font-bold animate-pulse text-sm">Loading feed...</div>
+            ) : displayedReviews.length === 0 ? (
+              <div className="p-12 text-center flex flex-col items-center">
+                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-2xl mb-4">🔍</div>
+                <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 mb-1">Nothing here yet</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Be the first to share your thoughts in this category.</p>
+                <button onClick={() => { if (!user) handleLogin(); else setShowOrganicModal(true); }} className="bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-bold px-6 py-2 rounded-full text-sm">Draft a Review</button>
+              </div>
+            ) : (
+              displayedReviews.map(review => (
+                <article key={review.id} className="p-4 hover:bg-slate-50/50 dark:hover:bg-slate-900/50 transition cursor-pointer">
+                  <div className="flex gap-3">
+                    {/* Avatar */}
+                    <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex-shrink-0 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 text-sm">
+                      {review.reviewerName?.charAt(0) || "A"}
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-1.5 truncate">
+                          <span className="font-bold text-[15px] text-slate-900 dark:text-slate-100 hover:underline">{review.reviewerName || "Anonymous"}</span>
+                          <span className="text-sm text-slate-500 dark:text-slate-400 truncate">· {review.category}</span>
+                        </div>
+                        <span className="text-xs font-bold text-yellow-600 dark:text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 px-1.5 py-0.5 rounded">★ {review.rating}</span>
+                      </div>
+                      
+                      {review.productName && <p className="text-[13px] font-semibold text-indigo-600 dark:text-indigo-400 mb-1">{review.productName}</p>}
+                      
+                      <p className="text-[15px] text-slate-800 dark:text-slate-200 leading-snug mb-3 whitespace-pre-wrap">{review.content}</p>
+                      
+                      {review.marketingQuote && (
+                        <div className="mb-3 border-l-2 border-indigo-200 dark:border-indigo-800 pl-3">
+                          <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-snug">"{review.marketingQuote}"</p>
+                        </div>
+                      )}
+                      
+                      {/* Interaction Footer */}
+                      <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 max-w-md">
+                        <button className="flex items-center gap-1.5 text-sm hover:text-indigo-600 dark:hover:text-indigo-400 group">
+                          <span className="p-1.5 rounded-full group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/30 transition">👍</span> {review.likesCount || 0}
+                        </button>
+                        {review.campaignId !== "organic" && (
+                          <Link href={`/product/${review.productId}`} className="text-[13px] font-bold text-green-600 dark:text-green-400 hover:underline">
+                            View Reward Pool →
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        </main>
+
+        {/* RIGHT COLUMN: Trending & Active Campaigns */}
+        <aside className="hidden lg:block w-[350px] pl-8 py-6 sticky top-0 h-screen overflow-y-auto no-scrollbar">
+          
+          {/* AI Insights Widget */}
+          <div className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 mb-6 border border-slate-100 dark:border-slate-800">
+            <h2 className="text-lg font-black text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              ✨ Trending Insights
+            </h2>
+            <div className="space-y-4">
+              {trendingInsights.length > 0 ? trendingInsights.map(insight => (
+                <div key={insight.id} className="cursor-pointer group">
+                  <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-0.5">{insight.productName || insight.category}</p>
+                  <p className="text-sm text-slate-800 dark:text-slate-200 font-medium leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">"{insight.marketingQuote}"</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">— {insight.reviewerName}</p>
                 </div>
+              )) : (
+                <p className="text-sm text-slate-500 dark:text-slate-400">Not enough data to generate insights yet.</p>
               )}
             </div>
           </div>
-        </div>
+
+          {/* Active Campaigns Widget */}
+          <div className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 border border-slate-100 dark:border-slate-800">
+            <h2 className="text-lg font-black text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              💰 Active Pools
+            </h2>
+            <div className="space-y-4">
+              {products.length > 0 ? products.map((product) => (
+                <Link href={`/product/${product.id}`} key={product.id} className="block group">
+                  <div className="flex justify-between items-start mb-1">
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition truncate pr-2">{product.name}</h4>
+                    <span className="text-[10px] font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-1.5 rounded flex-shrink-0">Live</span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">by {product.brandName}</p>
+                  <div className="flex justify-between items-center text-[11px] font-medium text-slate-600 dark:text-slate-400">
+                    <span>Ends: {new Date(product.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                    <span className="text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded-full">{getReviewCount(product.campaignId)} entries</span>
+                  </div>
+                </Link>
+              )) : (
+                <p className="text-sm text-slate-500 dark:text-slate-400">No active pools right now.</p>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-8 text-xs text-slate-400 dark:text-slate-600 flex flex-wrap gap-x-3 gap-y-1 px-2">
+            <Link href="/brands" className="hover:underline">For Brands</Link>
+            <span className="hover:underline cursor-pointer">Terms of Service</span>
+            <span className="hover:underline cursor-pointer">Privacy Policy</span>
+            <p className="w-full mt-2">© 2026 Review Jam</p>
+          </div>
+        </aside>
 
       </div>
     </main>
