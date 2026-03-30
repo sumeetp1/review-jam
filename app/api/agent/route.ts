@@ -5,6 +5,12 @@ import { db } from "../../../lib/firebase";
 
 // Initialize the Gemini API Brain
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const MODEL_CANDIDATES = [
+  process.env.GEMINI_MODEL,
+  "gemini-2.0-flash",
+  "gemini-2.0-flash-lite",
+  "gemini-1.5-flash",
+].filter(Boolean) as string[];
 
 type ReviewAnalysis = {
   isGenuine: boolean;
@@ -99,6 +105,38 @@ async function logModerationEvent(args: {
   }
 }
 
+function isModelNotFoundError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const maybe = error as { status?: number; message?: string };
+  if (maybe.status === 404) return true;
+  return typeof maybe.message === "string" && maybe.message.toLowerCase().includes("not found");
+}
+
+async function generateWithFallbackModel(prompt: string) {
+  let lastError: unknown = null;
+
+  for (const modelName of MODEL_CANDIDATES) {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        generationConfig: {
+          responseMimeType: "application/json",
+        },
+      });
+      const result = await model.generateContent(prompt);
+      return result.response.text().trim();
+    } catch (error) {
+      lastError = error;
+      if (isModelNotFoundError(error)) {
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  throw lastError ?? new Error("No Gemini models are available for this API key.");
+}
+
 export async function POST(req: Request) {
   try {
     const { reviewContent, reviewerName } = await req.json();
@@ -124,15 +162,6 @@ export async function POST(req: Request) {
         { status: 503 }
       );
     }
-
-    // We use gemini-1.5-flash because it is lightning fast and perfect for JSON tasks
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      // Forcing the AI to return clean JSON
-      generationConfig: {
-        responseMimeType: "application/json",
-      }
-    });
 
     // The Ruthless System Prompt
     const systemInstruction = `
@@ -166,8 +195,7 @@ export async function POST(req: Request) {
     `;
 
     // Wake up the AI and get the response
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text().trim();
+    const responseText = await generateWithFallbackModel(prompt);
     
     const parsedRaw = tryParseJsonObject(responseText);
     if (!parsedRaw || typeof parsedRaw !== "object") {
