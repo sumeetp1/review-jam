@@ -226,9 +226,23 @@ export default function Home() {
               <div>
                 <textarea value={organicContent} onChange={(e) => setOrganicContent(e.target.value)} required placeholder="What's your honest take?" className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm h-32 focus:ring-1 focus:ring-indigo-500 outline-none dark:text-white dark:placeholder-slate-500" />
               </div>
-              <button type="submit" disabled={isSubmitting} className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-indigo-700 transition disabled:opacity-50">
+              {/* --- NEW: CANCEL & SUBMIT BUTTONS --- */}
+              <div className="flex gap-3 pt-2">
+                <button 
+                  type="button" 
+                  onClick={() => setShowOrganicModal(false)} 
+                  className="w-1/3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 py-2.5 rounded-lg font-semibold text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isSubmitting} 
+                  className="w-2/3 bg-indigo-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-indigo-700 transition disabled:opacity-50"
+                >
                 {isSubmitting ? "AI Quality Check..." : "Post Review"}
               </button>
+              </div>
             </form>
           </div>
         </div>
@@ -277,16 +291,7 @@ export default function Home() {
             Post a Review
           </button>
 
-          {/* User Status at Bottom */}
-          <div className="mt-auto px-4 py-3 rounded-full hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer transition flex items-center gap-3" onClick={user ? handleLogout : handleLogin}>
-            <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 text-sm">
-              {user ? user.displayName?.charAt(0) : "?"}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-[15px] leading-tight text-slate-900 dark:text-slate-100 truncate">{user ? user.displayName : "Guest Account"}</p>
-              <p className="text-[13px] text-slate-500 dark:text-slate-400">{user ? "Log out" : "Click to sign in"}</p>
-            </div>
-          </div>
+        
         </aside>
 
         {/* CENTER COLUMN: The Feed */}
@@ -405,7 +410,20 @@ export default function Home() {
 
         {/* RIGHT COLUMN: Trending & Active Campaigns */}
         <aside className="hidden lg:block w-[350px] pl-8 py-6 sticky top-0 h-screen overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          
+          {/* TOP RIGHT PROFILE WIDGET */}
+          <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-4 mb-6 border border-slate-100 dark:border-slate-800/60 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 text-sm">
+              {user ? user.displayName?.charAt(0) : "?"}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-[15px] leading-tight text-slate-900 dark:text-slate-100 truncate">{user ? user.displayName : "Guest Mode"}</p>
+              {user ? (
+                <button onClick={handleLogout} className="text-[12px] text-red-500 hover:text-red-600 font-bold mt-0.5 transition">Log out</button>
+              ) : (
+                <button onClick={handleLogin} className="text-[12px] text-indigo-500 hover:text-indigo-600 font-bold mt-0.5 transition">Sign in securely</button>
+              )}
+            </div>
+          </div>
           <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-5 mb-6 border border-slate-100 dark:border-slate-800/60">
             <h2 className="text-[17px] font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
               ✨ Trending Insights
