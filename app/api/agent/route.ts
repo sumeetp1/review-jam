@@ -3,7 +3,6 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 
-// Initialize the Gemini API Brain
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 const MODEL_CANDIDATES = [
   process.env.GEMINI_MODEL,
@@ -18,7 +17,7 @@ type ReviewAnalysis = {
   marketingQuote: string;
 };
 
-function reject(reason: string) {
+function reject(reason: string): ReviewAnalysis {
   return { isGenuine: false, reason, marketingQuote: "" };
 }
 
@@ -42,14 +41,12 @@ function runDeterministicChecks(reviewContent: string): ReviewAnalysis | null {
     return reject("Review contains keyboard mashing or repeated gibberish.");
   }
 
-  // Very low unique-word ratio often indicates generic junk or repeated text.
   const uniqueRatio = new Set(words.map((w) => w.toLowerCase())).size / words.length;
   if (words.length >= 10 && uniqueRatio < 0.45) {
     return reject("Review appears repetitive and low-quality.");
   }
 
-  const hasLetters = /[a-z]/i.test(normalized);
-  if (!hasLetters) {
+  if (!/[a-z]/i.test(normalized)) {
     return reject("Review must contain readable text feedback.");
   }
 
@@ -119,17 +116,13 @@ async function generateWithFallbackModel(prompt: string) {
     try {
       const model = genAI.getGenerativeModel({
         model: modelName,
-        generationConfig: {
-          responseMimeType: "application/json",
-        },
+        generationConfig: { responseMimeType: "application/json" },
       });
       const result = await model.generateContent(prompt);
       return result.response.text().trim();
     } catch (error) {
       lastError = error;
-      if (isModelNotFoundError(error)) {
-        continue;
-      }
+      if (isModelNotFoundError(error)) continue;
       throw error;
     }
   }
@@ -139,7 +132,20 @@ async function generateWithFallbackModel(prompt: string) {
 
 export async function POST(req: Request) {
   try {
-    const { reviewContent, reviewerName } = await req.json();
+    const body = await req.json();
+    const {
+      reviewContent,
+      reviewerName,
+      pros,
+      cons,
+      summary,
+    }: {
+      reviewContent: string;
+      reviewerName?: string;
+      pros?: string[];
+      cons?: string[];
+      summary?: string;
+    } = body;
 
     if (typeof reviewContent !== "string" || !reviewContent.trim()) {
       return NextResponse.json({ error: "Review content is required" }, { status: 400 });
@@ -163,40 +169,52 @@ export async function POST(req: Request) {
       );
     }
 
-    // The Ruthless System Prompt
+    // Build structured context for AI from all review fields
+    const prosText = pros && pros.length > 0 ? `Pros: ${pros.join(", ")}` : "";
+    const consText = cons && cons.length > 0 ? `Cons: ${cons.join(", ")}` : "";
+    const summaryText = summary ? `Headline: "${summary}"` : "";
+    const structuredContext = [summaryText, prosText, consText]
+      .filter(Boolean)
+      .join("\n");
+
     const systemInstruction = `
-    You are a ruthless, highly strict Quality Control Agent for a product review platform. Your job is to analyze incoming reviews and filter out spam.
+You are a strict Quality Control Agent for a product review marketplace. Your job is to assess whether a review is genuine, helpful, and from real product experience.
 
-    You MUST return a JSON object with this exact structure:
-    {
-      "isGenuine": boolean,
-      "reason": "string",
-      "marketingQuote": "string"
-    }
+You MUST return a JSON object with this exact structure:
+{
+  "isGenuine": boolean,
+  "reason": "string",
+  "marketingQuote": "string"
+}
 
-    RULES FOR REJECTION (Set isGenuine to false):
-    1. If the text contains keyboard mashing (e.g., "asdfg", "qwerty").
-    2. If the user explicitly states it is a test, fake, dummy, or trial review.
-    3. If the review is less than 3 words long.
-    4. If the text is completely unrelated to evaluating a product or service.
+RULES FOR REJECTION (set isGenuine to false):
+1. Keyboard mashing or gibberish text.
+2. Explicit admission it is a test, fake, dummy, or trial review.
+3. Review is completely unrelated to any real product experience.
+4. Pure promotional text with no personal experience or opinion.
+5. Contradictions between the headline, pros/cons, and main text that suggest the reviewer didn't use the product.
 
-    If rejected, provide a stern "reason" (e.g., "Review contains keyboard mashing and lacks genuine feedback.") and leave the marketingQuote empty.
-    If accepted, set isGenuine to true, leave reason empty, and extract a compelling 5-10 word "marketingQuote" from their text.
-    `;
+APPROVAL CRITERIA:
+- Personal first-hand experience with the product is evident.
+- The review is helpful to a buyer even if negative.
+- Pros/cons (if provided) align with the main review text.
 
-    // Constructing the final prompt
+If rejected: set isGenuine to false, write a clear stern reason, leave marketingQuote empty.
+If approved: set isGenuine to true, leave reason empty, and use the headline (if provided) as the marketingQuote. If no headline is provided, extract a compelling 5-12 word quote from the review text.
+    `.trim();
+
     const prompt = `
-    ${systemInstruction}
-    
-    Reviewer Name: ${reviewerName || "Anonymous"}
-    Review Content: "${reviewContent}"
-    
-    Analyze this review and return the JSON.
-    `;
+${systemInstruction}
 
-    // Wake up the AI and get the response
+Reviewer: ${reviewerName || "Anonymous"}
+${structuredContext ? `\n${structuredContext}` : ""}
+Full Review: "${reviewContent}"
+
+Analyze and return JSON.
+    `.trim();
+
     const responseText = await generateWithFallbackModel(prompt);
-    
+
     const parsedRaw = tryParseJsonObject(responseText);
     if (!parsedRaw || typeof parsedRaw !== "object") {
       return NextResponse.json(
@@ -213,6 +231,11 @@ export async function POST(req: Request) {
       );
     }
 
+    // If summary was provided and review is genuine, use it as the marketing quote
+    if (analysis.isGenuine && summary && summary.trim().length >= 10) {
+      analysis.marketingQuote = summary.trim();
+    }
+
     await logModerationEvent({
       reviewerName,
       reviewContent,
@@ -220,14 +243,13 @@ export async function POST(req: Request) {
       source: "ai",
     });
 
-    // Send it back to the frontend!
     return NextResponse.json({ success: true, analysis });
 
   } catch (error) {
     console.error("AI Agent Error:", error);
-    return NextResponse.json({ 
-      success: false, 
-      error: "Failed to process review with AI." 
-    }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: "Failed to process review with AI." },
+      { status: 500 }
+    );
   }
 }
