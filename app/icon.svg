@@ -5,7 +5,7 @@
       <stop offset="1" stop-color="#7C3AED"/>
     </linearGradient>
   </defs>
-  <rect x="24" y="24" width="208" height="208" rx="56" fill="url(#iconGradient)"/>
-  <path d="M72 132L107 167L180 94" stroke="white" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M145 156H174C184.5 156 193 164.5 193 175C193 185.5 184.5 194 174 194H133C122.5 194 114 185.5 114 175C114 167.5 118.2 161 124.3 157.7" fill="white" fill-opacity="0.2"/>
+  <rect x="16" y="16" width="224" height="224" rx="56" fill="url(#iconGradient)"/>
+  <!-- Star: represents reviews/ratings -->
+  <polygon points="128,44 150,97 208,101 164,140 179,196 128,163 77,196 92,140 48,101 106,97" fill="white"/>
 </svg>
