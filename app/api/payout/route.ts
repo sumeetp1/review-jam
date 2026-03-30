@@ -1,66 +1,91 @@
 import { NextResponse } from "next/server";
-import { collection, getDocs, query, where, doc, updateDoc, increment } from "firebase/firestore";
-// Adjust this import path if your firebase.ts is located elsewhere
-import { db } from "../../../lib/firebase"; 
+import {
+  collection, getDocs, query, where,
+  doc, updateDoc, increment, addDoc,
+} from "firebase/firestore";
+import { db } from "../../../lib/firebase";
+
+// Reviews with photos contribute 1.5× their likes weight
+const PHOTO_MULTIPLIER = 1.5;
 
 export async function POST(req: Request) {
   try {
-    // 1. Receive the dynamic inputs from the Admin Panel
     const { campaignId, budget } = await req.json();
 
     if (!campaignId || !budget) {
-      return NextResponse.json({ success: false, error: "Missing Campaign ID or Budget" }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: "Missing Campaign ID or Budget" },
+        { status: 400 }
+      );
     }
 
-    // 2. Fetch all reviews tied to this specific campaign
     const q = query(collection(db, "reviews"), where("campaignId", "==", campaignId));
     const snapshot = await getDocs(q);
-    
-    // The famous TypeScript 'any[]' fix!
-    const reviews: any[] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const reviews: any[] = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
 
     if (reviews.length === 0) {
       return NextResponse.json({ success: false, error: "No reviews found for this campaign." });
     }
 
-    // 3. Calculate the Total Market Cap of Likes
-    let totalLikes = 0;
-    reviews.forEach(review => {
-      totalLikes += (review.likesCount || 0);
-    });
+    // Compute weighted likes — photos get 1.5× multiplier
+    const weightedLikes = (r: any) => {
+      const hasPhoto = r.mediaUrls && r.mediaUrls.length > 0;
+      return (r.likesCount || 0) * (hasPhoto ? PHOTO_MULTIPLIER : 1);
+    };
 
-    if (totalLikes === 0) {
-      return NextResponse.json({ success: false, error: "No likes on any reviews. Cannot distribute funds." });
+    const totalWeight = reviews.reduce((sum, r) => sum + weightedLikes(r), 0);
+
+    if (totalWeight === 0) {
+      return NextResponse.json({
+        success: false,
+        error: "No likes on any reviews. Cannot distribute funds.",
+      });
     }
 
-    // 4. Distribute the Pool Proportionally
+    const paidAt = new Date().toISOString();
     let payoutsMade = 0;
+
     for (const review of reviews) {
-      const likes = review.likesCount || 0;
-      
-      // Only pay users who actually got likes
-      if (likes > 0 && review.reviewerId) {
-        // The Math: (User's Likes / Total Likes) * Total Budget
-        const userShare = (likes / totalLikes) * budget;
-        
-        // Securely increment the user's wallet in Firebase
-        const userRef = doc(db, "users", review.reviewerId);
-        await updateDoc(userRef, {
-          walletBalance: increment(userShare)
+      const wt = weightedLikes(review);
+      if (wt > 0 && review.reviewerId) {
+        const share = (wt / totalWeight) * budget;
+
+        // Update wallet balance
+        await updateDoc(doc(db, "users", review.reviewerId), {
+          walletBalance: increment(share),
+          totalEarned: increment(share),
         });
-        
+
+        // Create a ledger entry so the reviewer can see the breakdown
+        await addDoc(collection(db, "payoutLedger"), {
+          userId: review.reviewerId,
+          reviewerName: review.reviewerName || "Anonymous",
+          reviewId: review.id,
+          campaignId,
+          productName: review.productName || "",
+          productId: review.productId || "",
+          amount: share,
+          rawLikes: review.likesCount || 0,
+          weightedLikes: wt,
+          hasPhoto: !!(review.mediaUrls && review.mediaUrls.length > 0),
+          status: "paid",
+          paidAt,
+        });
+
         payoutsMade++;
       }
     }
 
-    // 5. Send the success receipt back to the Admin Panel
-    return NextResponse.json({ 
-      success: true, 
-      message: `Distributed $${budget} across ${payoutsMade} reviewers!` 
+    return NextResponse.json({
+      success: true,
+      message: `Distributed $${Number(budget).toFixed(2)} across ${payoutsMade} reviewer${payoutsMade !== 1 ? "s" : ""}!`,
     });
 
   } catch (error) {
     console.error("Payout API Error:", error);
-    return NextResponse.json({ success: false, error: "Internal Server Error during payout." }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: "Internal Server Error during payout." },
+      { status: 500 }
+    );
   }
 }

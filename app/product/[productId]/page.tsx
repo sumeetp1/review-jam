@@ -10,6 +10,7 @@ import {
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { db, auth, storage } from "../../../lib/firebase";
+import { updateUserBadges } from "../../../lib/badges";
 import ReviewWizard, { ReviewFormData } from "../../components/ReviewWizard";
 import ReviewCard from "../../components/ReviewCard";
 
@@ -143,6 +144,7 @@ export default function ProductPage() {
     const docRef = await addDoc(collection(db, "reviews"), newReview);
     setReviews((prev) => [{ id: docRef.id, ...newReview }, ...prev]);
     setHasAlreadyReviewed(true);
+    updateUserBadges(user.uid).catch(() => {});
   };
 
   const handleLike = async (reviewId: string, likedBy: string[] = []) => {
@@ -162,6 +164,38 @@ export default function ProductPage() {
     await updateDoc(reviewRef, {
       likesCount: increment(hasLiked ? -1 : 1),
       likedBy: hasLiked ? arrayRemove(user.uid) : arrayUnion(user.uid),
+    });
+  };
+
+  const handleHelpful = async (reviewId: string, helpfulBy: string[] = []) => {
+    if (!user) return;
+    const has = helpfulBy.includes(user.uid);
+    setReviews((cur) =>
+      cur.map((r) =>
+        r.id !== reviewId ? r : has
+          ? { ...r, helpfulCount: Math.max(0, (r.helpfulCount || 0) - 1), helpfulBy: (r.helpfulBy || []).filter((id: string) => id !== user.uid) }
+          : { ...r, helpfulCount: (r.helpfulCount || 0) + 1, helpfulBy: [...(r.helpfulBy || []), user.uid] }
+      )
+    );
+    await updateDoc(doc(db, "reviews", reviewId), {
+      helpfulCount: increment(has ? -1 : 1),
+      helpfulBy: has ? arrayRemove(user.uid) : arrayUnion(user.uid),
+    });
+  };
+
+  const handleNotHelpful = async (reviewId: string, notHelpfulBy: string[] = []) => {
+    if (!user) return;
+    const has = notHelpfulBy.includes(user.uid);
+    setReviews((cur) =>
+      cur.map((r) =>
+        r.id !== reviewId ? r : has
+          ? { ...r, notHelpfulCount: Math.max(0, (r.notHelpfulCount || 0) - 1), notHelpfulBy: (r.notHelpfulBy || []).filter((id: string) => id !== user.uid) }
+          : { ...r, notHelpfulCount: (r.notHelpfulCount || 0) + 1, notHelpfulBy: [...(r.notHelpfulBy || []), user.uid] }
+      )
+    );
+    await updateDoc(doc(db, "reviews", reviewId), {
+      notHelpfulCount: increment(has ? -1 : 1),
+      notHelpfulBy: has ? arrayRemove(user.uid) : arrayUnion(user.uid),
     });
   };
 
@@ -269,7 +303,10 @@ export default function ProductPage() {
                 key={review.id}
                 review={review}
                 currentUserId={user?.uid}
+                currentUserName={user?.displayName ?? undefined}
                 onLike={handleLike}
+                onHelpful={handleHelpful}
+                onNotHelpful={handleNotHelpful}
                 showPoolLink={false}
               />
             ))
