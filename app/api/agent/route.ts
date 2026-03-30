@@ -50,14 +50,32 @@ function runDeterministicChecks(reviewContent: string): ReviewAnalysis | null {
   return null;
 }
 
-function isValidAnalysis(payload: unknown): payload is ReviewAnalysis {
-  if (!payload || typeof payload !== "object") return false;
-  const maybe = payload as Record<string, unknown>;
-  return (
-    typeof maybe.isGenuine === "boolean" &&
-    typeof maybe.reason === "string" &&
-    typeof maybe.marketingQuote === "string"
-  );
+function normalizeAnalysis(raw: Record<string, unknown>): ReviewAnalysis | null {
+  if (typeof raw.isGenuine !== "boolean") return null;
+  const str = (v: unknown) =>
+    typeof v === "string" ? v : v == null ? "" : String(v);
+  return {
+    isGenuine: raw.isGenuine,
+    reason: str(raw.reason),
+    marketingQuote: str(raw.marketingQuote),
+  };
+}
+
+function tryParseJsonObject(text: string): unknown {
+  const trimmed = text.trim();
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    const fence = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if (fence?.[1]) {
+      try {
+        return JSON.parse(fence[1].trim());
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
 }
 
 async function logModerationEvent(args: {
@@ -151,28 +169,21 @@ export async function POST(req: Request) {
     const result = await model.generateContent(prompt);
     const responseText = result.response.text().trim();
     
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(responseText);
-    } catch {
+    const parsedRaw = tryParseJsonObject(responseText);
+    if (!parsedRaw || typeof parsedRaw !== "object") {
       return NextResponse.json(
         { success: false, error: "Invalid moderation response format from AI." },
         { status: 502 }
       );
     }
 
-    if (!isValidAnalysis(parsed)) {
+    const analysis = normalizeAnalysis(parsedRaw as Record<string, unknown>);
+    if (!analysis) {
       return NextResponse.json(
         { success: false, error: "Incomplete moderation response from AI." },
         { status: 502 }
       );
     }
-
-    const analysis: ReviewAnalysis = {
-      isGenuine: parsed.isGenuine,
-      reason: parsed.reason,
-      marketingQuote: parsed.marketingQuote,
-    };
 
     await logModerationEvent({
       reviewerName,

@@ -139,7 +139,11 @@ export default function Home() {
       const agentData = await agentResponse.json();
 
       if (!agentResponse.ok || !agentData?.success || !agentData?.analysis) {
-        alert("Unable to validate this review right now. Please try again.");
+        const serverMsg =
+          typeof agentData?.error === "string" && agentData.error.trim()
+            ? agentData.error
+            : "Unable to validate this review right now. Please try again.";
+        alert(serverMsg);
         setIsSubmitting(false);
         return;
       }
