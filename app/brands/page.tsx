@@ -36,69 +36,66 @@ export default function BrandsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-900 text-white font-sans selection:bg-indigo-500">
-      <nav className="border-b border-slate-800 px-10 py-6 flex justify-between items-center">
-        <Link href="/">
-          <h1 className="text-2xl font-black text-white tracking-tight leading-none hover:text-indigo-400 transition">
-            Review Jam <span className="text-indigo-500">for Brands</span>
-          </h1>
+    <main className="min-h-screen bg-slate-950 text-slate-200 font-sans antialiased">
+      <nav className="border-b border-slate-800/80 px-4 sm:px-8 py-3 flex justify-between items-center max-w-5xl mx-auto">
+        <Link href="/" className="text-sm font-semibold text-white hover:text-slate-300 transition">
+          Review Jam <span className="text-slate-500 font-medium">/ Brands</span>
         </Link>
-        <Link href="/" className="text-sm font-bold text-slate-400 hover:text-white transition">
-          ← Back to Marketplace
+        <Link href="/" className="text-sm font-medium text-slate-400 hover:text-white transition">
+          ← Home
         </Link>
       </nav>
 
-      <div className="max-w-4xl mx-auto px-6 py-20 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+      <div className="max-w-5xl mx-auto px-4 sm:px-8 py-12 md:py-16 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-start">
         <div>
-          <h2 className="text-5xl font-black mb-6 leading-tight">Get genuine reviews from real users.</h2>
-          <p className="text-slate-400 text-lg mb-8 leading-relaxed">
-            Stop hoping for organic feedback. Launch a reward pool on Review Jam and get high-quality, AI-verified reviews for your product in hours, not months. You only pay for performance.
+          <h2 className="text-2xl sm:text-3xl font-semibold text-white mb-4 leading-snug tracking-tight">Real reviews from real users.</h2>
+          <p className="text-slate-400 text-[15px] mb-6 leading-relaxed">
+            Launch a reward pool and collect AI-checked reviews fast. Pay for performance, not noise.
           </p>
-          <ul className="space-y-4 font-bold text-slate-300">
-            <li className="flex items-center gap-3"><span className="text-green-400">✓</span> AI Quality Control filters out spam</li>
-            <li className="flex items-center gap-3"><span className="text-green-400">✓</span> Pay only for community-liked reviews</li>
-            <li className="flex items-center gap-3"><span className="text-green-400">✓</span> Shareable URLs for your customers</li>
+          <ul className="space-y-3 text-[15px] text-slate-300 font-normal">
+            <li className="flex items-start gap-2"><span className="text-emerald-500 shrink-0">✓</span> Automated quality checks reduce spam</li>
+            <li className="flex items-start gap-2"><span className="text-emerald-500 shrink-0">✓</span> Reward engagement that resonates</li>
+            <li className="flex items-start gap-2"><span className="text-emerald-500 shrink-0">✓</span> Shareable campaign links</li>
           </ul>
         </div>
 
-        <div className="bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl">
+        <div className="bg-slate-900/80 p-6 rounded-xl border border-slate-800">
           {isSuccess ? (
-            <div className="text-center py-10">
-              <div className="text-5xl mb-4">🎉</div>
-              <h3 className="text-2xl font-black mb-2">Application Received!</h3>
-              <p className="text-slate-400">Our team will email you within 24 hours to set up your campaign.</p>
+            <div className="text-center py-8">
+              <h3 className="text-lg font-semibold text-white mb-2">Thanks — we received your request</h3>
+              <p className="text-sm text-slate-400 leading-relaxed">We will follow up by email within one business day.</p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <h3 className="text-xl font-black mb-4">Launch a Campaign</h3>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-1">Get started</h3>
               <div>
-                <label className="block text-sm font-bold text-slate-400 mb-2">Company / Product Name</label>
-                <input type="text" required value={companyName} onChange={e => setCompanyName(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none" />
+                <label className="block text-xs font-medium text-slate-500 mb-1.5">Company or product</label>
+                <input type="text" required value={companyName} onChange={e => setCompanyName(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-slate-600" />
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-400 mb-2">Work Email</label>
-                <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none" />
+                <label className="block text-xs font-medium text-slate-500 mb-1.5">Work email</label>
+                <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-slate-600" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-bold text-slate-400 mb-2">Budget ($)</label>
-                  <select value={budget} onChange={e => setBudget(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                  <label className="block text-xs font-medium text-slate-500 mb-1.5">Budget ($)</label>
+                  <select value={budget} onChange={e => setBudget(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-slate-600">
                     <option value="500">$500</option>
                     <option value="1000">$1,000</option>
                     <option value="5000">$5,000</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-slate-400 mb-2">Duration</label>
-                  <select value={duration} onChange={e => setDuration(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                    <option value="3">3 Days</option>
-                    <option value="7">7 Days</option>
-                    <option value="14">14 Days</option>
+                  <label className="block text-xs font-medium text-slate-500 mb-1.5">Duration</label>
+                  <select value={duration} onChange={e => setDuration(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-slate-600">
+                    <option value="3">3 days</option>
+                    <option value="7">7 days</option>
+                    <option value="14">14 days</option>
                   </select>
                 </div>
               </div>
-              <button type="submit" disabled={isSubmitting} className="w-full bg-indigo-600 text-white py-4 rounded-xl font-black text-lg hover:bg-indigo-500 transition disabled:opacity-50 mt-4">
-                {isSubmitting ? "Submitting..." : "Request Access"}
+              <button type="submit" disabled={isSubmitting} className="w-full bg-white text-slate-950 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-200 transition disabled:opacity-50 mt-2">
+                {isSubmitting ? "Sending…" : "Request access"}
               </button>
             </form>
           )}

@@ -82,69 +82,64 @@ export default function ProfilePage() {
   };
 
   if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center bg-gray-50">Loading profile...</div>;
+    return <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950 text-sm text-slate-500">Loading…</div>;
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-10">
-        <h2 className="text-2xl font-bold mb-4">Please log in to view your profile</h2>
-        <Link href="/" className="text-blue-600 hover:underline font-bold">Go back Home</Link>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-slate-950 p-8">
+        <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 mb-2">Sign in to view your profile</h2>
+        <Link href="/" className="text-sm text-slate-600 dark:text-slate-400 hover:underline">← Home</Link>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200">
       
-      {/* Simple Navigation */}
-      <nav className="bg-white border-b border-gray-200 px-10 py-4 flex justify-between items-center">
-        <Link href="/">
-          <h1 className="text-2xl font-black text-blue-600 tracking-tight hover:opacity-80 transition">
-            ← Back to Market
-          </h1>
+      <nav className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-8 py-3 flex justify-between items-center max-w-2xl mx-auto md:max-w-3xl">
+        <Link href="/" className="text-sm font-medium text-slate-900 dark:text-slate-100 hover:underline">
+          ← Home
         </Link>
-        <button onClick={handleLogout} className="text-sm bg-red-50 text-red-600 px-4 py-2 rounded-full hover:bg-red-100 transition font-bold">
-          Sign Out
+        <button type="button" onClick={handleLogout} className="text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 px-2 py-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-900">
+          Sign out
         </button>
       </nav>
 
-      <div className="max-w-3xl mx-auto p-10 space-y-8">
+      <div className="max-w-2xl md:max-w-3xl mx-auto px-4 sm:px-8 py-8 space-y-6">
         
-        {/* User Header */}
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 flex items-center gap-6">
-          <div className="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-3xl font-bold">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-4">
+          <div className="w-14 h-14 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-full flex items-center justify-center text-lg font-medium">
             {user.displayName?.charAt(0) || "U"}
           </div>
-          <div>
-            <h2 className="text-3xl font-bold text-gray-900">{user.displayName}</h2>
-            <p className="text-gray-500">{user.email}</p>
+          <div className="min-w-0">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 truncate">{user.displayName}</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-500 truncate">{user.email}</p>
           </div>
         </div>
 
-        {/* The Wallet / Earnings Component */}
-        <div className="bg-gradient-to-br from-green-500 to-emerald-700 p-8 rounded-2xl shadow-lg text-white">
-          <h3 className="text-green-100 font-medium uppercase tracking-wider mb-2">Available Balance</h3>
-          <p className="text-6xl font-black mb-4">${walletBalance.toFixed(2)}</p>
-          <p className="text-sm text-green-100 bg-black/20 inline-block px-3 py-1 rounded">
-            Funds are deposited automatically when campaigns end.
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800">
+          <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wide mb-1">Balance</h3>
+          <p className="text-3xl font-semibold tabular-nums text-slate-900 dark:text-slate-100">${walletBalance.toFixed(2)}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-500 mt-2 leading-relaxed">
+            Payouts are credited when campaigns close.
           </p>
         </div>
 
-        {/* Interests Editor */}
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
-          <h3 className="text-xl font-bold text-gray-900 mb-2">My Interests</h3>
-          <p className="text-gray-500 mb-6">Update what you want to see on your personalized feed.</p>
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1">Feed interests</h3>
+          <p className="text-sm text-slate-500 dark:text-slate-500 mb-4">Used to personalize your default feed.</p>
           
-          <div className="flex flex-wrap gap-3 mb-8">
+          <div className="flex flex-wrap gap-2 mb-6">
             {AVAILABLE_CATEGORIES.map(cat => (
               <button 
                 key={cat}
+                type="button"
                 onClick={() => toggleInterest(cat)}
-                className={`px-4 py-2 rounded-full font-semibold border-2 transition-colors ${
+                className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
                   interests.includes(cat) 
-                    ? "bg-blue-600 text-white border-blue-600" 
-                    : "bg-gray-50 text-gray-600 border-gray-200 hover:border-blue-300"
+                    ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100" 
+                    : "bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-600"
                 }`}
               >
                 {cat}
@@ -152,16 +147,17 @@ export default function ProfilePage() {
             ))}
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 flex-wrap">
             <button 
+              type="button"
               onClick={handleSaveInterests}
               disabled={isSaving}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-50"
+              className="bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-sm font-medium px-4 py-2 rounded-lg hover:opacity-90 transition disabled:opacity-50"
             >
-              {isSaving ? "Saving..." : "Save Changes"}
+              {isSaving ? "Saving…" : "Save"}
             </button>
             {saveMessage && (
-              <span className="text-green-600 font-medium">{saveMessage}</span>
+              <span className="text-sm text-emerald-600 dark:text-emerald-500">{saveMessage}</span>
             )}
           </div>
         </div>

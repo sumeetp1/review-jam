@@ -65,9 +65,18 @@ export default function ProductPage() {
     });
     const agentData = await agentResponse.json();
 
-    if (agentData.analysis && agentData.analysis.isGenuine === false) {
-      alert(`Rejected by AI Quality Control: ${agentData.analysis.reason}`);
-      return; 
+    if (!agentResponse.ok || !agentData?.success || !agentData?.analysis) {
+      const serverMsg =
+        typeof agentData?.error === "string" && agentData.error.trim()
+          ? agentData.error
+          : "Unable to validate this review right now. Please try again.";
+      alert(serverMsg);
+      return;
+    }
+
+    if (agentData.analysis.isGenuine !== true) {
+      alert(`Rejected by AI Quality Control: ${agentData.analysis.reason || "Review quality check failed."}`);
+      return;
     }
 
     // Save genuine review with the Product ID attached
@@ -116,76 +125,80 @@ export default function ProductPage() {
     });
   }
 
-  if (isLoading) return <div className="p-10 text-center">Loading product data...</div>;
-  if (!product) return <div className="p-10 text-center text-red-500">Product not found.</div>;
+  if (isLoading) return <div className="min-h-[40vh] flex items-center justify-center text-sm text-slate-500 dark:text-slate-500 bg-white dark:bg-slate-950">Loading…</div>;
+  if (!product) return <div className="p-8 text-center text-sm text-red-600 dark:text-red-400 bg-white dark:bg-slate-950">Product not found.</div>;
 
   return (
-    <main className="min-h-screen bg-gray-50 p-10">
-      <div className="max-w-3xl mx-auto">
+    <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200">
+      <div className="max-w-xl mx-auto border-x border-slate-200/80 dark:border-slate-800 min-h-screen">
         
-        {/* Product Header Card */}
-        <div className="bg-blue-600 text-white p-8 rounded-lg shadow-lg mb-8">
-          <p className="text-blue-200 text-sm font-bold tracking-wider uppercase mb-1">{product.category}</p>
-          <h1 className="text-4xl font-bold mb-2">{product.name}</h1>
-          <p className="text-blue-100 text-lg">by {product.brandName}</p>
-          <div className="mt-4 inline-block bg-white text-blue-800 px-4 py-1 rounded-full text-sm font-bold">
-            💰 Active Reward Campaign
-          </div>
+        <div className="px-4 py-4 border-b border-slate-200/80 dark:border-slate-800">
+          <p className="text-[11px] font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wide mb-1">{product.category}</p>
+          <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100 leading-snug">{product.name}</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-500 mt-0.5">{product.brandName}</p>
+          <span className="inline-block mt-3 text-[11px] font-medium text-emerald-800 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded">
+            Active pool
+          </span>
         </div>
 
-        {/* Review Form */}
         {user ? (
-          <form onSubmit={handleSubmitReview} className="bg-white p-6 rounded-lg shadow-md border border-gray-200 mb-8">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">Write a Review for {product.name}</h2>
+          <form onSubmit={handleSubmitReview} className="p-4 border-b border-slate-200/80 dark:border-slate-800">
+            <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-3">Write a review</h2>
             <textarea
               value={newReviewText}
               onChange={(e) => setNewReviewText(e.target.value)}
-              placeholder="What did you think about this product?"
-              className="w-full border border-gray-300 rounded p-3 mb-4 h-24 text-black"
+              placeholder="What stood out?"
+              className="w-full border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 mb-3 h-24 text-sm bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 dark:focus:ring-slate-600"
               required
             />
-            <div className="flex justify-between items-center">
-              <select value={newRating} onChange={(e) => setNewRating(Number(e.target.value))} className="border border-gray-300 rounded p-1 text-black">
-                {[5, 4, 3, 2, 1].map(num => <option key={num} value={num}>{num} Stars</option>)}
+            <div className="flex justify-between items-center gap-3">
+              <select value={newRating} onChange={(e) => setNewRating(Number(e.target.value))} className="border border-slate-200 dark:border-slate-800 rounded-lg px-2 py-1.5 text-sm bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+                {[5, 4, 3, 2, 1].map(num => <option key={num} value={num}>{num} ★</option>)}
               </select>
-              <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded shadow hover:bg-green-700">Submit Review</button>
+              <button type="submit" className="text-sm font-medium bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-4 py-2 rounded-full hover:opacity-90">Post</button>
             </div>
           </form>
         ) : (
-          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 mb-8 text-center">
-            <p className="text-gray-600">Please log in to write a review and participate in the campaign.</p>
+          <div className="p-4 border-b border-slate-200/80 dark:border-slate-800 text-center">
+            <p className="text-sm text-slate-500 dark:text-slate-500">Sign in to post a review.</p>
           </div>
         )}
         
-        {/* Reviews Feed */}
-        <div className="space-y-4">
-          <h3 className="text-2xl font-bold text-gray-800 mb-4">Customer Reviews</h3>
+        <div className="divide-y divide-slate-200/80 dark:divide-slate-800">
+          <div className="px-4 py-3">
+            <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wide">Reviews</h3>
+          </div>
           {reviews.map((review) => {
             const hasLiked = user && review.likedBy?.includes(user.uid);
             return (
-              <div key={review.id} className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                <p className="text-gray-700 text-lg mb-2">"{review.content}"</p>
-                {review.reviewerName && <p className="text-sm text-gray-500 mb-4">- {review.reviewerName}</p>}
+              <div key={review.id} className="px-4 py-3 hover:bg-slate-50/80 dark:hover:bg-slate-900/40">
+                <div className="flex justify-between items-start gap-2 mb-1">
+                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{review.reviewerName || "Anonymous"}</p>
+                  <span className="text-xs text-amber-800 dark:text-amber-400/90 tabular-nums shrink-0">★ {review.rating}</span>
+                </div>
+                <p className="text-[15px] text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">{review.content}</p>
                 
                 {review.marketingQuote && (
-                  <div className="bg-blue-50 border-l-4 border-blue-500 p-3 my-3">
-                    <p className="text-sm text-blue-800 italic"><strong>AI Marketer:</strong> "{review.marketingQuote}"</p>
+                  <div className="mt-2 border-l border-slate-300 dark:border-slate-600 pl-2.5">
+                    <p className="text-[13px] text-slate-500 dark:text-slate-500">"{review.marketingQuote}"</p>
                   </div>
                 )}
                 
-                <div className="flex justify-between items-center border-t pt-4 mt-2 text-sm">
-                  <span className="font-semibold text-yellow-500">Rating: {review.rating} / 5</span>
+                <div className="flex justify-between items-center mt-3 text-[13px] text-slate-500 dark:text-slate-500">
                   <button 
+                    type="button"
                     onClick={() => handleLike(review.id, review.likedBy)}
-                    className={`flex items-center gap-1 px-3 py-1 rounded transition-colors ${hasLiked ? 'bg-blue-100 text-blue-700 font-bold' : 'bg-gray-100 hover:bg-blue-50 text-gray-600'}`}
+                    className={`font-medium rounded-md px-2 py-1 -ml-2 transition-colors ${hasLiked ? 'text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800' : 'hover:bg-slate-100 dark:hover:bg-slate-900'}`}
                   >
-                    {hasLiked ? '👍 Liked' : '👍 Like'} ({review.likesCount || 0})
+                    👍 {review.likesCount || 0}
                   </button>
                 </div>
               </div>
             );
           })}
-          {reviews.length === 0 && <p className="text-gray-500 italic">No reviews yet for {product.name}. Be the first!</p>}
+          {reviews.length === 0 && (
+            <p className="px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-500">No reviews yet.</p>
+          )}
         </div>
       </div>
     </main>
