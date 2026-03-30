@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link"; 
+import Image from "next/image";
 import { collection, getDocs, doc, getDoc, setDoc, addDoc } from "firebase/firestore";
 import { signInWithPopup, signOut, onAuthStateChanged, User } from "firebase/auth"; 
 import { db, auth, googleProvider } from "../lib/firebase";
@@ -250,7 +251,10 @@ export default function Home() {
 
       {/* MOBILE TOP NAVIGATION */}
       <nav className="md:hidden bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 px-4 h-14 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-indigo-600 dark:text-indigo-400 tracking-tight">Review Jam</h1>
+        <Link href="/" className="flex items-center gap-2">
+          <Image src="/logo.svg" alt="Review Jam" width={140} height={34} priority className="dark:hidden" />
+          <Image src="/logo-dark.svg" alt="Review Jam" width={140} height={34} priority className="hidden dark:block" />
+        </Link>
         {user ? (
           <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-semibold text-sm">{user.displayName?.charAt(0)}</div>
         ) : (
@@ -264,7 +268,8 @@ export default function Home() {
         {/* LEFT COLUMN: Fixed Navigation */}
         <aside className="hidden md:flex flex-col w-[275px] h-screen sticky top-0 border-r border-slate-100 dark:border-slate-800 p-4 pt-6 pr-8">
           <Link href="/" className="mb-8 px-4">
-            <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 tracking-tight">Review Jam</h1>
+            <Image src="/logo.svg" alt="Review Jam" width={180} height={44} priority className="dark:hidden" />
+            <Image src="/logo-dark.svg" alt="Review Jam" width={180} height={44} priority className="hidden dark:block" />
           </Link>
 
           <nav className="flex flex-col gap-1 mb-8">
