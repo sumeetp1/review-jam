@@ -138,10 +138,16 @@ export default function Home() {
       });
       const agentData = await agentResponse.json();
 
-      if (agentData.analysis && agentData.analysis.isGenuine === false) {
-        alert(`Rejected by AI Quality Control: ${agentData.analysis.reason}`);
+      if (!agentResponse.ok || !agentData?.success || !agentData?.analysis) {
+        alert("Unable to validate this review right now. Please try again.");
         setIsSubmitting(false);
-        return; 
+        return;
+      }
+
+      if (agentData.analysis.isGenuine !== true) {
+        alert(`Rejected by AI Quality Control: ${agentData.analysis.reason || "Review quality check failed."}`);
+        setIsSubmitting(false);
+        return;
       }
 
       const newReview = {

@@ -3,11 +3,25 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase";
 
 // REPLACE THIS WITH YOUR EXACT GOOGLE LOGIN EMAIL
 const ADMIN_EMAIL = "sumit.pandey75@gmail.com"; 
+
+type ModerationEvent = {
+  id: string;
+  reviewerName: string;
+  reviewPreview: string;
+  isGenuine: boolean;
+  reason: string;
+  marketingQuote?: string;
+  source: "deterministic" | "ai";
+  createdAt: string;
+};
+
+type DateRangeFilter = "24h" | "7d" | "30d" | "all";
+type SourceFilter = "all" | "deterministic" | "ai";
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<User | null>(null);
@@ -24,6 +38,10 @@ export default function AdminDashboard() {
   const [isCreating, setIsCreating] = useState(false);
   const [payoutCampId, setPayoutCampId] = useState("");
   const [payoutBudget, setPayoutBudget] = useState("");
+  const [moderationEvents, setModerationEvents] = useState<ModerationEvent[]>([]);
+  const [isLoadingModeration, setIsLoadingModeration] = useState(true);
+  const [dateRangeFilter, setDateRangeFilter] = useState<DateRangeFilter>("7d");
+  const [sourceFilter, setSourceFilter] = useState<SourceFilter>("all");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -32,6 +50,33 @@ export default function AdminDashboard() {
     });
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!user || user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase().trim()) return;
+
+    async function fetchModerationEvents() {
+      setIsLoadingModeration(true);
+      try {
+        const moderationQuery = query(
+          collection(db, "moderationEvents"),
+          orderBy("createdAt", "desc"),
+          limit(300)
+        );
+        const snapshot = await getDocs(moderationQuery);
+        const events = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as ModerationEvent[];
+        setModerationEvents(events);
+      } catch (error) {
+        console.error("Failed to load moderation events:", error);
+      } finally {
+        setIsLoadingModeration(false);
+      }
+    }
+
+    fetchModerationEvents();
+  }, [user]);
 
   if (isAuthLoading) return <div className="min-h-screen bg-slate-900 flex items-center justify-center text-slate-400 font-bold animate-pulse">Verifying Security Credentials...</div>;
   if (!user) return <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center text-white p-10"><p className="text-xl text-slate-400 mb-4">Please log in to access the Admin Dashboard.</p><Link href="/" className="bg-indigo-600 px-6 py-2 rounded-xl font-bold hover:bg-indigo-500 transition">Go Home to Login</Link></div>;
@@ -142,6 +187,78 @@ export default function AdminDashboard() {
     }
   }
 
+  const nowMs = Date.now();
+  const rangeToMs: Record<DateRangeFilter, number> = {
+    "24h": 24 * 60 * 60 * 1000,
+    "7d": 7 * 24 * 60 * 60 * 1000,
+    "30d": 30 * 24 * 60 * 60 * 1000,
+    all: Number.POSITIVE_INFINITY,
+  };
+
+  const filteredEvents = moderationEvents.filter((event) => {
+    const createdAtMs = Date.parse(event.createdAt || "");
+    const isWithinRange =
+      dateRangeFilter === "all" || (Number.isFinite(createdAtMs) && nowMs - createdAtMs <= rangeToMs[dateRangeFilter]);
+    const matchesSource = sourceFilter === "all" || event.source === sourceFilter;
+    return isWithinRange && matchesSource;
+  });
+
+  const blockedEvents = filteredEvents.filter((event) => event.isGenuine === false);
+  const reasonCounts = blockedEvents.reduce<Record<string, number>>((acc, event) => {
+    const key = event.reason?.trim() || "Unknown rejection reason";
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+  const topReasons = Object.entries(reasonCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8);
+  const approvalRate = filteredEvents.length
+    ? Math.round(((filteredEvents.length - blockedEvents.length) / filteredEvents.length) * 100)
+    : 0;
+
+  const handleExportModerationCsv = () => {
+    if (filteredEvents.length === 0) {
+      alert("No moderation rows available for the selected filters.");
+      return;
+    }
+
+    const escapeCsv = (value: string) => `"${String(value).replace(/"/g, '""')}"`;
+    const headers = [
+      "createdAt",
+      "reviewerName",
+      "source",
+      "isGenuine",
+      "reason",
+      "reviewPreview",
+      "marketingQuote",
+    ];
+    const rows = filteredEvents.map((event) =>
+      [
+        event.createdAt || "",
+        event.reviewerName || "Anonymous",
+        event.source || "",
+        String(event.isGenuine),
+        event.reason || "",
+        event.reviewPreview || "",
+        event.marketingQuote || "",
+      ]
+        .map(escapeCsv)
+        .join(",")
+    );
+
+    const csv = [headers.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const today = new Date().toISOString().slice(0, 10);
+    link.href = url;
+    link.setAttribute("download", `moderation-events-${dateRangeFilter}-${sourceFilter}-${today}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <main className="min-h-screen bg-slate-900 p-10 text-white font-sans">
       <div className="max-w-6xl mx-auto">
@@ -236,6 +353,131 @@ export default function AdminDashboard() {
             )}
           </div>
 
+        </div>
+
+        <div className="mt-8 bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h2 className="text-2xl font-bold mb-1">🛡️ Moderation Reason Dashboard</h2>
+              <p className="text-slate-400 text-sm">
+                Recent moderation outcomes from the `moderationEvents` stream.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                Loaded {moderationEvents.length}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row md:items-end gap-3 mb-6">
+            <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Date Range</label>
+              <select
+                value={dateRangeFilter}
+                onChange={(e) => setDateRangeFilter(e.target.value as DateRangeFilter)}
+                className="bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white outline-none"
+              >
+                <option value="24h">Last 24 hours</option>
+                <option value="7d">Last 7 days</option>
+                <option value="30d">Last 30 days</option>
+                <option value="all">All time</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Source</label>
+              <select
+                value={sourceFilter}
+                onChange={(e) => setSourceFilter(e.target.value as SourceFilter)}
+                className="bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white outline-none"
+              >
+                <option value="all">All sources</option>
+                <option value="deterministic">Deterministic checks</option>
+                <option value="ai">AI moderation</option>
+              </select>
+            </div>
+            <button
+              onClick={handleExportModerationCsv}
+              className="md:ml-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2.5 rounded-xl transition"
+            >
+              Export CSV
+            </button>
+          </div>
+
+          {isLoadingModeration ? (
+            <div className="text-slate-400 font-semibold animate-pulse">Loading moderation analytics...</div>
+          ) : moderationEvents.length === 0 ? (
+            <div className="text-slate-400">No moderation events yet. Submit some reviews to populate this dashboard.</div>
+          ) : filteredEvents.length === 0 ? (
+            <div className="text-slate-400">No events match the current date/source filters.</div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div className="bg-slate-900 border border-slate-700 rounded-2xl p-4">
+                  <p className="text-slate-400 text-xs font-bold uppercase">Total Checked</p>
+                  <p className="text-2xl font-black text-white mt-1">{filteredEvents.length}</p>
+                </div>
+                <div className="bg-slate-900 border border-slate-700 rounded-2xl p-4">
+                  <p className="text-slate-400 text-xs font-bold uppercase">Blocked</p>
+                  <p className="text-2xl font-black text-red-400 mt-1">{blockedEvents.length}</p>
+                </div>
+                <div className="bg-slate-900 border border-slate-700 rounded-2xl p-4">
+                  <p className="text-slate-400 text-xs font-bold uppercase">Approved</p>
+                  <p className="text-2xl font-black text-green-400 mt-1">{filteredEvents.length - blockedEvents.length}</p>
+                </div>
+                <div className="bg-slate-900 border border-slate-700 rounded-2xl p-4">
+                  <p className="text-slate-400 text-xs font-bold uppercase">Approval Rate</p>
+                  <p className="text-2xl font-black text-indigo-300 mt-1">{approvalRate}%</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-slate-900 border border-slate-700 rounded-2xl p-5">
+                  <h3 className="font-bold text-lg mb-4">Top Rejection Reasons</h3>
+                  {topReasons.length === 0 ? (
+                    <p className="text-slate-400 text-sm">No blocked reviews in this sample window.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {topReasons.map(([reason, count]) => (
+                        <div key={reason}>
+                          <div className="flex items-center justify-between text-sm mb-1">
+                            <p className="text-slate-300 font-medium truncate pr-3">{reason}</p>
+                            <p className="text-indigo-300 font-bold">{count}</p>
+                          </div>
+                          <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-indigo-500 rounded-full"
+                              style={{ width: `${Math.max(8, (count / blockedEvents.length) * 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-slate-900 border border-slate-700 rounded-2xl p-5">
+                  <h3 className="font-bold text-lg mb-4">Recent Blocked Reviews</h3>
+                  {blockedEvents.length === 0 ? (
+                    <p className="text-slate-400 text-sm">No blocked reviews yet.</p>
+                  ) : (
+                    <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                      {blockedEvents.slice(0, 12).map((event) => (
+                        <div key={event.id} className="border border-red-500/20 bg-red-900/10 rounded-xl p-3">
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="text-sm font-bold text-red-300">{event.reviewerName || "Anonymous"}</p>
+                            <p className="text-[11px] text-slate-500">{event.source}</p>
+                          </div>
+                          <p className="text-[13px] text-slate-300 mb-2 line-clamp-2">{event.reviewPreview}</p>
+                          <p className="text-[12px] font-semibold text-red-400">Reason: {event.reason}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </main>

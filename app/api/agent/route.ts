@@ -1,15 +1,110 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "../../../lib/firebase";
 
 // Initialize the Gemini API Brain
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+
+type ReviewAnalysis = {
+  isGenuine: boolean;
+  reason: string;
+  marketingQuote: string;
+};
+
+function reject(reason: string) {
+  return { isGenuine: false, reason, marketingQuote: "" };
+}
+
+function runDeterministicChecks(reviewContent: string): ReviewAnalysis | null {
+  const normalized = reviewContent.trim();
+  const words = normalized.split(/\s+/).filter(Boolean);
+  const lower = normalized.toLowerCase();
+
+  if (words.length < 6) {
+    return reject("Review is too short. Please add meaningful detail.");
+  }
+
+  const explicitFakePattern =
+    /\b(test|dummy|fake|sample|lorem ipsum|trial review|placeholder)\b/i;
+  if (explicitFakePattern.test(lower)) {
+    return reject("Review appears to be a test/dummy submission.");
+  }
+
+  const keyboardMashPattern = /(.)\1{5,}|(?:^|\s)(asdf|qwerty|zxcv|poiuy|lkjhg)(?:\s|$)/i;
+  if (keyboardMashPattern.test(lower)) {
+    return reject("Review contains keyboard mashing or repeated gibberish.");
+  }
+
+  // Very low unique-word ratio often indicates generic junk or repeated text.
+  const uniqueRatio = new Set(words.map((w) => w.toLowerCase())).size / words.length;
+  if (words.length >= 10 && uniqueRatio < 0.45) {
+    return reject("Review appears repetitive and low-quality.");
+  }
+
+  const hasLetters = /[a-z]/i.test(normalized);
+  if (!hasLetters) {
+    return reject("Review must contain readable text feedback.");
+  }
+
+  return null;
+}
+
+function isValidAnalysis(payload: unknown): payload is ReviewAnalysis {
+  if (!payload || typeof payload !== "object") return false;
+  const maybe = payload as Record<string, unknown>;
+  return (
+    typeof maybe.isGenuine === "boolean" &&
+    typeof maybe.reason === "string" &&
+    typeof maybe.marketingQuote === "string"
+  );
+}
+
+async function logModerationEvent(args: {
+  reviewerName?: string;
+  reviewContent: string;
+  analysis: ReviewAnalysis;
+  source: "deterministic" | "ai";
+}) {
+  try {
+    await addDoc(collection(db, "moderationEvents"), {
+      reviewerName: args.reviewerName || "Anonymous",
+      reviewPreview: args.reviewContent.slice(0, 280),
+      isGenuine: args.analysis.isGenuine,
+      reason: args.analysis.reason || "",
+      marketingQuote: args.analysis.marketingQuote || "",
+      source: args.source,
+      createdAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Failed to log moderation event:", error);
+  }
+}
 
 export async function POST(req: Request) {
   try {
     const { reviewContent, reviewerName } = await req.json();
 
-    if (!reviewContent) {
+    if (typeof reviewContent !== "string" || !reviewContent.trim()) {
       return NextResponse.json({ error: "Review content is required" }, { status: 400 });
+    }
+
+    const preCheckFailure = runDeterministicChecks(reviewContent);
+    if (preCheckFailure) {
+      await logModerationEvent({
+        reviewerName,
+        reviewContent,
+        analysis: preCheckFailure,
+        source: "deterministic",
+      });
+      return NextResponse.json({ success: true, analysis: preCheckFailure }, { status: 200 });
+    }
+
+    if (!process.env.GEMINI_API_KEY) {
+      return NextResponse.json(
+        { success: false, error: "AI moderation is unavailable. Try again later." },
+        { status: 503 }
+      );
     }
 
     // We use gemini-1.5-flash because it is lightning fast and perfect for JSON tasks
@@ -54,10 +149,37 @@ export async function POST(req: Request) {
 
     // Wake up the AI and get the response
     const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+    const responseText = result.response.text().trim();
     
-    // Parse the AI's string into an actual JSON object
-    const analysis = JSON.parse(responseText);
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(responseText);
+    } catch {
+      return NextResponse.json(
+        { success: false, error: "Invalid moderation response format from AI." },
+        { status: 502 }
+      );
+    }
+
+    if (!isValidAnalysis(parsed)) {
+      return NextResponse.json(
+        { success: false, error: "Incomplete moderation response from AI." },
+        { status: 502 }
+      );
+    }
+
+    const analysis: ReviewAnalysis = {
+      isGenuine: parsed.isGenuine,
+      reason: parsed.reason,
+      marketingQuote: parsed.marketingQuote,
+    };
+
+    await logModerationEvent({
+      reviewerName,
+      reviewContent,
+      analysis,
+      source: "ai",
+    });
 
     // Send it back to the frontend!
     return NextResponse.json({ success: true, analysis });
