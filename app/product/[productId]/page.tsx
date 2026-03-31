@@ -22,7 +22,7 @@ export default function ProductPage() {
   const [reviews, setReviews] = useState<any[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showReviewWizard, setShowReviewWizard] = useState(false);
+  const [reviewMode, setReviewMode] = useState<"campaign" | "verified" | "generic" | null>(null);
   const [hasAlreadyReviewed, setHasAlreadyReviewed] = useState(false);
 
   useEffect(() => {
@@ -67,7 +67,6 @@ export default function ProductPage() {
   const handleReviewSubmit = async (data: ReviewFormData) => {
     if (!user || !product) throw new Error("Missing user or product.");
 
-    // Duplicate guard — one review per user per campaign product
     if (hasAlreadyReviewed) {
       throw new Error("You have already submitted a review for this product.");
     }
@@ -79,40 +78,41 @@ export default function ProductPage() {
         for (const file of data.mediaFiles) {
           const fileRef = storageRef(storage, `reviews/${user.uid}/${Date.now()}_${file.name}`);
           await uploadBytes(fileRef, file);
-          const url = await getDownloadURL(fileRef);
-          mediaUrls.push(url);
+          mediaUrls.push(await getDownloadURL(fileRef));
         }
       } catch (err) {
         console.warn("Image upload failed, continuing without images:", err);
       }
     }
 
-    // AI validation
-    const agentResponse = await fetch("/api/agent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        reviewContent: data.content,
-        reviewerName: user.displayName,
-        pros: data.pros,
-        cons: data.cons,
-        summary: data.summary,
-      }),
-    });
-    const agentData = await agentResponse.json();
+    let marketingQuote = data.summary || "";
 
-    if (!agentResponse.ok || !agentData?.success || !agentData?.analysis) {
-      throw new Error(
-        typeof agentData?.error === "string" && agentData.error.trim()
-          ? agentData.error
-          : "Unable to validate this review right now. Please try again."
-      );
-    }
+    // Generic reviews skip AI validation and are not eligible for payouts
+    if (data.reviewType !== "generic") {
+      const agentResponse = await fetch("/api/agent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reviewContent: data.content,
+          reviewerName: user.displayName,
+          pros: data.pros,
+          cons: data.cons,
+          summary: data.summary,
+        }),
+      });
+      const agentData = await agentResponse.json();
 
-    if (agentData.analysis.isGenuine !== true) {
-      throw new Error(
-        `AI Quality Control: ${agentData.analysis.reason || "Review quality check failed."}`
-      );
+      if (!agentResponse.ok || !agentData?.success || !agentData?.analysis) {
+        throw new Error(
+          typeof agentData?.error === "string" && agentData.error.trim()
+            ? agentData.error
+            : "Unable to validate this review right now. Please try again."
+        );
+      }
+      if (agentData.analysis.isGenuine !== true) {
+        throw new Error(`AI Quality Control: ${agentData.analysis.reason || "Review quality check failed."}`);
+      }
+      marketingQuote = agentData.analysis?.marketingQuote || data.summary || "";
     }
 
     const newReview = {
@@ -126,8 +126,12 @@ export default function ProductPage() {
       campaignId: product.campaignId || "default",
       likesCount: 0,
       likedBy: [],
-      marketingQuote: agentData.analysis?.marketingQuote || data.summary || "",
-      // Structured fields
+      helpfulCount: 0,
+      helpfulBy: [],
+      notHelpfulCount: 0,
+      notHelpfulBy: [],
+      commentCount: 0,
+      marketingQuote,
       pros: data.pros,
       cons: data.cons,
       summary: data.summary,
@@ -137,14 +141,18 @@ export default function ProductPage() {
       subRatings: data.subRatings,
       bestFor: data.bestFor,
       mediaUrls,
-      isCampaignReview: true,
+      reviewType: data.reviewType,
+      productCode: data.productCode ?? null,
+      isCampaignReview: data.reviewType === "campaign",
+      // Generic reviews excluded from payout pool
+      eligibleForPayout: data.reviewType !== "generic",
       createdAt: new Date().toISOString(),
     };
 
     const docRef = await addDoc(collection(db, "reviews"), newReview);
     setReviews((prev) => [{ id: docRef.id, ...newReview }, ...prev]);
     setHasAlreadyReviewed(true);
-    updateUserBadges(user.uid).catch(() => {});
+    if (data.reviewType !== "generic") updateUserBadges(user.uid).catch(() => {});
   };
 
   const handleLike = async (reviewId: string, likedBy: string[] = []) => {
@@ -222,14 +230,14 @@ export default function ProductPage() {
 
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200">
-      {showReviewWizard && user && (
+      {reviewMode && user && (
         <ReviewWizard
           user={user}
-          mode="campaign"
+          mode={reviewMode}
           productInfo={{ name: product.name, category: product.category }}
-          isCampaignReview
+          isCampaignReview={reviewMode === "campaign"}
           onSubmit={handleReviewSubmit}
-          onClose={() => setShowReviewWizard(false)}
+          onClose={() => setReviewMode(null)}
         />
       )}
 
@@ -275,13 +283,34 @@ export default function ProductPage() {
               You&apos;ve already reviewed this product. Thank you!
             </p>
           ) : (
-            <button
-              type="button"
-              onClick={() => setShowReviewWizard(true)}
-              className="w-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-sm font-medium py-2.5 rounded-lg hover:opacity-90 transition"
-            >
-              Write a review
-            </button>
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setReviewMode("verified")}
+                  className="bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-sm font-medium py-2.5 rounded-lg hover:opacity-90 transition"
+                >
+                  I own this product
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReviewMode("campaign")}
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium py-2.5 rounded-lg transition"
+                >
+                  Campaign reviewer
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReviewMode("generic")}
+                className="w-full border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-sm py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition"
+              >
+                Quick review (no payout)
+              </button>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center">
+                Verified &amp; campaign reviews earn based on engagement.
+              </p>
+            </div>
           )}
         </div>
 

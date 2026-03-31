@@ -31,7 +31,7 @@ export default function Home() {
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [showReviewWizard, setShowReviewWizard] = useState(false);
+  const [reviewMode, setReviewMode] = useState<"organic" | "verified" | "generic" | null>(null);
   const [currentTime, setCurrentTime] = useState(Date.now());
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -156,32 +156,36 @@ export default function Home() {
       }
     }
 
-    // AI validation
-    const agentResponse = await fetch("/api/agent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        reviewContent: data.content,
-        reviewerName: user.displayName,
-        pros: data.pros,
-        cons: data.cons,
-        summary: data.summary,
-      }),
-    });
-    const agentData = await agentResponse.json();
+    let marketingQuote = data.summary || "";
 
-    if (!agentResponse.ok || !agentData?.success || !agentData?.analysis) {
-      throw new Error(
-        typeof agentData?.error === "string" && agentData.error.trim()
-          ? agentData.error
-          : "Unable to validate this review right now. Please try again."
-      );
-    }
-    if (agentData.analysis.isGenuine !== true) {
-      throw new Error(`AI Quality Control: ${agentData.analysis.reason || "Review quality check failed."}`);
+    // Generic reviews skip AI validation and are not eligible for payouts
+    if (data.reviewType !== "generic") {
+      const agentResponse = await fetch("/api/agent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reviewContent: data.content,
+          reviewerName: user.displayName,
+          pros: data.pros,
+          cons: data.cons,
+          summary: data.summary,
+        }),
+      });
+      const agentData = await agentResponse.json();
+
+      if (!agentResponse.ok || !agentData?.success || !agentData?.analysis) {
+        throw new Error(
+          typeof agentData?.error === "string" && agentData.error.trim()
+            ? agentData.error
+            : "Unable to validate this review right now. Please try again."
+        );
+      }
+      if (agentData.analysis.isGenuine !== true) {
+        throw new Error(`AI Quality Control: ${agentData.analysis.reason || "Review quality check failed."}`);
+      }
+      marketingQuote = agentData.analysis?.marketingQuote || data.summary || "";
     }
 
-    // Save to Firestore
     const newReview = {
       content: data.content,
       rating: data.overallRating,
@@ -198,7 +202,7 @@ export default function Home() {
       notHelpfulCount: 0,
       notHelpfulBy: [],
       commentCount: 0,
-      marketingQuote: agentData.analysis?.marketingQuote || data.summary || "",
+      marketingQuote,
       pros: data.pros,
       cons: data.cons,
       summary: data.summary,
@@ -208,15 +212,17 @@ export default function Home() {
       subRatings: data.subRatings,
       bestFor: data.bestFor,
       mediaUrls,
+      reviewType: data.reviewType,
+      productCode: data.productCode ?? null,
       isCampaignReview: false,
+      eligibleForPayout: data.reviewType !== "generic",
       createdAt: new Date().toISOString(),
     };
 
     const docRef = await addDoc(collection(db, "reviews"), newReview);
     setAllReviews((prev) => [{ id: docRef.id, ...newReview }, ...prev]);
 
-    // Update badges in background
-    updateUserBadges(user.uid).catch(() => {});
+    if (data.reviewType !== "generic") updateUserBadges(user.uid).catch(() => {});
   };
 
   const handleLike = async (reviewId: string, likedBy: string[] = []) => {
@@ -322,12 +328,12 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-300 transition-colors duration-200">
 
-      {showReviewWizard && user && (
+      {reviewMode && user && (
         <ReviewWizard
           user={user}
-          mode="organic"
+          mode={reviewMode}
           onSubmit={handleReviewSubmit}
-          onClose={() => setShowReviewWizard(false)}
+          onClose={() => setReviewMode(null)}
         />
       )}
 
@@ -411,13 +417,22 @@ export default function Home() {
             </button>
           </nav>
 
-          <button
-            type="button"
-            onClick={() => { if (!user) handleLogin(); else setShowReviewWizard(true); }}
-            className="w-full max-w-[200px] bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-sm font-medium py-2.5 px-4 rounded-full hover:bg-slate-800 dark:hover:bg-white transition"
-          >
-            Post
-          </button>
+          <div className="w-full max-w-[200px] space-y-1.5">
+            <button
+              type="button"
+              onClick={() => { if (!user) handleLogin(); else setReviewMode("verified"); }}
+              className="w-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-sm font-medium py-2.5 px-4 rounded-full hover:bg-slate-800 dark:hover:bg-white transition"
+            >
+              Post a review
+            </button>
+            <button
+              type="button"
+              onClick={() => { if (!user) handleLogin(); else setReviewMode("generic"); }}
+              className="w-full border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs py-1.5 px-4 rounded-full hover:bg-slate-50 dark:hover:bg-slate-900 transition"
+            >
+              Quick review (no payout)
+            </button>
+          </div>
         </aside>
 
         {/* Center: Feed */}
@@ -509,7 +524,7 @@ export default function Home() {
                   {feedTab === "campaigns" ? "No campaign reviews yet." : "When people review in this view, they will show up here."}
                 </p>
                 {feedTab !== "campaigns" && (
-                  <button type="button" onClick={() => { if (!user) handleLogin(); else setShowReviewWizard(true); }} className="text-sm font-medium bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-4 py-2 rounded-full hover:opacity-90 transition">
+                  <button type="button" onClick={() => { if (!user) handleLogin(); else setReviewMode("verified"); }} className="text-sm font-medium bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-4 py-2 rounded-full hover:opacity-90 transition">
                     Write a review
                   </button>
                 )}
