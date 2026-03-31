@@ -163,13 +163,13 @@ function CommentThread({
                 onChange={(e) => setNewComment(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleSubmitComment(); } }}
                 placeholder="Add a comment…"
-                className="flex-1 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-[12px] focus:outline-none focus:ring-1 focus:ring-slate-300 dark:text-slate-100 dark:placeholder-slate-500"
+                className="flex-1 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 md:px-2.5 md:py-1.5 text-sm md:text-[12px] focus:outline-none focus:ring-1 focus:ring-slate-300 dark:text-slate-100 dark:placeholder-slate-500"
               />
               <button
                 type="button"
                 onClick={handleSubmitComment}
                 disabled={!newComment.trim() || submitting}
-                className="px-2.5 py-1.5 bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-900 rounded-lg text-[12px] font-medium disabled:opacity-40 hover:opacity-90 transition"
+                className="px-3 py-2.5 md:px-2.5 md:py-1.5 bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-900 rounded-lg text-sm md:text-[12px] font-medium disabled:opacity-40 hover:opacity-90 transition"
               >
                 {submitting ? "…" : "Post"}
               </button>
@@ -214,10 +214,10 @@ export default function ReviewCard({
     .slice(0, 3);
 
   return (
-    <article className="px-3 py-3 md:px-4 hover:bg-slate-50/80 dark:hover:bg-slate-900/40 transition-colors">
+    <article className="px-4 py-4 md:px-4 md:py-3 hover:bg-slate-50/80 dark:hover:bg-slate-900/40 transition-colors">
       <div className="flex gap-3">
         {/* Avatar */}
-        <div className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-800 flex-shrink-0 flex items-center justify-center text-slate-600 dark:text-slate-300 text-xs font-medium">
+        <div className="w-10 h-10 md:w-9 md:h-9 rounded-full bg-slate-200 dark:bg-slate-800 flex-shrink-0 flex items-center justify-center text-slate-600 dark:text-slate-300 text-sm md:text-xs font-medium">
           {review.reviewerName?.charAt(0) || "A"}
         </div>
 
@@ -322,7 +322,7 @@ export default function ReviewCard({
                   <img
                     src={url}
                     alt=""
-                    className="w-20 h-20 object-cover rounded-lg border border-slate-200 dark:border-slate-700 hover:opacity-90 transition"
+                    className="w-24 h-24 md:w-20 md:h-20 object-cover rounded-lg border border-slate-200 dark:border-slate-700 hover:opacity-90 transition"
                   />
                 </a>
               ))}
@@ -342,13 +342,13 @@ export default function ReviewCard({
           )}
 
           {/* Action bar */}
-          <div className="flex items-center gap-0.5 text-[13px] text-slate-500 dark:text-slate-500 mt-1 flex-wrap -ml-1">
+          <div className="flex items-center gap-1 text-[13px] md:text-[13px] text-slate-500 dark:text-slate-500 mt-2 md:mt-1 -ml-2 md:-ml-1">
             {/* Like */}
             <button
               type="button"
               onClick={() => onLike?.(review.id, review.likedBy ?? [])}
               disabled={!onLike}
-              className={`flex items-center gap-1 rounded-md py-1 px-1.5 transition-colors ${
+              className={`flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 transition-colors ${
                 hasLiked
                   ? "text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800"
                   : "hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/50"
@@ -363,7 +363,7 @@ export default function ReviewCard({
               type="button"
               onClick={() => onHelpful?.(review.id, review.helpfulBy ?? [])}
               disabled={!onHelpful}
-              className={`flex items-center gap-1 rounded-md py-1 px-1.5 transition-colors ${
+              className={`flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 transition-colors ${
                 hasHelpful
                   ? "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30"
                   : "hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/50"
@@ -378,7 +378,7 @@ export default function ReviewCard({
               type="button"
               onClick={() => onNotHelpful?.(review.id, review.notHelpfulBy ?? [])}
               disabled={!onNotHelpful}
-              className={`flex items-center gap-1 rounded-md py-1 px-1.5 transition-colors ${
+              className={`flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 transition-colors ${
                 hasNotHelpful
                   ? "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30"
                   : "hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/50"
@@ -392,7 +392,7 @@ export default function ReviewCard({
             <button
               type="button"
               onClick={() => setShowComments((v) => !v)}
-              className="flex items-center gap-1 rounded-md py-1 px-1.5 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/50 transition-colors"
+              className="flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/50 transition-colors"
             >
               <span aria-hidden>💬</span>
               <span className="tabular-nums">{commentCount}</span>
@@ -403,12 +403,14 @@ export default function ReviewCard({
               type="button"
               onClick={() => {
                 const text = `"${review.summary || review.content?.slice(0, 80)}" — ${review.reviewerName} on ${review.productName}`;
-                if (navigator.clipboard) {
+                if (navigator.share) {
+                  navigator.share({ text }).catch(() => {});
+                } else if (navigator.clipboard) {
                   navigator.clipboard.writeText(text);
                 }
               }}
-              className="flex items-center gap-1 rounded-md py-1 px-1.5 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/50 transition-colors"
-              title="Copy review quote"
+              className="flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/50 transition-colors"
+              title="Share"
             >
               <span aria-hidden>↗</span>
             </button>
@@ -417,7 +419,7 @@ export default function ReviewCard({
             {showPoolLink && review.campaignId && review.campaignId !== "organic" && review.productId && (
               <Link
                 href={`/product/${review.productId}`}
-                className="ml-auto font-medium text-slate-600 dark:text-slate-400 hover:underline shrink-0"
+                className="ml-auto font-medium text-slate-600 dark:text-slate-400 hover:underline shrink-0 py-2 px-2.5 md:py-1 md:px-1.5"
               >
                 Pool →
               </Link>

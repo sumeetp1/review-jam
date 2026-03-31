@@ -32,6 +32,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   const [reviewMode, setReviewMode] = useState<"organic" | "verified" | "generic" | null>(null);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [currentTime, setCurrentTime] = useState(Date.now());
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -368,21 +370,84 @@ export default function Home() {
       )}
 
       {/* Mobile Nav */}
-      <nav className="md:hidden bg-white/95 dark:bg-slate-950/95 backdrop-blur-sm border-b border-slate-200/80 dark:border-slate-800 sticky top-0 z-40 px-3 h-12 flex justify-between items-center">
-        <Link href="/" className="flex items-center">
-          <Image src="/logo.svg" alt="Review Jam" width={118} height={28} priority className="dark:hidden" />
-          <Image src="/logo-dark.svg" alt="Review Jam" width={118} height={28} priority className="hidden dark:block" />
-        </Link>
-        {user ? (
-          <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center text-xs font-medium">
-            {user.displayName?.charAt(0)}
+      <nav className="md:hidden bg-white/95 dark:bg-slate-950/95 backdrop-blur-sm border-b border-slate-200/80 dark:border-slate-800 sticky top-0 z-40">
+        {!showMobileSearch ? (
+          <div className="px-3 h-12 flex justify-between items-center">
+            <Link href="/" className="flex items-center">
+              <Image src="/logo.svg" alt="Review Jam" width={118} height={28} priority className="dark:hidden" />
+              <Image src="/logo-dark.svg" alt="Review Jam" width={118} height={28} priority className="hidden dark:block" />
+            </Link>
+            <div className="flex items-center gap-1">
+              <button type="button" onClick={() => setShowMobileSearch(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition" aria-label="Search">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-600 dark:text-slate-400"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              </button>
+              <button type="button" onClick={toggleDarkMode} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition text-sm" aria-label="Toggle dark mode">
+                {isDarkMode ? "☀️" : "🌙"}
+              </button>
+              {user ? (
+                <button type="button" onClick={() => setShowMobileMenu((v) => !v)} className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center text-xs font-bold">
+                  {user.displayName?.charAt(0)}
+                </button>
+              ) : (
+                <button onClick={handleLogin} className="text-sm font-medium text-slate-900 dark:text-slate-100 px-3 py-2 rounded-full border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900">
+                  Sign in
+                </button>
+              )}
+            </div>
           </div>
         ) : (
-          <button onClick={handleLogin} className="text-sm font-medium text-slate-900 dark:text-slate-100 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900">
-            Sign in
-          </button>
+          <div className="px-3 h-12 flex items-center gap-2">
+            <input
+              type="search"
+              autoFocus
+              placeholder="Search reviews…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1 bg-slate-100 dark:bg-slate-900 rounded-full px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-600 dark:text-slate-100 dark:placeholder-slate-500"
+            />
+            <button type="button" onClick={() => { setShowMobileSearch(false); setSearchQuery(""); }} className="w-10 h-10 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium shrink-0">
+              ✕
+            </button>
+          </div>
         )}
       </nav>
+
+      {/* Mobile slide-down menu */}
+      {showMobileMenu && (
+        <div className="md:hidden fixed inset-0 z-50" onClick={() => setShowMobileMenu(false)}>
+          <div className="absolute inset-0 bg-black/40 dark:bg-black/60" />
+          <div className="absolute top-0 right-0 w-64 bg-white dark:bg-slate-900 h-full shadow-xl border-l border-slate-200 dark:border-slate-800 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="p-4 border-b border-slate-100 dark:border-slate-800">
+              <p className="font-semibold text-base text-slate-900 dark:text-slate-100">{user?.displayName}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{user?.email}</p>
+            </div>
+            <nav className="py-2">
+              {[
+                { href: "/profile",    label: "Profile",   icon: "👤" },
+                { href: "/explore",    label: "Explore",   icon: "🔍" },
+                { href: "/campaigns",  label: "Campaigns", icon: "🎯" },
+                { href: "/brands",     label: "For brands",icon: "🏢" },
+                { href: "/brands/dashboard", label: "Brand dashboard", icon: "📊" },
+                { href: "/admin",      label: "Admin",     icon: "⚡" },
+              ].map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setShowMobileMenu(false)}
+                  className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                >
+                  <span aria-hidden className="text-base">{item.icon}</span> {item.label}
+                </Link>
+              ))}
+            </nav>
+            <div className="border-t border-slate-100 dark:border-slate-800 p-4">
+              <button type="button" onClick={() => { handleLogout(); setShowMobileMenu(false); }} className="text-sm text-red-600 dark:text-red-400 font-medium">
+                Log out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto flex justify-center">
 
@@ -436,9 +501,9 @@ export default function Home() {
         </aside>
 
         {/* Center: Feed */}
-        <main className="w-full md:w-[600px] md:max-w-[600px] md:shrink-0 border-x border-slate-200/80 dark:border-slate-800 min-h-screen pb-20 md:pb-0">
+        <main className="w-full md:w-[600px] md:max-w-[600px] md:shrink-0 md:border-x border-slate-200/80 dark:border-slate-800 min-h-screen">
 
-          <div className="sticky top-0 z-30 bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm border-b border-slate-200/80 dark:border-slate-800">
+          <div className="sticky top-12 md:top-0 z-30 bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm border-b border-slate-200/80 dark:border-slate-800">
             <div className="hidden md:flex items-center h-12 px-4 border-b border-slate-100 dark:border-slate-800/80">
               <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Home</h1>
             </div>
@@ -450,7 +515,7 @@ export default function Home() {
                   key={tab.id}
                   type="button"
                   onClick={() => setFeedTab(tab.id)}
-                  className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                  className={`flex-1 py-3.5 md:py-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
                     feedTab === tab.id
                       ? "border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100"
                       : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
@@ -461,7 +526,8 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="p-3 md:px-4 md:py-3">
+            {/* Desktop search + category pills */}
+            <div className="hidden md:block px-4 py-3">
               <input
                 type="search"
                 placeholder="Search"
@@ -469,12 +535,10 @@ export default function Home() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-slate-100 dark:bg-slate-900/80 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-600 dark:text-slate-100 dark:placeholder-slate-500 border border-slate-200/80 dark:border-slate-800"
               />
-
               <div className="relative mt-2.5 flex items-center">
                 <button type="button" onClick={() => scrollCategories("left")} className="absolute left-0 z-10 p-1 bg-gradient-to-r from-white via-white to-transparent dark:from-slate-950 dark:via-slate-950 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition h-full flex items-center justify-start w-8" aria-label="Scroll left">
                   <span className="text-lg leading-none">‹</span>
                 </button>
-
                 <div ref={categoriesRef} className="flex gap-1.5 overflow-x-auto snap-x scroll-smooth px-7 w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                   <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${activeCategoryFilter === "All" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900"}`}>
                     All
@@ -485,16 +549,29 @@ export default function Home() {
                     </button>
                   ))}
                 </div>
-
                 <button type="button" onClick={() => scrollCategories("right")} className="absolute right-0 z-10 p-1 bg-gradient-to-l from-white via-white to-transparent dark:from-slate-950 dark:via-slate-950 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition h-full flex items-center justify-end w-8" aria-label="Scroll right">
                   <span className="text-lg leading-none">›</span>
                 </button>
               </div>
             </div>
+
+            {/* Mobile: horizontal category chips only (no search, no arrows) */}
+            <div className="md:hidden px-3 py-2">
+              <div className="flex gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3.5 py-2 rounded-full text-[13px] font-medium border transition shrink-0 ${activeCategoryFilter === "All" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"}`}>
+                  All
+                </button>
+                {AVAILABLE_CATEGORIES.map((cat) => (
+                  <button type="button" key={cat} onClick={() => setActiveCategoryFilter(cat)} className={`whitespace-nowrap px-3.5 py-2 rounded-full text-[13px] font-medium border transition shrink-0 ${activeCategoryFilter === cat ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"}`}>
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* Mobile campaigns strip */}
-          <div className="lg:hidden border-b border-slate-200/80 dark:border-slate-800 px-3 py-3 bg-slate-50/80 dark:bg-slate-900/40">
+          {/* Campaigns strip — tablet only (mobile uses bottom nav Campaigns tab) */}
+          <div className="hidden md:block lg:hidden border-b border-slate-200/80 dark:border-slate-800 px-3 py-3 bg-slate-50/80 dark:bg-slate-900/40">
             <h3 className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-2">Active pools</h3>
             <div className="flex gap-2 overflow-x-auto snap-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {products.map((product) => (
@@ -604,6 +681,18 @@ export default function Home() {
           </div>
         </aside>
       </div>
+
+      {/* Mobile FAB — Post a review */}
+      <button
+        type="button"
+        onClick={() => { if (!user) handleLogin(); else setReviewMode("verified"); }}
+        className="md:hidden fixed bottom-[76px] right-4 z-40 w-14 h-14 rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 flex items-center justify-center hover:bg-indigo-500 active:scale-95 transition"
+        aria-label="Post a review"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+      </button>
     </main>
   );
 }
