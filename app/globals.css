@@ -27,3 +27,13 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* iOS safe area support for bottom nav */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Prevent content from sliding under bottom nav on iOS */
+html {
+  scroll-padding-bottom: 56px;
+}
