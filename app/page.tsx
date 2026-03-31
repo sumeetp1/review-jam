@@ -381,18 +381,9 @@ export default function Home() {
               <button type="button" onClick={() => setShowMobileSearch(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition" aria-label="Search">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-600 dark:text-slate-400"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
               </button>
-              <button type="button" onClick={toggleDarkMode} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition text-sm" aria-label="Toggle dark mode">
-                {isDarkMode ? "☀️" : "🌙"}
+              <button type="button" onClick={() => setShowMobileMenu((v) => !v)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition" aria-label="Menu">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-slate-700 dark:text-slate-300"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
               </button>
-              {user ? (
-                <button type="button" onClick={() => setShowMobileMenu((v) => !v)} className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center text-xs font-bold">
-                  {user.displayName?.charAt(0)}
-                </button>
-              ) : (
-                <button onClick={handleLogin} className="text-sm font-medium text-slate-900 dark:text-slate-100 px-3 py-2 rounded-full border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900">
-                  Sign in
-                </button>
-              )}
             </div>
           </div>
         ) : (
@@ -416,11 +407,34 @@ export default function Home() {
       {showMobileMenu && (
         <div className="md:hidden fixed inset-0 z-50" onClick={() => setShowMobileMenu(false)}>
           <div className="absolute inset-0 bg-black/40 dark:bg-black/60" />
-          <div className="absolute top-0 right-0 w-64 bg-white dark:bg-slate-900 h-full shadow-xl border-l border-slate-200 dark:border-slate-800 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="p-4 border-b border-slate-100 dark:border-slate-800">
-              <p className="font-semibold text-base text-slate-900 dark:text-slate-100">{user?.displayName}</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{user?.email}</p>
+          <div className="absolute top-0 right-0 w-72 bg-white dark:bg-slate-900 h-full shadow-xl border-l border-slate-200 dark:border-slate-800 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            {/* Close button */}
+            <div className="flex justify-end p-3">
+              <button type="button" onClick={() => setShowMobileMenu(false)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 text-lg">
+                ✕
+              </button>
             </div>
+
+            {/* User section */}
+            <div className="px-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+              {user ? (
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 text-sm font-bold shrink-0">
+                    {user.displayName?.charAt(0)}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-base text-slate-900 dark:text-slate-100 truncate">{user.displayName}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
+                  </div>
+                </div>
+              ) : (
+                <button type="button" onClick={() => { handleLogin(); setShowMobileMenu(false); }} className="w-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-sm font-medium py-3 rounded-lg hover:opacity-90 transition">
+                  Sign in with Google
+                </button>
+              )}
+            </div>
+
+            {/* Nav links */}
             <nav className="py-2">
               {[
                 { href: "/profile",    label: "Profile",   icon: "👤" },
@@ -434,17 +448,24 @@ export default function Home() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setShowMobileMenu(false)}
-                  className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                  className="flex items-center gap-3 px-4 py-3.5 text-[15px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
                 >
-                  <span aria-hidden className="text-base">{item.icon}</span> {item.label}
+                  <span aria-hidden className="text-lg w-6 text-center">{item.icon}</span> {item.label}
                 </Link>
               ))}
-            </nav>
-            <div className="border-t border-slate-100 dark:border-slate-800 p-4">
-              <button type="button" onClick={() => { handleLogout(); setShowMobileMenu(false); }} className="text-sm text-red-600 dark:text-red-400 font-medium">
-                Log out
+              <button type="button" onClick={() => { toggleDarkMode(); }} className="flex items-center gap-3 px-4 py-3.5 text-[15px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition w-full text-left">
+                <span aria-hidden className="text-lg w-6 text-center">{isDarkMode ? "☀️" : "🌙"}</span> {isDarkMode ? "Light mode" : "Dark mode"}
               </button>
-            </div>
+            </nav>
+
+            {/* Logout */}
+            {user && (
+              <div className="border-t border-slate-100 dark:border-slate-800 p-4">
+                <button type="button" onClick={() => { handleLogout(); setShowMobileMenu(false); }} className="text-sm text-red-600 dark:text-red-400 font-medium">
+                  Log out
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
