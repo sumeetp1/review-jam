@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
@@ -149,6 +149,21 @@ export async function POST(req: Request) {
 
     if (typeof reviewContent !== "string" || !reviewContent.trim()) {
       return NextResponse.json({ error: "Review content is required" }, { status: 400 });
+    }
+
+    // Check if AI moderation is disabled by admin
+    try {
+      const configSnap = await getDoc(doc(db, "config", "moderation"));
+      if (configSnap.exists() && configSnap.data().aiCheckEnabled === false) {
+        const bypassAnalysis: ReviewAnalysis = {
+          isGenuine: true,
+          reason: "",
+          marketingQuote: summary?.trim() || reviewContent.slice(0, 80),
+        };
+        return NextResponse.json({ success: true, analysis: bypassAnalysis });
+      }
+    } catch {
+      // If config fetch fails, proceed normally
     }
 
     const preCheckFailure = runDeterministicChecks(reviewContent);
