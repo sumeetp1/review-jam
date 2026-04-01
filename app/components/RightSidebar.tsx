@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import Avatar from "./Avatar";
 import type { ReviewData } from "./ReviewCard";
 
 type Props = {
@@ -85,9 +86,7 @@ export default function RightSidebar({ allReviews }: Props) {
                     {r.productName}
                   </p>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <div className="w-4 h-4 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[9px] font-semibold text-slate-500 shrink-0">
-                      {r.reviewerName?.charAt(0) ?? "?"}
-                    </div>
+                    <Avatar name={r.reviewerName} size="xs" />
                     <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{r.reviewerName}</span>
                     {r.rating != null && (
                       <span className="text-[10px] text-amber-500 tabular-nums shrink-0">★{r.rating}</span>

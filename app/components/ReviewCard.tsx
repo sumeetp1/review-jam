@@ -10,6 +10,7 @@ import { db } from "../../lib/firebase";
 import { getBadgeById } from "../../lib/badges";
 import HealthScoreBadge from "./HealthScoreBadge";
 import ReviewTimeline from "./ReviewTimeline";
+import Avatar from "./Avatar";
 import type { HealthBreakdown } from "../../lib/healthScore";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -155,9 +156,7 @@ function CommentThread({
   const renderComment = (c: Comment, depth: number) => (
     <div key={c.id} style={{ marginLeft: depth * 20 }}>
       <div className="flex gap-2">
-        <div className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[9px] font-medium text-slate-600 dark:text-slate-300 shrink-0">
-          {c.userName.charAt(0)}
-        </div>
+        <Avatar name={c.userName} size="xs" />
         <div className="flex-1 min-w-0">
           <span className="text-[12px] font-medium text-slate-700 dark:text-slate-300 mr-1">{c.userName}</span>
           <span className="text-[12px] text-slate-600 dark:text-slate-400">{c.content}</span>
@@ -265,9 +264,7 @@ export default function ReviewCard({
     <article className="px-4 py-4 md:px-4 md:py-3 hover:bg-slate-50/80 dark:hover:bg-slate-900/40 transition-colors">
       <div className="flex gap-3">
         {/* Avatar */}
-        <div className="w-10 h-10 md:w-9 md:h-9 rounded-full bg-slate-200 dark:bg-slate-800 flex-shrink-0 flex items-center justify-center text-slate-600 dark:text-slate-300 text-sm md:text-xs font-medium">
-          {review.reviewerName?.charAt(0) || "A"}
-        </div>
+        <Avatar name={review.reviewerName} size="md" />
 
         <div className="flex-1 min-w-0">
           {/* Reviewer name + badges + category + rating */}

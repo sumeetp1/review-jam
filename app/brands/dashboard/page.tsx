@@ -7,6 +7,7 @@ import {
 } from "firebase/firestore";
 import { onAuthStateChanged, signInWithPopup, User } from "firebase/auth";
 import { db, auth, googleProvider } from "../../../lib/firebase";
+import Avatar from "../../components/Avatar";
 
 type Campaign = {
   id: string;
@@ -274,9 +275,7 @@ export default function BrandDashboardPage() {
                 <div key={r.id} className="px-5 py-4">
                   <div className="flex items-start justify-between gap-3 mb-1">
                     <div className="flex items-center gap-2">
-                      <span className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-[11px] font-medium text-slate-300 shrink-0">
-                        {r.reviewerName?.charAt(0) || "A"}
-                      </span>
+                      <Avatar name={r.reviewerName} size="sm" />
                       <p className="text-sm font-medium text-white">{r.reviewerName}</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0 text-[12px] text-slate-400">

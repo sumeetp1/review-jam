@@ -15,6 +15,7 @@ import ReviewWizard, { ReviewFormData, AVAILABLE_CATEGORIES } from "./components
 import ReviewCard, { type ReviewData } from "./components/ReviewCard";
 import RightSidebar from "./components/RightSidebar";
 import LeftSidebar from "./components/LeftSidebar";
+import Avatar from "./components/Avatar";
 
 type FeedTab = "foryou" | "trending" | "campaigns";
 
@@ -458,9 +459,7 @@ export default function Home() {
             <div className="px-4 pb-4 border-b border-slate-100 dark:border-slate-800">
               {user ? (
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 text-sm font-bold shrink-0">
-                    {user.displayName?.charAt(0)}
-                  </div>
+                  <Avatar name={user.displayName} src={user.photoURL} size="lg" className="w-11 h-11" />
                   <div className="min-w-0">
                     <p className="font-semibold text-base text-slate-900 dark:text-slate-100 truncate">{user.displayName}</p>
                     <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user.email}</p>

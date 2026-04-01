@@ -10,6 +10,7 @@ import { onAuthStateChanged, User, signOut } from "firebase/auth";
 import { db, auth } from "../../lib/firebase";
 import VersionUpdateWizard from "../components/VersionUpdateWizard";
 import { ALL_BADGES, getBadgeById } from "../../lib/badges";
+import Avatar from "../components/Avatar";
 
 const AVAILABLE_CATEGORIES = [
   "Tech", "Home", "SaaS", "Automotive", "Beauty",
@@ -177,9 +178,7 @@ export default function ProfilePage() {
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         {/* Identity card */}
         <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-4">
-          <div className="w-14 h-14 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-full flex items-center justify-center text-lg font-medium shrink-0">
-            {user.displayName?.charAt(0) || "U"}
-          </div>
+          <Avatar name={user.displayName} src={user.photoURL} size="lg" />
           <div className="min-w-0 flex-1">
             <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 truncate">{user.displayName}</h2>
             <p className="text-sm text-slate-500 dark:text-slate-500 truncate">{user.email}</p>
