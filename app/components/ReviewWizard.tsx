@@ -29,6 +29,14 @@ export type ReviewFormData = {
   // SKU / variant
   variantId?: string;
   variantName?: string;
+  // Proof of purchase
+  isVerifiedPurchase?: boolean;
+  receiptVerification?: {
+    storeName?: string | null;
+    purchaseDate?: string | null;
+    detectedProduct?: string | null;
+    confidence?: string;
+  };
 };
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -436,7 +444,7 @@ type Props = {
   onClose: () => void;
 };
 
-const STEP_LABELS = ["Context", "Your Review", "Finish"];
+// Step labels are computed per-instance based on mode (see FullReviewWizard)
 
 export default function ReviewWizard({
   user: _user,
@@ -489,6 +497,14 @@ export default function ReviewWizard({
 
 // ─── Full Wizard (Campaign / Verified / Organic) ──────────────────────────────
 
+type ReceiptVerification = {
+  status: "idle" | "checking" | "verified" | "failed";
+  storeName?: string | null;
+  purchaseDate?: string | null;
+  detectedProduct?: string | null;
+  confidence?: string;
+};
+
 function FullReviewWizard({
   mode,
   productInfo,
@@ -496,10 +512,17 @@ function FullReviewWizard({
   onSubmit,
   onClose,
 }: Omit<Props, "user">) {
+  // Campaign reviews: 3 steps. Organic/verified: 4 steps (adds Proof of Purchase)
+  const STEP_LABELS = isCampaignReview
+    ? ["Context", "Your Review", "Finish"]
+    : ["Context", "Your Review", "Proof of Purchase", "Finish"];
+  const totalSteps = STEP_LABELS.length;
+
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const receiptInputRef = useRef<HTMLInputElement>(null);
 
   // ── Step 1 ──
   const [productName, setProductName] = useState(productInfo?.name ?? "");
@@ -518,7 +541,12 @@ function FullReviewWizard({
   const [content, setContent] = useState("");
   const [summary, setSummary] = useState("");
 
-  // ── Step 3 ──
+  // ── Proof of Purchase (step 3, non-campaign only) ──
+  const [receiptVerification, setReceiptVerification] = useState<ReceiptVerification>({ status: "idle" });
+  const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+
+  // ── Finish step ──
   const [bestFor, setBestFor] = useState<string[]>([]);
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
@@ -527,6 +555,8 @@ function FullReviewWizard({
   const subRatingKeys = CATEGORY_SUB_RATINGS[category] ?? [];
 
   // ── Validation ──
+  const finishStepNumber = totalSteps; // 3 for campaign, 4 for non-campaign
+
   const validateStep = (s: number): boolean => {
     if (s === 1) {
       if (mode === "organic" && !productName.trim()) {
@@ -564,7 +594,9 @@ function FullReviewWizard({
         return false;
       }
     }
-    if (s === 3) {
+    // Step 3 non-campaign = Proof of Purchase — no required fields, skip freely
+    // Finish step — always requires honest opinion checkbox
+    if (s === finishStepNumber) {
       if (!isHonestOpinion) {
         setError("Please confirm this is your honest opinion.");
         return false;
@@ -577,6 +609,70 @@ function FullReviewWizard({
     setError("");
     if (!validateStep(step)) return;
     setStep((s) => s + 1);
+  };
+
+  const handleReceiptChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("Please upload an image file (JPG, PNG, WEBP, etc.).");
+      return;
+    }
+    if (file.size > 6 * 1024 * 1024) {
+      setError("Receipt image must be under 6 MB.");
+      return;
+    }
+    setError("");
+    setReceiptFile(file);
+    setReceiptPreview(URL.createObjectURL(file));
+    setReceiptVerification({ status: "checking" });
+
+    // Convert to base64 and call verify-receipt API
+    try {
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          // strip data URL prefix → keep only base64 body
+          resolve(result.split(",")[1]);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const res = await fetch("/api/verify-receipt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          imageBase64: base64,
+          mimeType: file.type,
+          productName: productInfo?.name ?? productName,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success && data.isVerified) {
+        setReceiptVerification({
+          status: "verified",
+          storeName: data.storeName,
+          purchaseDate: data.purchaseDate,
+          detectedProduct: data.detectedProduct,
+          confidence: data.confidence,
+        });
+      } else {
+        setReceiptVerification({ status: "failed" });
+      }
+    } catch {
+      setReceiptVerification({ status: "failed" });
+    }
+
+    if (receiptInputRef.current) receiptInputRef.current.value = "";
+  };
+
+  const clearReceipt = () => {
+    setReceiptFile(null);
+    setReceiptPreview(null);
+    setReceiptVerification({ status: "idle" });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -617,6 +713,15 @@ function FullReviewWizard({
         productCode: mode === "verified" ? productCode : undefined,
         variantId: variantId || undefined,
         variantName: variantName || undefined,
+        isVerifiedPurchase: receiptVerification.status === "verified",
+        receiptVerification: receiptVerification.status === "verified"
+          ? {
+              storeName: receiptVerification.storeName,
+              purchaseDate: receiptVerification.purchaseDate,
+              detectedProduct: receiptVerification.detectedProduct,
+              confidence: receiptVerification.confidence,
+            }
+          : undefined,
       });
       onClose();
     } catch (err) {
@@ -914,8 +1019,121 @@ function FullReviewWizard({
           </div>
         )}
 
-        {/* ════ STEP 3: Finish ════ */}
-        {step === 3 && (
+        {/* ════ STEP 3 (non-campaign): Proof of Purchase ════ */}
+        {step === 3 && !isCampaignReview && (
+          <div className="space-y-4 py-2">
+            <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 rounded-lg px-3 py-2.5">
+              <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300 mb-0.5">
+                ✓ Verified Owner badge
+              </p>
+              <p className="text-[11px] text-emerald-700 dark:text-emerald-400 leading-relaxed">
+                Upload a receipt or order screenshot and we'll verify your purchase. Verified reviews earn a trust badge and higher credibility scores. This step is optional — you can skip it.
+              </p>
+            </div>
+
+            {/* Hidden file input */}
+            <input
+              ref={receiptInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleReceiptChange}
+            />
+
+            {receiptVerification.status === "idle" && !receiptPreview && (
+              <button
+                type="button"
+                onClick={() => receiptInputRef.current?.click()}
+                className="w-full border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl py-8 flex flex-col items-center gap-2 text-slate-400 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-500 dark:hover:text-slate-300 transition"
+              >
+                <span className="text-3xl">🧾</span>
+                <span className="text-sm font-medium">Upload receipt or order screenshot</span>
+                <span className="text-[11px]">JPG, PNG, WEBP · max 6 MB</span>
+              </button>
+            )}
+
+            {receiptVerification.status === "checking" && (
+              <div className="flex flex-col items-center gap-3 py-8">
+                <div className="w-8 h-8 border-2 border-slate-300 border-t-emerald-500 rounded-full animate-spin" />
+                <p className="text-sm text-slate-500 dark:text-slate-400">Parsing receipt…</p>
+              </div>
+            )}
+
+            {(receiptVerification.status === "verified" || receiptVerification.status === "failed") && receiptPreview && (
+              <div className="space-y-3">
+                {/* Receipt thumbnail */}
+                <div className="relative w-full max-h-48 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={receiptPreview} alt="Receipt" className="w-full object-contain max-h-48" />
+                  <button
+                    type="button"
+                    onClick={clearReceipt}
+                    className="absolute top-1.5 right-1.5 w-6 h-6 bg-black/60 text-white rounded-full text-[11px] flex items-center justify-center hover:bg-black/80"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                {receiptVerification.status === "verified" ? (
+                  <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 rounded-lg px-3 py-2.5 space-y-1">
+                    <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
+                      <span>✓</span> Purchase verified
+                    </p>
+                    {receiptVerification.storeName && (
+                      <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
+                        <span className="font-medium">Store:</span> {receiptVerification.storeName}
+                      </p>
+                    )}
+                    {receiptVerification.purchaseDate && (
+                      <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
+                        <span className="font-medium">Date:</span>{" "}
+                        {new Date(receiptVerification.purchaseDate).toLocaleDateString(undefined, {
+                          year: "numeric", month: "long", day: "numeric",
+                        })}
+                      </p>
+                    )}
+                    {receiptVerification.detectedProduct && (
+                      <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
+                        <span className="font-medium">Product:</span> {receiptVerification.detectedProduct}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-lg px-3 py-2.5">
+                    <p className="text-xs font-semibold text-amber-700 dark:text-amber-300 mb-0.5">
+                      Could not verify purchase
+                    </p>
+                    <p className="text-[11px] text-amber-700 dark:text-amber-400 leading-relaxed">
+                      We couldn&apos;t read a store name and date from this image. Try a clearer photo, or skip this step.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => receiptInputRef.current?.click()}
+                      className="mt-2 text-[11px] font-medium text-amber-700 dark:text-amber-400 underline underline-offset-2"
+                    >
+                      Try a different image
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center">
+              Your receipt is used only for verification and is not stored or shared.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => { setError(""); setStep((s) => s + 1); }}
+              className="w-full text-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 py-1 transition underline-offset-2 hover:underline"
+            >
+              Skip — continue without verification
+            </button>
+          </div>
+        )}
+
+        {/* ════ STEP 3 (campaign) / STEP 4 (non-campaign): Finish ════ */}
+        {step === finishStepNumber && (
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
@@ -1036,13 +1254,14 @@ function FullReviewWizard({
           </button>
         )}
 
-        {step < 3 ? (
+        {step < totalSteps ? (
           <button
             type="button"
             onClick={goNext}
-            className="flex-[1.4] bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 dark:hover:bg-slate-200 transition"
+            disabled={receiptVerification.status === "checking"}
+            className="flex-[1.4] bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 dark:hover:bg-slate-200 transition disabled:opacity-50"
           >
-            Continue →
+            {receiptVerification.status === "checking" ? "Verifying…" : "Continue →"}
           </button>
         ) : (
           <button

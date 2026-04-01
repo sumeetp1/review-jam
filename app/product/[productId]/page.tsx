@@ -172,6 +172,7 @@ export default function ProductPage() {
       productCode: data.productCode ?? null,
       isCampaignReview: data.reviewType === "campaign",
       eligibleForPayout: data.reviewType !== "generic",
+      isVerifiedPurchase: data.isVerifiedPurchase ?? false,
       // Variant / SKU
       variantId: data.variantId ?? null,
       variantName: data.variantName ?? null,

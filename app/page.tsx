@@ -224,6 +224,7 @@ export default function Home() {
       productCode: data.productCode ?? null,
       isCampaignReview: false,
       eligibleForPayout: data.reviewType !== "generic",
+      isVerifiedPurchase: data.isVerifiedPurchase ?? false,
       createdAt: new Date().toISOString(),
     };
 
