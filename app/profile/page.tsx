@@ -8,6 +8,7 @@ import {
 } from "firebase/firestore";
 import { onAuthStateChanged, User, signOut } from "firebase/auth";
 import { db, auth } from "../../lib/firebase";
+import VersionUpdateWizard from "../components/VersionUpdateWizard";
 import { ALL_BADGES, getBadgeById } from "../../lib/badges";
 
 const AVAILABLE_CATEGORIES = [
@@ -29,12 +30,16 @@ type LedgerEntry = {
 type ReviewSummary = {
   id: string;
   productName: string;
+  category?: string;
   rating: number;
   likesCount: number;
   summary?: string;
   marketingQuote?: string;
   createdAt: string;
   campaignId: string;
+  versionCount?: number;
+  latestVersionLabel?: string;
+  healthScore?: number;
 };
 
 export default function ProfilePage() {
@@ -47,6 +52,7 @@ export default function ProfilePage() {
   const [myReviews, setMyReviews] = useState<ReviewSummary[]>([]);
 
   const [activeTab, setActiveTab] = useState<"overview" | "reviews" | "earnings" | "interests">("overview");
+  const [updatingReview, setUpdatingReview] = useState<ReviewSummary | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -280,17 +286,50 @@ export default function ProfilePage() {
                           "{r.summary || r.marketingQuote}"
                         </p>
                       )}
-                      <div className="flex items-center gap-3 mt-1.5 text-[11px] text-slate-500 dark:text-slate-500">
+                      <div className="flex items-center gap-3 mt-1.5 text-[11px] text-slate-500 dark:text-slate-500 flex-wrap">
                         <span>👍 {r.likesCount || 0}</span>
+                        {r.healthScore != null && (
+                          <span className={`font-medium ${r.healthScore >= 70 ? "text-emerald-600 dark:text-emerald-400" : r.healthScore >= 40 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400"}`}>
+                            Score: {r.healthScore}
+                          </span>
+                        )}
                         <span>{new Date(r.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>
                         {r.campaignId !== "organic" && (
                           <span className="text-emerald-600 dark:text-emerald-400 font-medium">Campaign</span>
                         )}
+                        {(r.versionCount ?? 0) > 1 && (
+                          <span className="text-blue-600 dark:text-blue-400 font-medium">{r.versionCount} updates</span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setUpdatingReview(r)}
+                          className="ml-auto text-[11px] font-medium text-slate-600 dark:text-slate-300 px-2 py-0.5 border border-slate-200 dark:border-slate-700 rounded hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                        >
+                          Post Update
+                        </button>
                       </div>
                     </div>
                   ))
                 )}
               </div>
+            )}
+
+            {/* Version Update Wizard */}
+            {updatingReview && (
+              <VersionUpdateWizard
+                reviewId={updatingReview.id}
+                existingVersionCount={updatingReview.versionCount ?? 1}
+                productName={updatingReview.productName}
+                category={updatingReview.category ?? "Tech"}
+                onClose={() => setUpdatingReview(null)}
+                onSaved={() => {
+                  setMyReviews((prev) => prev.map((r) =>
+                    r.id === updatingReview.id
+                      ? { ...r, versionCount: (r.versionCount ?? 1) + 1 }
+                      : r
+                  ));
+                }}
+              />
             )}
 
             {/* ── Earnings Ledger ── */}

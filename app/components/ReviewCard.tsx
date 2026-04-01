@@ -8,6 +8,9 @@ import {
 } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { getBadgeById } from "../../lib/badges";
+import HealthScoreBadge from "./HealthScoreBadge";
+import ReviewTimeline from "./ReviewTimeline";
+import type { HealthBreakdown } from "../../lib/healthScore";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -51,6 +54,17 @@ export type ReviewData = {
   productSource?: string;
   usageDuration?: string;
   badges?: string[];
+  healthScore?: number;
+  healthScoreBreakdown?: HealthBreakdown;
+  forkedFromReviewId?: string;
+  forkedFromReviewerName?: string;
+  forkCount?: number;
+  versionCount?: number;
+  latestVersionLabel?: string;
+  channelSlug?: string;
+  channelId?: string;
+  reviewerId?: string;
+  createdAt?: string;
 };
 
 type Comment = {
@@ -59,6 +73,8 @@ type Comment = {
   userName: string;
   content: string;
   createdAt: string;
+  parentCommentId?: string | null;
+  depth?: number;
 };
 
 type Props = {
@@ -68,6 +84,7 @@ type Props = {
   onLike?: (reviewId: string, likedBy: string[]) => void;
   onHelpful?: (reviewId: string, helpfulBy: string[]) => void;
   onNotHelpful?: (reviewId: string, notHelpfulBy: string[]) => void;
+  onFork?: (review: ReviewData) => void;
   showPoolLink?: boolean;
 };
 
@@ -86,6 +103,7 @@ function CommentThread({
   const [loaded, setLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const [replyingTo, setReplyingTo] = useState<{ id: string; userName: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const loadComments = async () => {
@@ -111,22 +129,52 @@ function CommentThread({
     if (!currentUserId || !newComment.trim()) return;
     setSubmitting(true);
     try {
-      const commentData = {
+      const commentData: Record<string, unknown> = {
         reviewId,
         userId: currentUserId,
         userName: currentUserName || "Anonymous",
         content: newComment.trim(),
         createdAt: new Date().toISOString(),
+        parentCommentId: replyingTo?.id ?? null,
+        depth: replyingTo ? Math.min((comments.find((c) => c.id === replyingTo.id)?.depth ?? 0) + 1, 2) : 0,
       };
       const ref = await addDoc(collection(db, "reviewComments"), commentData);
-      setComments((prev) => [...prev, { id: ref.id, ...commentData }]);
-      // Bump the review's commentCount
+      setComments((prev) => [...prev, { id: ref.id, ...commentData } as Comment]);
       await updateDoc(doc(db, "reviews", reviewId), { commentCount: increment(1) });
       setNewComment("");
+      setReplyingTo(null);
     } finally {
       setSubmitting(false);
     }
   };
+
+  // Build threaded view: top-level first, then children nested
+  const topLevel = comments.filter((c) => !c.parentCommentId);
+  const childrenOf = (parentId: string) => comments.filter((c) => c.parentCommentId === parentId);
+
+  const renderComment = (c: Comment, depth: number) => (
+    <div key={c.id} style={{ marginLeft: depth * 20 }}>
+      <div className="flex gap-2">
+        <div className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[9px] font-medium text-slate-600 dark:text-slate-300 shrink-0">
+          {c.userName.charAt(0)}
+        </div>
+        <div className="flex-1 min-w-0">
+          <span className="text-[12px] font-medium text-slate-700 dark:text-slate-300 mr-1">{c.userName}</span>
+          <span className="text-[12px] text-slate-600 dark:text-slate-400">{c.content}</span>
+          {currentUserId && depth < 2 && (
+            <button
+              type="button"
+              onClick={() => setReplyingTo({ id: c.id, userName: c.userName })}
+              className="ml-2 text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+            >
+              Reply
+            </button>
+          )}
+        </div>
+      </div>
+      {childrenOf(c.id).map((child) => renderComment(child, depth + 1))}
+    </div>
+  );
 
   return (
     <div className="mt-2 border-t border-slate-100 dark:border-slate-800 pt-2">
@@ -143,36 +191,34 @@ function CommentThread({
           {comments.length === 0 && (
             <p className="text-[12px] text-slate-400 dark:text-slate-600">No comments yet.</p>
           )}
-          {comments.map((c) => (
-            <div key={c.id} className="flex gap-2">
-              <div className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[9px] font-medium text-slate-600 dark:text-slate-300 shrink-0">
-                {c.userName.charAt(0)}
-              </div>
-              <div className="flex-1 min-w-0">
-                <span className="text-[12px] font-medium text-slate-700 dark:text-slate-300 mr-1">{c.userName}</span>
-                <span className="text-[12px] text-slate-600 dark:text-slate-400">{c.content}</span>
-              </div>
-            </div>
-          ))}
+          {topLevel.map((c) => renderComment(c, 0))}
 
           {currentUserId && (
-            <div className="flex gap-2 pt-1">
-              <input
-                type="text"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleSubmitComment(); } }}
-                placeholder="Add a comment…"
-                className="flex-1 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 md:px-2.5 md:py-1.5 text-sm md:text-[12px] focus:outline-none focus:ring-1 focus:ring-slate-300 dark:text-slate-100 dark:placeholder-slate-500"
-              />
-              <button
-                type="button"
-                onClick={handleSubmitComment}
-                disabled={!newComment.trim() || submitting}
-                className="px-3 py-2.5 md:px-2.5 md:py-1.5 bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-900 rounded-lg text-sm md:text-[12px] font-medium disabled:opacity-40 hover:opacity-90 transition"
-              >
-                {submitting ? "…" : "Post"}
-              </button>
+            <div className="pt-1">
+              {replyingTo && (
+                <div className="flex items-center gap-1 mb-1">
+                  <span className="text-[10px] text-slate-500">Replying to {replyingTo.userName}</span>
+                  <button type="button" onClick={() => setReplyingTo(null)} className="text-[10px] text-slate-400 hover:text-slate-600">✕</button>
+                </div>
+              )}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleSubmitComment(); } }}
+                  placeholder={replyingTo ? `Reply to ${replyingTo.userName}…` : "Add a comment…"}
+                  className="flex-1 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 md:px-2.5 md:py-1.5 text-sm md:text-[12px] focus:outline-none focus:ring-1 focus:ring-slate-300 dark:text-slate-100 dark:placeholder-slate-500"
+                />
+                <button
+                  type="button"
+                  onClick={handleSubmitComment}
+                  disabled={!newComment.trim() || submitting}
+                  className="px-3 py-2.5 md:px-2.5 md:py-1.5 bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-900 rounded-lg text-sm md:text-[12px] font-medium disabled:opacity-40 hover:opacity-90 transition"
+                >
+                  {submitting ? "…" : "Post"}
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -190,9 +236,11 @@ export default function ReviewCard({
   onLike,
   onHelpful,
   onNotHelpful,
+  onFork,
   showPoolLink = true,
 }: Props) {
   const [showComments, setShowComments] = useState(false);
+  const [showTimeline, setShowTimeline] = useState(false);
 
   const hasLiked       = !!(currentUserId && review.likedBy?.includes(currentUserId));
   const hasHelpful     = !!(currentUserId && review.helpfulBy?.includes(currentUserId));
@@ -241,12 +289,24 @@ export default function ReviewCard({
                 <span className="text-slate-500 dark:text-slate-500 text-[13px]">· {review.category}</span>
               )}
             </div>
-            {review.rating != null && (
-              <span className="text-[11px] font-medium text-amber-700 dark:text-amber-400/90 tabular-nums shrink-0">
-                ★ {review.rating}
-              </span>
-            )}
+            <div className="flex items-center gap-1.5 shrink-0">
+              {review.healthScore != null && (
+                <HealthScoreBadge score={review.healthScore} breakdown={review.healthScoreBreakdown} />
+              )}
+              {review.rating != null && (
+                <span className="text-[11px] font-medium text-amber-700 dark:text-amber-400/90 tabular-nums">
+                  ★ {review.rating}
+                </span>
+              )}
+            </div>
           </div>
+
+          {/* Forked-from banner */}
+          {review.forkedFromReviewId && (
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1">
+              <span>⑂</span> Forked from {review.forkedFromReviewerName || "another review"}
+            </p>
+          )}
 
           {/* Product name + context badges */}
           {review.productName && (
@@ -261,6 +321,17 @@ export default function ReviewCard({
                 <span className="text-[10px] font-medium bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded">
                   {sourceLabel}
                 </span>
+              )}
+              {review.channelSlug && (
+                <a href={`/channels/${review.channelSlug}`} className="text-[10px] font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded hover:underline">
+                  r/{review.channelSlug}
+                </a>
+              )}
+              {(review.versionCount ?? 0) > 1 && (
+                <button type="button" onClick={() => setShowTimeline((v) => !v)}
+                  className="text-[10px] font-medium bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded hover:bg-blue-100 dark:hover:bg-blue-900/40 transition">
+                  {review.versionCount} updates
+                </button>
               )}
             </p>
           )}
@@ -398,6 +469,19 @@ export default function ReviewCard({
               <span className="tabular-nums">{commentCount}</span>
             </button>
 
+            {/* Fork */}
+            {onFork && (
+              <button
+                type="button"
+                onClick={() => onFork(review)}
+                className="flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/50 transition-colors"
+                title="Fork — write your take on this review"
+              >
+                <span aria-hidden>⑂</span>
+                {(review.forkCount ?? 0) > 0 && <span className="tabular-nums">{review.forkCount}</span>}
+              </button>
+            )}
+
             {/* Share */}
             <button
               type="button"
@@ -425,6 +509,20 @@ export default function ReviewCard({
               </Link>
             )}
           </div>
+
+          {/* Version timeline */}
+          {showTimeline && (
+            <ReviewTimeline
+              reviewId={review.id}
+              originalReview={{
+                content: review.content,
+                rating: review.rating,
+                pros: review.pros,
+                cons: review.cons,
+                createdAt: review.createdAt,
+              }}
+            />
+          )}
 
           {/* Comments thread */}
           {showComments && (

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { collection, addDoc, getDocs, limit, orderBy, query, doc, updateDoc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase";
+import { computeHealthScore } from "../../lib/healthScore";
 
 // REPLACE THIS WITH YOUR EXACT GOOGLE LOGIN EMAIL
 const ADMIN_EMAIL = "sumit.pandey75@gmail.com"; 
@@ -176,14 +177,22 @@ export default function AdminDashboard() {
       const now = new Date();
       const day = 24 * 60 * 60 * 1000;
 
-      // ── Clear existing products and reviews ───────────────────────────────
-      const [prodSnap, revSnap] = await Promise.all([
+      // ── Clear existing data ──────────────────────────────────────────────
+      const [prodSnap, revSnap, chSnap, cmSnap, rcSnap, rfSnap] = await Promise.all([
         getDocs(collection(db, "products")),
         getDocs(collection(db, "reviews")),
+        getDocs(collection(db, "channels")),
+        getDocs(collection(db, "channelMembers")),
+        getDocs(collection(db, "reviewComments")),
+        getDocs(collection(db, "reviewForks")),
       ]);
       await Promise.all([
         ...prodSnap.docs.map((d) => deleteDoc(d.ref)),
         ...revSnap.docs.map((d) => deleteDoc(d.ref)),
+        ...chSnap.docs.map((d) => deleteDoc(d.ref)),
+        ...cmSnap.docs.map((d) => deleteDoc(d.ref)),
+        ...rcSnap.docs.map((d) => deleteDoc(d.ref)),
+        ...rfSnap.docs.map((d) => deleteDoc(d.ref)),
       ]);
 
       setStatusMessage("Inserting campaigns…");
@@ -265,8 +274,9 @@ export default function AdminDashboard() {
         { productName: "Wealthfront", category: "Finance", campaignId: "organic", productId: "org_15", reviewerName: "Grace S.", rating: 5, summary: "Set it and forget it investing that actually works", content: "Tax-loss harvesting alone has saved me more than the management fee costs. The Path planning tool showed me I could retire three years earlier than I thought. Portfolio line of credit at 5% beats any HELOC I have seen.", pros: ["Tax-loss harvesting", "Path planner", "Portfolio credit line"], cons: ["No individual stock picking"], likesCount: 189, isCampaignReview: false, createdAt: ago(28) },
       ];
 
+      const reviewIds: string[] = [];
       for (const rev of reviews) {
-        await addDoc(collection(db, "reviews"), {
+        const reviewData = {
           ...rev,
           reviewerId: "seed_user",
           likedBy: [],
@@ -275,12 +285,136 @@ export default function AdminDashboard() {
           notHelpfulCount: 0,
           notHelpfulBy: [],
           commentCount: 0,
+          forkCount: 0,
+          versionCount: 1,
           eligibleForPayout: rev.isCampaignReview,
           reviewType: rev.isCampaignReview ? "campaign" : "verified",
+          mediaUrls: [],
+        };
+        const { score, breakdown } = computeHealthScore(reviewData, 0, 0);
+        const ref = await addDoc(collection(db, "reviews"), {
+          ...reviewData,
+          healthScore: score,
+          healthScoreBreakdown: breakdown,
+          healthScoreUpdatedAt: now.toISOString(),
+        });
+        reviewIds.push(ref.id);
+      }
+
+      setStatusMessage("Inserting channels…");
+
+      // ── Sample channels ──────────────────────────────────────────────────
+      const sampleChannels = [
+        { name: "Smartphones", slug: "smartphones", description: "Reviews of the latest smartphones, cases, and accessories", category: "Tech", iconEmoji: "📱" },
+        { name: "Standing Desks", slug: "standing-desks", description: "Standing desk reviews, ergonomics tips, and setup inspiration", category: "Home", iconEmoji: "🪑" },
+        { name: "Skincare", slug: "skincare", description: "Skincare product reviews, routines, and ingredient breakdowns", category: "Beauty", iconEmoji: "✨" },
+        { name: "Electric Vehicles", slug: "electric-vehicles", description: "EV reviews, charging tips, and road trip reports", category: "Automotive", iconEmoji: "⚡" },
+      ];
+
+      const channelIds: Record<string, string> = {};
+      for (const ch of sampleChannels) {
+        const ref = await addDoc(collection(db, "channels"), {
+          ...ch,
+          creatorId: "seed_admin",
+          creatorName: "Admin",
+          memberCount: 5,
+          reviewCount: 0,
+          createdAt: now.toISOString(),
+          isOfficial: true,
+        });
+        channelIds[ch.slug] = ref.id;
+      }
+
+      setStatusMessage("Adding engagement data…");
+
+      // ── Version updates on first 2 reviews ───────────────────────────────
+      if (reviewIds.length >= 2) {
+        // 3-month update on first review
+        await addDoc(collection(db, "reviews", reviewIds[0], "versions"), {
+          versionNumber: 2,
+          versionLabel: "3 Month Update",
+          content: "Three months in and the noise cancellation is still best-in-class. The ear cushions have broken in nicely and comfort has improved significantly. Battery still holds 38+ hours.",
+          rating: 5,
+          subRatings: {},
+          pros: ["Broken-in comfort", "Consistent ANC"],
+          cons: ["App still bloated"],
+          mediaUrls: [],
+          createdAt: ago(1),
+        });
+        await updateDoc(doc(db, "reviews", reviewIds[0]), {
+          versionCount: 2,
+          latestVersionLabel: "3 Month Update",
+          lastUpdatedAt: ago(1),
+        });
+
+        // 6-month update on second review
+        await addDoc(collection(db, "reviews", reviewIds[1], "versions"), {
+          versionNumber: 2,
+          versionLabel: "6 Month Update",
+          content: "After six months of daily use, the headband padding shows slight wear but the sound quality is unchanged. Multipoint has become essential for my workflow switching between phone and laptop.",
+          rating: 4,
+          subRatings: {},
+          pros: ["Multipoint essential", "Sound quality holds"],
+          cons: ["Headband wear"],
+          mediaUrls: [],
+          createdAt: ago(1),
+        });
+        await updateDoc(doc(db, "reviews", reviewIds[1]), {
+          versionCount: 2,
+          latestVersionLabel: "6 Month Update",
+          lastUpdatedAt: ago(1),
         });
       }
 
-      setStatusMessage(`✅ Done! Inserted ${campaigns.length} campaigns and ${reviews.length} reviews across all 9 categories.`);
+      // ── Fork: third review forks the first ───────────────────────────────
+      if (reviewIds.length >= 3) {
+        await updateDoc(doc(db, "reviews", reviewIds[2]), {
+          forkedFromReviewId: reviewIds[0],
+          forkedFromReviewerName: "Alex Chen",
+        });
+        await updateDoc(doc(db, "reviews", reviewIds[0]), { forkCount: 1 });
+        await addDoc(collection(db, "reviewForks"), {
+          originalReviewId: reviewIds[0],
+          forkReviewId: reviewIds[2],
+          forkerId: "seed_user",
+          forkerName: "Dan T.",
+          createdAt: ago(10),
+        });
+      }
+
+      // ── Threaded comments ────────────────────────────────────────────────
+      if (reviewIds.length >= 1) {
+        const c1 = await addDoc(collection(db, "reviewComments"), {
+          reviewId: reviewIds[0],
+          userId: "seed_user_2",
+          userName: "Marcus T.",
+          content: "Totally agree about the ANC. Have you tried them on a plane?",
+          createdAt: ago(2),
+          parentCommentId: null,
+          depth: 0,
+        });
+        await addDoc(collection(db, "reviewComments"), {
+          reviewId: reviewIds[0],
+          userId: "seed_user",
+          userName: "Alex Chen",
+          content: "Yes! Used them on a 12-hour flight to Tokyo. Complete silence even during takeoff.",
+          createdAt: ago(1),
+          parentCommentId: c1.id,
+          depth: 1,
+        });
+        await addDoc(collection(db, "reviewComments"), {
+          reviewId: reviewIds[0],
+          userId: "seed_user_3",
+          userName: "Sophie K.",
+          content: "How do they compare to the Bose QC Ultra?",
+          createdAt: ago(1),
+          parentCommentId: null,
+          depth: 0,
+        });
+        await updateDoc(doc(db, "reviews", reviewIds[0]), { commentCount: 3 });
+      }
+
+      setStatusMessage(`✅ Done! Inserted ${campaigns.length} campaigns, ${reviews.length} reviews, ${sampleChannels.length} channels, version updates, forks, and threaded comments.`);
     } catch (error) {
       console.error(error);
       setStatusMessage("❌ Error seeding data. Check console.");

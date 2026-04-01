@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 import {
   collection, getDocs, query, where,
-  doc, updateDoc, increment, addDoc,
+  doc, updateDoc, increment, addDoc, getDoc,
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
-
-// Reviews with photos contribute 1.5× their likes weight
-const PHOTO_MULTIPLIER = 1.5;
+import { computeHealthScore } from "../../../lib/healthScore";
 
 export async function POST(req: Request) {
   try {
@@ -27,36 +25,53 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "No reviews found for this campaign." });
     }
 
-    // Compute weighted likes — photos get 1.5× multiplier
-    const weightedLikes = (r: any) => {
-      const hasPhoto = r.mediaUrls && r.mediaUrls.length > 0;
-      return (r.likesCount || 0) * (hasPhoto ? PHOTO_MULTIPLIER : 1);
-    };
+    // Compute health scores for all reviews before distributing
+    const scoredReviews: { review: any; score: number }[] = [];
+    for (const review of reviews) {
+      let badgeCount = 0;
+      let reviewCount = 0;
+      if (review.reviewerId) {
+        try {
+          const userSnap = await getDoc(doc(db, "users", review.reviewerId));
+          if (userSnap.exists()) {
+            const u = userSnap.data();
+            badgeCount = (u.badges ?? []).length;
+          }
+          const rq = query(collection(db, "reviews"), where("reviewerId", "==", review.reviewerId));
+          const rSnap = await getDocs(rq);
+          reviewCount = rSnap.size;
+        } catch { /* ignore */ }
+      }
+      const { score } = computeHealthScore(review, badgeCount, reviewCount);
+      scoredReviews.push({ review, score });
+      // Persist updated score on the review doc
+      await updateDoc(doc(db, "reviews", review.id), {
+        healthScore: score,
+        healthScoreUpdatedAt: new Date().toISOString(),
+      });
+    }
 
-    const totalWeight = reviews.reduce((sum, r) => sum + weightedLikes(r), 0);
+    const totalWeight = scoredReviews.reduce((sum, r) => sum + r.score, 0);
 
     if (totalWeight === 0) {
       return NextResponse.json({
         success: false,
-        error: "No likes on any reviews. Cannot distribute funds.",
+        error: "All reviews have a health score of 0. Cannot distribute funds.",
       });
     }
 
     const paidAt = new Date().toISOString();
     let payoutsMade = 0;
 
-    for (const review of reviews) {
-      const wt = weightedLikes(review);
-      if (wt > 0 && review.reviewerId) {
-        const share = (wt / totalWeight) * budget;
+    for (const { review, score } of scoredReviews) {
+      if (score > 0 && review.reviewerId) {
+        const share = (score / totalWeight) * budget;
 
-        // Update wallet balance
         await updateDoc(doc(db, "users", review.reviewerId), {
           walletBalance: increment(share),
           totalEarned: increment(share),
         });
 
-        // Create a ledger entry so the reviewer can see the breakdown
         await addDoc(collection(db, "payoutLedger"), {
           userId: review.reviewerId,
           reviewerName: review.reviewerName || "Anonymous",
@@ -65,8 +80,8 @@ export async function POST(req: Request) {
           productName: review.productName || "",
           productId: review.productId || "",
           amount: share,
+          healthScore: score,
           rawLikes: review.likesCount || 0,
-          weightedLikes: wt,
           hasPhoto: !!(review.mediaUrls && review.mediaUrls.length > 0),
           status: "paid",
           paidAt,

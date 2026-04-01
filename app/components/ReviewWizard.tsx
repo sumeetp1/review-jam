@@ -22,6 +22,10 @@ export type ReviewFormData = {
   isCampaignReview: boolean;
   reviewType: "campaign" | "verified" | "generic";
   productCode?: string;
+  forkedFromReviewId?: string;
+  forkedFromReviewerName?: string;
+  channelId?: string;
+  channelSlug?: string;
 };
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -407,11 +411,22 @@ function GenericReviewForm({
 
 // ─── Main Wizard (Campaign / Verified / Organic) ──────────────────────────────
 
+type ForkSource = {
+  reviewId: string;
+  reviewerName: string;
+  productName: string;
+  category: string;
+  productId?: string;
+};
+
 type Props = {
   user: User;
   mode: "organic" | "campaign" | "verified" | "generic";
   productInfo?: { name: string; category: string };
   isCampaignReview?: boolean;
+  forkSource?: ForkSource;
+  channelId?: string;
+  channelSlug?: string;
   onSubmit: (data: ReviewFormData) => Promise<void>;
   onClose: () => void;
 };
@@ -423,16 +438,34 @@ export default function ReviewWizard({
   mode,
   productInfo,
   isCampaignReview = false,
+  forkSource,
+  channelId,
+  channelSlug,
   onSubmit,
   onClose,
 }: Props) {
+  // If forking, pre-fill product info from the fork source
+  const effectiveProductInfo = forkSource
+    ? { name: forkSource.productName, category: forkSource.category }
+    : productInfo;
+
+  // Wrap onSubmit to inject fork/channel metadata
+  const wrappedSubmit = async (data: ReviewFormData) => {
+    if (forkSource) {
+      data.forkedFromReviewId = forkSource.reviewId;
+      data.forkedFromReviewerName = forkSource.reviewerName;
+    }
+    if (channelId) { data.channelId = channelId; }
+    if (channelSlug) { data.channelSlug = channelSlug; }
+    return onSubmit(data);
+  };
 
   // Generic mode delegates to a simpler component
   if (mode === "generic") {
     return (
       <GenericReviewForm
-        productInfo={productInfo}
-        onSubmit={onSubmit}
+        productInfo={effectiveProductInfo}
+        onSubmit={wrappedSubmit}
         onClose={onClose}
       />
     );
@@ -441,9 +474,9 @@ export default function ReviewWizard({
   return (
     <FullReviewWizard
       mode={mode}
-      productInfo={productInfo}
+      productInfo={effectiveProductInfo}
       isCampaignReview={isCampaignReview}
-      onSubmit={onSubmit}
+      onSubmit={wrappedSubmit}
       onClose={onClose}
     />
   );

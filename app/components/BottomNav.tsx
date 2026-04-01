@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const NAV_ITEMS = [
   { href: "/",          label: "Home",      icon: HomeIcon },
   { href: "/explore",   label: "Explore",   icon: ExploreIcon },
+  { href: "/channels",  label: "Channels",  icon: ChannelsIcon },
   { href: "/campaigns", label: "Campaigns", icon: CampaignsIcon },
   { href: "/profile",   label: "Profile",   icon: ProfileIcon },
 ];
@@ -57,6 +58,18 @@ function ExploreIcon({ active }: { active: boolean }) {
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.2 : 1.8} strokeLinecap="round" strokeLinejoin="round">
       <circle cx="11" cy="11" r="8" fill={active ? "currentColor" : "none"} fillOpacity={active ? 0.12 : 0} />
       <path d="M21 21l-4.35-4.35" />
+    </svg>
+  );
+}
+
+function ChannelsIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.2 : 1.8} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 20h16" />
+      <path d="M4 15h16" />
+      <path d="M4 10h16" />
+      <path d="M8 4v16" fill={active ? "currentColor" : "none"} fillOpacity={active ? 0.12 : 0} />
+      <path d="M16 4v16" fill={active ? "currentColor" : "none"} fillOpacity={active ? 0.12 : 0} />
     </svg>
   );
 }

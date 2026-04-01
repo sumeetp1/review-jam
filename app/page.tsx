@@ -12,7 +12,7 @@ import { signInWithPopup, signOut, onAuthStateChanged, User } from "firebase/aut
 import { db, auth, googleProvider, storage } from "../lib/firebase";
 import { updateUserBadges } from "../lib/badges";
 import ReviewWizard, { ReviewFormData, AVAILABLE_CATEGORIES } from "./components/ReviewWizard";
-import ReviewCard from "./components/ReviewCard";
+import ReviewCard, { type ReviewData } from "./components/ReviewCard";
 
 type FeedTab = "foryou" | "trending" | "campaigns";
 
@@ -32,6 +32,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   const [reviewMode, setReviewMode] = useState<"organic" | "verified" | "generic" | null>(null);
+  const [forkSource, setForkSource] = useState<{ reviewId: string; reviewerName: string; productName: string; category: string; productId?: string } | null>(null);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [currentTime, setCurrentTime] = useState(Date.now());
@@ -188,7 +189,7 @@ export default function Home() {
       marketingQuote = agentData.analysis?.marketingQuote || data.summary || "";
     }
 
-    const newReview = {
+    const newReview: Record<string, unknown> = {
       content: data.content,
       rating: data.overallRating,
       reviewerId: user.uid,
@@ -204,6 +205,8 @@ export default function Home() {
       notHelpfulCount: 0,
       notHelpfulBy: [],
       commentCount: 0,
+      forkCount: 0,
+      versionCount: 1,
       marketingQuote,
       pros: data.pros,
       cons: data.cons,
@@ -221,8 +224,29 @@ export default function Home() {
       createdAt: new Date().toISOString(),
     };
 
+    // Fork metadata
+    if (data.forkedFromReviewId) {
+      newReview.forkedFromReviewId = data.forkedFromReviewId;
+      newReview.forkedFromReviewerName = data.forkedFromReviewerName;
+      // Increment fork count on original
+      await updateDoc(doc(db, "reviews", data.forkedFromReviewId), { forkCount: increment(1) });
+      setAllReviews((cur) => cur.map((r) => r.id === data.forkedFromReviewId ? { ...r, forkCount: (r.forkCount || 0) + 1 } : r));
+      await addDoc(collection(db, "reviewForks"), {
+        originalReviewId: data.forkedFromReviewId,
+        forkReviewId: "", // will update after
+        forkerId: user.uid,
+        forkerName: user.displayName,
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    // Channel metadata
+    if (data.channelId) { newReview.channelId = data.channelId; }
+    if (data.channelSlug) { newReview.channelSlug = data.channelSlug; }
+
     const docRef = await addDoc(collection(db, "reviews"), newReview);
-    setAllReviews((prev) => [{ id: docRef.id, ...newReview }, ...prev]);
+    setAllReviews((prev) => [{ id: docRef.id, ...newReview } as ReviewData, ...prev]);
+    setForkSource(null);
 
     if (data.reviewType !== "generic") updateUserBadges(user.uid).catch(() => {});
   };
@@ -264,6 +288,18 @@ export default function Home() {
       notHelpfulCount: increment(has ? -1 : 1),
       notHelpfulBy: has ? arrayRemove(user.uid) : arrayUnion(user.uid),
     });
+  };
+
+  const handleFork = (review: ReviewData) => {
+    if (!user) { handleLogin(); return; }
+    setForkSource({
+      reviewId: review.id,
+      reviewerName: review.reviewerName || "Anonymous",
+      productName: review.productName || "",
+      category: review.category || "Tech",
+      productId: review.productId,
+    });
+    setReviewMode("verified");
   };
 
   const getReviewCount = (campaignId: string) =>
@@ -334,8 +370,9 @@ export default function Home() {
         <ReviewWizard
           user={user}
           mode={reviewMode}
+          forkSource={forkSource ?? undefined}
           onSubmit={handleReviewSubmit}
-          onClose={() => setReviewMode(null)}
+          onClose={() => { setReviewMode(null); setForkSource(null); }}
         />
       )}
 
@@ -637,6 +674,7 @@ export default function Home() {
                   onLike={handleLike}
                   onHelpful={handleHelpful}
                   onNotHelpful={handleNotHelpful}
+                  onFork={handleFork}
                   showPoolLink
                 />
               ))
