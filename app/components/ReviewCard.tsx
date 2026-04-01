@@ -66,6 +66,9 @@ export type ReviewData = {
   channelId?: string;
   reviewerId?: string;
   createdAt?: string;
+  // SKU / variant
+  variantId?: string;
+  variantName?: string;
 };
 
 type Comment = {
@@ -323,6 +326,11 @@ export default function ReviewCard({
                 <a href={`/channels/${review.channelSlug}`} className="text-[10px] font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded hover:underline">
                   rj/{review.channelSlug}
                 </a>
+              )}
+              {review.variantName && (
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-medium bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 px-1.5 py-0.5 rounded border border-violet-100 dark:border-violet-900/40">
+                  🎨 {review.variantName}
+                </span>
               )}
               {(review.versionCount ?? 0) > 1 && (
                 <button type="button" onClick={() => setShowTimeline((v) => !v)}

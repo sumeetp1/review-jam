@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { collection, addDoc, getDocs, limit, orderBy, query, doc, updateDoc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, limit, orderBy, query, doc, updateDoc, setDoc, getDoc, deleteDoc, writeBatch } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase";
 import { computeHealthScore } from "../../lib/healthScore";
 
@@ -40,6 +40,7 @@ export default function AdminDashboard() {
   const [newDescription, setNewDescription] = useState("");
   const [newBudget, setNewBudget] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [variantRows, setVariantRows] = useState<string[]>([""]);
 
   // Applications state
   type CampaignApplication = {
@@ -132,7 +133,7 @@ export default function AdminDashboard() {
     try {
       const universalEndDate = new Date(endDateLocal).toISOString();
 
-      await addDoc(collection(db, "products"), {
+      const productRef = await addDoc(collection(db, "products"), {
         name: newProdName,
         brandName: newBrandName,
         brandEmail: newBrandEmail.trim().toLowerCase(),
@@ -143,8 +144,21 @@ export default function AdminDashboard() {
         budget: newBudget ? Number(newBudget) : null,
         createdAt: new Date().toISOString(),
       });
-      alert("Campaign Created Successfully! It is now live on the homepage.");
+
+      // Write variants to subcollection
+      const validVariants = variantRows.map((v) => v.trim()).filter(Boolean);
+      if (validVariants.length > 0) {
+        const batch = writeBatch(db);
+        for (const name of validVariants) {
+          const variantRef = doc(collection(db, "products", productRef.id, "productVariants"));
+          batch.set(variantRef, { name, createdAt: new Date().toISOString() });
+        }
+        await batch.commit();
+      }
+
+      alert(`Campaign Created Successfully! ${validVariants.length > 0 ? `${validVariants.length} variant(s) added.` : ""} It is now live on the homepage.`);
       setNewProdName(""); setNewBrandName(""); setNewBrandEmail(""); setNewCampaignId(""); setEndDateLocal(""); setNewDescription(""); setNewBudget("");
+      setVariantRows([""]);
     } catch (error) {
       console.error("Error creating campaign:", error);
       alert("Failed to create campaign.");
@@ -624,6 +638,45 @@ export default function AdminDashboard() {
                   <input type="datetime-local" required value={endDateLocal} onChange={e => setEndDateLocal(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none" />
                 </div>
               </div>
+              {/* Variants / SKUs */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-sm font-bold text-slate-400">
+                    Variants / SKUs{" "}
+                    <span className="font-normal text-slate-500 text-xs">(optional — e.g. "Black 256GB", "Blue 128GB")</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setVariantRows((rows) => [...rows, ""])}
+                    className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold"
+                  >
+                    + Add variant
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {variantRows.map((v, idx) => (
+                    <div key={idx} className="flex gap-2">
+                      <input
+                        type="text"
+                        value={v}
+                        onChange={(e) => setVariantRows((rows) => rows.map((r, i) => (i === idx ? e.target.value : r)))}
+                        placeholder={`Variant ${idx + 1} — e.g. Blue · 128GB`}
+                        className="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none text-sm placeholder-slate-600"
+                      />
+                      {variantRows.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => setVariantRows((rows) => rows.filter((_, i) => i !== idx))}
+                          className="px-3 text-slate-500 hover:text-red-400 transition"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <button type="submit" disabled={isCreating} className="w-full bg-indigo-600 text-white py-4 rounded-xl font-black mt-2 hover:bg-indigo-500 transition disabled:opacity-50">
                 {isCreating ? "Publishing..." : "Launch Campaign Live"}
               </button>

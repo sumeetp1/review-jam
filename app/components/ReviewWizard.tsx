@@ -26,6 +26,9 @@ export type ReviewFormData = {
   forkedFromReviewerName?: string;
   channelId?: string;
   channelSlug?: string;
+  // SKU / variant
+  variantId?: string;
+  variantName?: string;
 };
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -419,10 +422,12 @@ type ForkSource = {
   productId?: string;
 };
 
+export type ProductVariant = { id: string; name: string };
+
 type Props = {
   user: User;
   mode: "organic" | "campaign" | "verified" | "generic";
-  productInfo?: { name: string; category: string };
+  productInfo?: { name: string; category: string; variants?: ProductVariant[] };
   isCampaignReview?: boolean;
   forkSource?: ForkSource;
   channelId?: string;
@@ -500,6 +505,8 @@ function FullReviewWizard({
   const [productName, setProductName] = useState(productInfo?.name ?? "");
   const [category, setCategory] = useState(productInfo?.category ?? AVAILABLE_CATEGORIES[0]);
   const [productCode, setProductCode] = useState("");
+  const [variantId, setVariantId] = useState("");
+  const [variantName, setVariantName] = useState("");
   const [usageDuration, setUsageDuration] = useState<ReviewFormData["usageDuration"]>("1_4_weeks");
   const [purchaseChannel, setPurchaseChannel] = useState<ReviewFormData["purchaseChannel"]>("amazon");
   const [overallRating, setOverallRating] = useState(0);
@@ -528,6 +535,10 @@ function FullReviewWizard({
       }
       if (mode === "verified" && !productCode.trim()) {
         setError("Please enter your product code to verify ownership.");
+        return false;
+      }
+      if ((productInfo?.variants?.length ?? 0) > 0 && !variantId) {
+        setError("Please select the variant you reviewed.");
         return false;
       }
       if (overallRating === 0) {
@@ -604,6 +615,8 @@ function FullReviewWizard({
         isCampaignReview: isCampaignReview ?? false,
         reviewType: mode === "campaign" ? "campaign" : mode === "verified" ? "verified" : "campaign",
         productCode: mode === "verified" ? productCode : undefined,
+        variantId: variantId || undefined,
+        variantName: variantName || undefined,
       });
       onClose();
     } catch (err) {
@@ -706,6 +719,27 @@ function FullReviewWizard({
               <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg px-3 py-2.5">
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-0.5">Reviewing</p>
                 <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{productInfo?.name}</p>
+              </div>
+            )}
+
+            {/* Variant picker — shown when the product has SKUs */}
+            {(productInfo?.variants?.length ?? 0) > 0 && (
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                  Which variant did you review?{" "}
+                  <span className="text-red-400">*</span>
+                </label>
+                <div className="flex gap-2 flex-wrap">
+                  {productInfo!.variants!.map((v) => (
+                    <OptionButton
+                      key={v.id}
+                      selected={variantId === v.id}
+                      onClick={() => { setVariantId(v.id); setVariantName(v.name); }}
+                    >
+                      {v.name}
+                    </OptionButton>
+                  ))}
+                </div>
               </div>
             )}
 

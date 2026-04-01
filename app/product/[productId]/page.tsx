@@ -11,7 +11,7 @@ import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage
 import { onAuthStateChanged, User } from "firebase/auth";
 import { db, auth, storage } from "../../../lib/firebase";
 import { updateUserBadges } from "../../../lib/badges";
-import ReviewWizard, { ReviewFormData } from "../../components/ReviewWizard";
+import ReviewWizard, { ReviewFormData, type ProductVariant } from "../../components/ReviewWizard";
 import ReviewCard from "../../components/ReviewCard";
 
 export default function ProductPage() {
@@ -20,6 +20,8 @@ export default function ProductPage() {
 
   const [product, setProduct] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [variants, setVariants] = useState<ProductVariant[]>([]);
+  const [selectedVariantId, setSelectedVariantId] = useState<string>("all");
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [reviewMode, setReviewMode] = useState<"campaign" | "verified" | "generic" | null>(null);
@@ -42,12 +44,24 @@ export default function ProductPage() {
     async function fetchProductAndReviews() {
       if (!productId) return;
       try {
+        // Fetch parent product
         const productRef = doc(db, "products", productId);
         const productSnap = await getDoc(productRef);
         if (productSnap.exists()) {
           setProduct({ id: productSnap.id, ...productSnap.data() });
         }
 
+        // Fetch variants subcollection
+        const variantSnap = await getDocs(
+          collection(db, "products", productId, "productVariants")
+        );
+        const fetchedVariants: ProductVariant[] = variantSnap.docs.map((d) => ({
+          id: d.id,
+          name: d.data().name as string,
+        }));
+        setVariants(fetchedVariants);
+
+        // Fetch all reviews for this product (all variants)
         const q = query(collection(db, "reviews"), where("productId", "==", productId));
         const snapshot = await getDocs(q);
         const fetched: any[] = [];
@@ -63,6 +77,19 @@ export default function ProductPage() {
 
     fetchProductAndReviews();
   }, [productId]);
+
+  // Filtered reviews based on selected variant
+  const filteredReviews =
+    selectedVariantId === "all"
+      ? reviews
+      : reviews.filter((r) => r.variantId === selectedVariantId);
+
+  // Aggregate stats for the currently filtered set
+  const displayedReviews = filteredReviews;
+  const avgRating =
+    displayedReviews.length > 0
+      ? (displayedReviews.reduce((sum, r) => sum + (r.rating || 0), 0) / displayedReviews.length).toFixed(1)
+      : null;
 
   const handleReviewSubmit = async (data: ReviewFormData) => {
     if (!user || !product) throw new Error("Missing user or product.");
@@ -144,8 +171,10 @@ export default function ProductPage() {
       reviewType: data.reviewType,
       productCode: data.productCode ?? null,
       isCampaignReview: data.reviewType === "campaign",
-      // Generic reviews excluded from payout pool
       eligibleForPayout: data.reviewType !== "generic",
+      // Variant / SKU
+      variantId: data.variantId ?? null,
+      variantName: data.variantName ?? null,
       createdAt: new Date().toISOString(),
     };
 
@@ -223,18 +252,13 @@ export default function ProductPage() {
     );
   }
 
-  const avgRating =
-    reviews.length > 0
-      ? (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length).toFixed(1)
-      : null;
-
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200">
       {reviewMode && user && (
         <ReviewWizard
           user={user}
           mode={reviewMode}
-          productInfo={{ name: product.name, category: product.category }}
+          productInfo={{ name: product.name, category: product.category, variants }}
           isCampaignReview={reviewMode === "campaign"}
           onSubmit={handleReviewSubmit}
           onClose={() => setReviewMode(null)}
@@ -266,10 +290,53 @@ export default function ProductPage() {
             </span>
             {avgRating && (
               <span className="text-[11px] font-medium text-amber-700 dark:text-amber-400">
-                ★ {avgRating} avg · {reviews.length} review{reviews.length !== 1 ? "s" : ""}
+                ★ {avgRating} avg · {displayedReviews.length} review{displayedReviews.length !== 1 ? "s" : ""}
+                {selectedVariantId !== "all" && (
+                  <span className="ml-1 text-slate-400">
+                    (filtered) · {reviews.length} total
+                  </span>
+                )}
               </span>
             )}
           </div>
+
+          {/* Variants — aggregate stats row */}
+          {variants.length > 0 && (
+            <div className="mt-3">
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                {variants.length} variant{variants.length !== 1 ? "s" : ""}
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {variants.map((v) => {
+                  const variantReviewCount = reviews.filter((r) => r.variantId === v.id).length;
+                  const variantAvg =
+                    variantReviewCount > 0
+                      ? (
+                          reviews
+                            .filter((r) => r.variantId === v.id)
+                            .reduce((s, r) => s + (r.rating || 0), 0) / variantReviewCount
+                        ).toFixed(1)
+                      : null;
+                  return (
+                    <div
+                      key={v.id}
+                      className="text-[11px] bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded px-2 py-1"
+                    >
+                      <span className="font-medium text-slate-700 dark:text-slate-300">{v.name}</span>
+                      {variantAvg ? (
+                        <span className="ml-1.5 text-amber-500 dark:text-amber-400">★ {variantAvg}</span>
+                      ) : (
+                        <span className="ml-1.5 text-slate-400">No reviews</span>
+                      )}
+                      <span className="ml-1 text-slate-400">
+                        ({variantReviewCount})
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Write review CTA */}
@@ -314,20 +381,66 @@ export default function ProductPage() {
           )}
         </div>
 
+        {/* Variant filter pills */}
+        {variants.length > 0 && (
+          <div className="px-4 py-3 border-b border-slate-200/80 dark:border-slate-800">
+            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+              Filter by variant
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                onClick={() => setSelectedVariantId("all")}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition ${
+                  selectedVariantId === "all"
+                    ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900"
+                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                }`}
+              >
+                All ({reviews.length})
+              </button>
+              {variants.map((v) => {
+                const count = reviews.filter((r) => r.variantId === v.id).length;
+                return (
+                  <button
+                    key={v.id}
+                    type="button"
+                    onClick={() => setSelectedVariantId(v.id)}
+                    className={`px-3 py-1 rounded-full text-xs font-medium transition ${
+                      selectedVariantId === v.id
+                        ? "bg-violet-600 text-white"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                    }`}
+                  >
+                    {v.name} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Reviews list */}
         <div className="divide-y divide-slate-200/80 dark:divide-slate-800">
           <div className="px-4 py-3">
             <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wide">
-              Reviews{reviews.length > 0 ? ` · ${reviews.length}` : ""}
+              Reviews
+              {selectedVariantId !== "all"
+                ? ` · ${variants.find((v) => v.id === selectedVariantId)?.name ?? ""} · ${displayedReviews.length}`
+                : displayedReviews.length > 0
+                ? ` · ${displayedReviews.length}`
+                : ""}
             </h3>
           </div>
 
-          {reviews.length === 0 ? (
+          {displayedReviews.length === 0 ? (
             <p className="px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-500">
-              No reviews yet. Be the first!
+              {selectedVariantId !== "all"
+                ? `No reviews for this variant yet.`
+                : "No reviews yet. Be the first!"}
             </p>
           ) : (
-            reviews.map((review) => (
+            displayedReviews.map((review) => (
               <ReviewCard
                 key={review.id}
                 review={review}
