@@ -14,6 +14,7 @@ import { updateUserBadges } from "../lib/badges";
 import ReviewWizard, { ReviewFormData, AVAILABLE_CATEGORIES } from "./components/ReviewWizard";
 import ReviewCard, { type ReviewData } from "./components/ReviewCard";
 import RightSidebar from "./components/RightSidebar";
+import LeftSidebar from "./components/LeftSidebar";
 
 type FeedTab = "foryou" | "trending" | "campaigns";
 
@@ -510,54 +511,18 @@ export default function Home() {
 
       <div className="max-w-7xl mx-auto flex justify-center">
 
-        {/* Left Nav */}
-        <aside className="hidden md:flex flex-col w-[260px] xl:w-[275px] h-screen sticky top-0 border-r border-slate-200/80 dark:border-slate-800 px-3 py-4 pr-4 xl:pr-6">
-          <Link href="/" className="mb-6 px-2">
-            <Image src="/logo.svg" alt="Review Jam" width={152} height={36} priority className="dark:hidden" />
-            <Image src="/logo-dark.svg" alt="Review Jam" width={152} height={36} priority className="hidden dark:block" />
-          </Link>
-
-          <nav className="flex flex-col gap-0.5 mb-6">
-            {[
-              { href: "/",           label: "Home",      icon: "🏠",  onClick: () => setActiveCategoryFilter("All") },
-              { href: "/explore",    label: "Explore",   icon: "🔍" },
-              { href: "/campaigns",  label: "Campaigns", icon: "🎯" },
-              { href: "/brands",     label: "For brands",icon: "🏢" },
-              { href: "/brands/dashboard", label: "Brand dashboard", icon: "📊" },
-              { href: "/admin",      label: "Admin",     icon: "⚡" },
-              { href: "/profile",    label: "Profile",   icon: "👤" },
-            ].map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={item.onClick}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/80 transition"
-              >
-                <span aria-hidden>{item.icon}</span> {item.label}
-              </Link>
-            ))}
-            <button type="button" onClick={toggleDarkMode} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/80 transition w-full text-left">
-              <span aria-hidden>{isDarkMode ? "☀️" : "🌙"}</span> {isDarkMode ? "Light" : "Dark"}
-            </button>
-          </nav>
-
-          <div className="w-full max-w-[200px] space-y-1.5">
-            <button
-              type="button"
-              onClick={() => { if (!user) handleLogin(); else setReviewMode("verified"); }}
-              className="btn-brand w-full text-sm font-semibold py-2.5 px-4 rounded-full"
-            >
-              ✍️ Post a review
-            </button>
-            <button
-              type="button"
-              onClick={() => { if (!user) handleLogin(); else setReviewMode("generic"); }}
-              className="w-full border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs py-1.5 px-4 rounded-full hover:border-amber-300 hover:text-amber-600 dark:hover:border-amber-700 dark:hover:text-amber-400 transition"
-            >
-              Quick review (no payout)
-            </button>
-          </div>
-        </aside>
+        {/* Left Sidebar */}
+        <LeftSidebar
+          user={user}
+          products={products}
+          isDarkMode={isDarkMode}
+          onToggleDark={toggleDarkMode}
+          onPostReview={() => setReviewMode("verified")}
+          onQuickReview={() => setReviewMode("generic")}
+          onLogin={handleLogin}
+          activeCategoryFilter={activeCategoryFilter}
+          onClearFilter={() => setActiveCategoryFilter("All")}
+        />
 
         {/* Center: Feed */}
         <main className="w-full md:w-[600px] md:max-w-[600px] md:shrink-0 md:border-x border-slate-200/80 dark:border-slate-800 min-h-screen">
@@ -684,14 +649,7 @@ export default function Home() {
         </main>
 
         {/* Right Sidebar */}
-        <RightSidebar
-          user={user}
-          products={products}
-          trendingInsights={trendingInsights}
-          allReviews={allReviews}
-          onLogin={handleLogin}
-          onLogout={handleLogout}
-        />
+        <RightSidebar allReviews={allReviews} />
       </div>
 
       {/* Mobile FAB — Post a review */}
