@@ -13,6 +13,7 @@ import { db, auth, googleProvider, storage } from "../lib/firebase";
 import { updateUserBadges } from "../lib/badges";
 import ReviewWizard, { ReviewFormData, AVAILABLE_CATEGORIES } from "./components/ReviewWizard";
 import ReviewCard, { type ReviewData } from "./components/ReviewCard";
+import RightSidebar from "./components/RightSidebar";
 
 type FeedTab = "foryou" | "trending" | "campaigns";
 
@@ -544,14 +545,14 @@ export default function Home() {
             <button
               type="button"
               onClick={() => { if (!user) handleLogin(); else setReviewMode("verified"); }}
-              className="w-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-sm font-medium py-2.5 px-4 rounded-full hover:bg-slate-800 dark:hover:bg-white transition"
+              className="btn-brand w-full text-sm font-semibold py-2.5 px-4 rounded-full"
             >
-              Post a review
+              ✍️ Post a review
             </button>
             <button
               type="button"
               onClick={() => { if (!user) handleLogin(); else setReviewMode("generic"); }}
-              className="w-full border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs py-1.5 px-4 rounded-full hover:bg-slate-50 dark:hover:bg-slate-900 transition"
+              className="w-full border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs py-1.5 px-4 rounded-full hover:border-amber-300 hover:text-amber-600 dark:hover:border-amber-700 dark:hover:text-amber-400 transition"
             >
               Quick review (no payout)
             </button>
@@ -575,7 +576,7 @@ export default function Home() {
                   onClick={() => setFeedTab(tab.id)}
                   className={`flex-1 py-3.5 md:py-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
                     feedTab === tab.id
-                      ? "border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100"
+                      ? "border-amber-500 text-amber-600 dark:text-amber-400"
                       : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
                   }`}
                 >
@@ -598,11 +599,11 @@ export default function Home() {
                   <span className="text-lg leading-none">‹</span>
                 </button>
                 <div ref={categoriesRef} className="flex gap-1.5 overflow-x-auto snap-x scroll-smooth px-7 w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                  <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${activeCategoryFilter === "All" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900"}`}>
+                  <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${activeCategoryFilter === "All" ? "bg-amber-500 text-white border-amber-500 shadow-sm shadow-amber-500/30" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-amber-300 hover:text-amber-600 dark:hover:border-amber-700 dark:hover:text-amber-400"}`}>
                     All
                   </button>
                   {AVAILABLE_CATEGORIES.map((cat) => (
-                    <button type="button" key={cat} onClick={() => setActiveCategoryFilter(cat)} className={`whitespace-nowrap px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${activeCategoryFilter === cat ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900"}`}>
+                    <button type="button" key={cat} onClick={() => setActiveCategoryFilter(cat)} className={`whitespace-nowrap px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${activeCategoryFilter === cat ? "bg-amber-500 text-white border-amber-500 shadow-sm shadow-amber-500/30" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-amber-300 hover:text-amber-600 dark:hover:border-amber-700 dark:hover:text-amber-400"}`}>
                       {cat}
                     </button>
                   ))}
@@ -683,69 +684,21 @@ export default function Home() {
         </main>
 
         {/* Right Sidebar */}
-        <aside className="hidden lg:block w-[300px] xl:w-[320px] pl-6 xl:pl-8 py-4 sticky top-0 h-screen overflow-y-auto text-[13px] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <div className="rounded-xl p-3 mb-4 border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 text-xs font-medium">
-              {user ? user.displayName?.charAt(0) : "?"}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm text-slate-900 dark:text-slate-100 leading-tight truncate">{user ? user.displayName : "Guest"}</p>
-              {user ? (
-                <button type="button" onClick={handleLogout} className="text-xs text-slate-500 hover:text-red-600 dark:text-slate-500 dark:hover:text-red-400 mt-0.5 transition">Log out</button>
-              ) : (
-                <button type="button" onClick={handleLogin} className="text-xs text-slate-600 dark:text-slate-400 hover:underline mt-0.5">Sign in</button>
-              )}
-            </div>
-          </div>
-
-          <div className="rounded-xl p-4 mb-4 border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-950">
-            <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wide mb-3">Trending</h2>
-            <div className="space-y-3">
-              {trendingInsights.length > 0 ? trendingInsights.map((insight) => (
-                <div key={insight.id}>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-500 mb-0.5">{insight.productName || insight.category}</p>
-                  <p className="text-[13px] text-slate-800 dark:text-slate-200 leading-snug">"{insight.summary || insight.marketingQuote}"</p>
-                  <p className="text-[12px] text-slate-500 dark:text-slate-500 mt-1">{insight.reviewerName}</p>
-                </div>
-              )) : <p className="text-[13px] text-slate-500 dark:text-slate-500">Nothing trending yet.</p>}
-            </div>
-          </div>
-
-          <div className="rounded-xl p-4 mb-4 border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-950">
-            <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wide mb-3">Active pools</h2>
-            <div className="space-y-3">
-              {products.length > 0 ? products.map((product) => (
-                <Link href={`/product/${product.id}`} key={product.id} className="block group py-1 -mx-1 px-1 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900/60">
-                  <div className="flex justify-between items-start gap-2 mb-0.5">
-                    <h4 className="font-medium text-[13px] text-slate-900 dark:text-slate-100 group-hover:underline truncate pr-1">{product.name}</h4>
-                    <span className="text-[10px] font-medium text-emerald-700 dark:text-emerald-400 shrink-0">Live</span>
-                  </div>
-                  <p className="text-[12px] text-slate-500 dark:text-slate-500 mb-1">{product.brandName}</p>
-                  <div className="flex justify-between items-center text-[11px] text-slate-500 dark:text-slate-500">
-                    <span>{new Date(product.endDate).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
-                    <span className="tabular-nums">{getReviewCount(product.campaignId)} reviews</span>
-                  </div>
-                </Link>
-              )) : <p className="text-[13px] text-slate-500 dark:text-slate-500">No pools right now.</p>}
-            </div>
-          </div>
-
-          <div className="mt-4 text-xs text-slate-500 dark:text-slate-600 flex flex-wrap gap-x-3 gap-y-1 px-1">
-            <Link href="/brands" className="hover:underline">For brands</Link>
-            <Link href="/explore" className="hover:underline">Explore</Link>
-            <Link href="/campaigns" className="hover:underline">Campaigns</Link>
-            <span className="hover:underline cursor-pointer">Terms</span>
-            <span className="hover:underline cursor-pointer">Privacy</span>
-            <p className="w-full mt-2 text-slate-400 dark:text-slate-600">© 2026 Review Jam</p>
-          </div>
-        </aside>
+        <RightSidebar
+          user={user}
+          products={products}
+          trendingInsights={trendingInsights}
+          allReviews={allReviews}
+          onLogin={handleLogin}
+          onLogout={handleLogout}
+        />
       </div>
 
       {/* Mobile FAB — Post a review */}
       <button
         type="button"
         onClick={() => { if (!user) handleLogin(); else setReviewMode("verified"); }}
-        className="md:hidden fixed bottom-[76px] right-4 z-40 w-14 h-14 rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 flex items-center justify-center hover:bg-indigo-500 active:scale-95 transition"
+        className="md:hidden fixed bottom-[76px] right-4 z-40 w-14 h-14 rounded-full btn-brand flex items-center justify-center active:scale-95 transition"
         aria-label="Post a review"
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

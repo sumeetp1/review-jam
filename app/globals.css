@@ -4,6 +4,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --brand: #f59e0b;
+  --brand-dark: #d97706;
+  --brand-hover: #fbbf24;
 }
 
 @theme inline {
@@ -27,6 +30,16 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Brand gradient button */
+.btn-brand {
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn-brand:hover { opacity: 0.92; }
+.btn-brand:active { transform: scale(0.97); }
 
 /* iOS safe area support for bottom nav */
 .safe-area-pb {

@@ -421,7 +421,7 @@ export default function ReviewCard({
               disabled={!onLike}
               className={`flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 transition-colors ${
                 hasLiked
-                  ? "text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800"
+                  ? "text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 font-medium"
                   : "hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/50"
               } disabled:cursor-default`}
             >
