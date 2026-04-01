@@ -324,7 +324,7 @@ export default function ReviewCard({
               )}
               {review.channelSlug && (
                 <a href={`/channels/${review.channelSlug}`} className="text-[10px] font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded hover:underline">
-                  r/{review.channelSlug}
+                  rj/{review.channelSlug}
                 </a>
               )}
               {(review.versionCount ?? 0) > 1 && (

@@ -45,7 +45,7 @@ export default function CreateChannelModal({ userId, userName, onClose, onCreate
       // Check slug uniqueness
       const existing = await getDocs(query(collection(db, "channels"), where("slug", "==", slug)));
       if (!existing.empty) {
-        setError(`Channel "r/${slug}" already exists. Choose a different name.`);
+        setError(`Channel "rj/${slug}" already exists. Choose a different name.`);
         setSubmitting(false);
         return;
       }
@@ -106,7 +106,7 @@ export default function CreateChannelModal({ userId, userName, onClose, onCreate
 
           <div>
             <label className="block text-[12px] font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-              Slug <span className="text-slate-400 font-normal">r/{slug || "..."}</span>
+              Slug <span className="text-slate-400 font-normal">rj/{slug || "..."}</span>
             </label>
             <input
               type="text"

@@ -207,7 +207,7 @@ export default function LeftSidebar({
             <p className="px-2 py-1 text-[12px] text-slate-400 dark:text-slate-500">No channels joined yet.</p>
           )}
           {visibleJoined.map((ch) => (
-            <NavRow key={ch.id} href={`/channels/${ch.slug}`} icon={ch.iconEmoji} label={`r/${ch.slug}`}
+            <NavRow key={ch.id} href={`/channels/${ch.slug}`} icon={ch.iconEmoji} label={`rj/${ch.slug}`}
               active={pathname === `/channels/${ch.slug}`}
               right={<span className="text-[10px] text-slate-400 tabular-nums">{ch.memberCount.toLocaleString()}</span>}
             />
@@ -226,7 +226,7 @@ export default function LeftSidebar({
         <SectionHeader label="Communities" />
         <div className="px-1">
           {visiblePopular.map((ch) => (
-            <NavRow key={ch.id} href={`/channels/${ch.slug}`} icon={ch.iconEmoji} label={`r/${ch.slug}`}
+            <NavRow key={ch.id} href={`/channels/${ch.slug}`} icon={ch.iconEmoji} label={`rj/${ch.slug}`}
               active={pathname === `/channels/${ch.slug}`}
               right={
                 <button type="button" onClick={(e) => handleJoin(e, ch)} disabled={joining === ch.id}

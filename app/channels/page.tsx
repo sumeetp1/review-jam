@@ -128,7 +128,7 @@ export default function ChannelsPage() {
                       <span className="text-2xl leading-none">{ch.iconEmoji}</span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-sm text-slate-900 dark:text-slate-100">r/{ch.slug}</span>
+                          <span className="font-medium text-sm text-slate-900 dark:text-slate-100">rj/{ch.slug}</span>
                           <span className="text-[10px] text-slate-400 dark:text-slate-500">{ch.memberCount} members</span>
                           <span className="text-[10px] text-slate-400 dark:text-slate-500">{ch.reviewCount} reviews</span>
                         </div>

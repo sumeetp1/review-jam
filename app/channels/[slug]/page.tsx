@@ -253,7 +253,7 @@ export default function ChannelPage({ params }: { params: Promise<{ slug: string
             </button>
             <span className="text-2xl leading-none">{channel.iconEmoji}</span>
             <div className="flex-1 min-w-0">
-              <h1 className="text-base font-bold text-slate-900 dark:text-slate-100 truncate">r/{channel.slug}</h1>
+              <h1 className="text-base font-bold text-slate-900 dark:text-slate-100 truncate">rj/{channel.slug}</h1>
               <p className="text-[11px] text-slate-500 dark:text-slate-400">{channel.memberCount} members · {channel.reviewCount} reviews</p>
             </div>
             <button
