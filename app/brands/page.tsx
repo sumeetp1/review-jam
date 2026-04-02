@@ -41,11 +41,17 @@ export default function BrandsPage() {
         <Link href="/" className="text-sm font-semibold text-white hover:text-slate-300 transition">
           Review Jam <span className="text-slate-500 font-medium">/ Brands</span>
         </Link>
-        <Link href="/" className="text-sm font-medium text-slate-400 hover:text-white transition">
-          ← Home
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/brands/dashboard" className="text-sm font-medium text-slate-400 hover:text-white transition">
+            Dashboard
+          </Link>
+          <Link href="/" className="text-sm font-medium text-slate-400 hover:text-white transition">
+            ← Home
+          </Link>
+        </div>
       </nav>
 
+      {/* Hero + form */}
       <div className="max-w-5xl mx-auto px-4 sm:px-8 py-12 md:py-16 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-start">
         <div>
           <h2 className="text-2xl sm:text-3xl font-semibold text-white mb-4 leading-snug tracking-tight">Real reviews from real users.</h2>
@@ -99,6 +105,142 @@ export default function BrandsPage() {
               </button>
             </form>
           )}
+        </div>
+      </div>
+
+      {/* ── Feature cards ──────────────────────────────────────────────────── */}
+      <div className="border-t border-slate-800/60">
+        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-14">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-8 text-center">Everything brands get</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+
+            {/* Card 1 — AI Quality */}
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col gap-3">
+              <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-lg">🤖</div>
+              <div>
+                <h3 className="text-sm font-semibold text-white mb-1">AI Quality Control</h3>
+                <p className="text-[13px] text-slate-400 leading-relaxed">
+                  Every review is scored by our AI for authenticity and depth. Spam and generic reviews are rejected automatically.
+                </p>
+              </div>
+              <div className="mt-auto">
+                <span className="text-[11px] font-medium bg-slate-800 text-slate-400 px-2 py-1 rounded-md">All tiers</span>
+              </div>
+            </div>
+
+            {/* Card 2 — Pay for performance */}
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col gap-3">
+              <div className="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-lg">💰</div>
+              <div>
+                <h3 className="text-sm font-semibold text-white mb-1">Pay for Performance</h3>
+                <p className="text-[13px] text-slate-400 leading-relaxed">
+                  Reward pools pay reviewers based on engagement — likes, helpful votes, and comment depth. You pay for impact.
+                </p>
+              </div>
+              <div className="mt-auto">
+                <span className="text-[11px] font-medium bg-slate-800 text-slate-400 px-2 py-1 rounded-md">All tiers</span>
+              </div>
+            </div>
+
+            {/* Card 3 — Trust Widget ⭐ FEATURED */}
+            <div className="bg-gradient-to-br from-amber-950/60 to-orange-950/40 border border-amber-700/40 rounded-xl p-5 flex flex-col gap-3 relative overflow-hidden">
+              {/* Glow accent */}
+              <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
+
+              <div className="flex items-start justify-between gap-2">
+                <div className="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-lg">🧩</div>
+                <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full uppercase tracking-wide">$500+ tier</span>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold text-white mb-1">Embeddable Trust Widget</h3>
+                <p className="text-[13px] text-slate-300 leading-relaxed">
+                  Paste a live widget on your website, Shopify store, or landing page. Shows your Health Score, star rating, top pros &amp; cons, and a direct review link — auto-updated hourly.
+                </p>
+              </div>
+
+              {/* Mini widget mockup */}
+              <div className="bg-slate-950/60 border border-slate-700/50 rounded-lg p-3 text-[11px] font-mono text-slate-400 my-1">
+                <span className="text-amber-400">&lt;iframe</span>{" "}
+                <span className="text-slate-500">src=</span>
+                <span className="text-emerald-400">&quot;reviewjam.com/api/widget/…&quot;</span>
+                {" "}<span className="text-amber-400">/&gt;</span>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[11px] text-amber-300/80 flex items-center gap-1">✓ iframe</span>
+                <span className="text-[11px] text-amber-300/80 flex items-center gap-1">✓ React component</span>
+                <span className="text-[11px] text-amber-300/80 flex items-center gap-1">✓ Light / Dark / Auto</span>
+              </div>
+
+              <div className="mt-auto pt-1">
+                <Link
+                  href="/brands/widgets"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-300 hover:text-amber-200 transition"
+                >
+                  Generate your widget →
+                </Link>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      {/* ── Tier comparison ────────────────────────────────────────────────── */}
+      <div className="border-t border-slate-800/60">
+        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-14">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-8 text-center">Compare tiers</p>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="border-b border-slate-800">
+                  <th className="text-left py-3 px-4 text-slate-500 font-medium w-1/2">Feature</th>
+                  <th className="text-center py-3 px-4 text-slate-400 font-medium">Starter<br/><span className="text-xs font-normal text-slate-600">$500</span></th>
+                  <th className="text-center py-3 px-4 text-slate-400 font-medium">Growth<br/><span className="text-xs font-normal text-slate-600">$1,000</span></th>
+                  <th className="text-center py-3 px-4 text-amber-400 font-semibold">Scale<br/><span className="text-xs font-normal text-amber-600">$5,000+</span></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60">
+                {[
+                  ["Campaign creation",     true,  true,  true ],
+                  ["AI moderation",         true,  true,  true ],
+                  ["Brand dashboard",       true,  true,  true ],
+                  ["Marketing quote export",true,  true,  true ],
+                  ["🧩 Trust Widget embed",  true,  true,  true ],
+                  ["Custom campaign duration", false, true, true],
+                  ["Priority placement",    false, false, true ],
+                  ["Dedicated account manager", false, false, true],
+                ].map(([label, s, g, sc]) => (
+                  <tr key={String(label)} className="hover:bg-slate-900/30 transition">
+                    <td className={`py-3 px-4 ${label === "🧩 Trust Widget embed" ? "text-amber-300 font-medium" : "text-slate-300"}`}>
+                      {String(label)}
+                    </td>
+                    <td className="text-center py-3 px-4">{s ? <span className="text-emerald-500">✓</span> : <span className="text-slate-700">—</span>}</td>
+                    <td className="text-center py-3 px-4">{g ? <span className="text-emerald-500">✓</span> : <span className="text-slate-700">—</span>}</td>
+                    <td className="text-center py-3 px-4">{sc ? <span className="text-emerald-400 font-semibold">✓</span> : <span className="text-slate-700">—</span>}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/brands/widgets"
+              className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg text-sm font-semibold hover:opacity-90 transition shadow-lg shadow-amber-900/30"
+            >
+              🧩 Generate Trust Widget
+            </Link>
+            <Link
+              href="/brands/dashboard"
+              className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-sm font-medium transition border border-slate-700"
+            >
+              View dashboard
+            </Link>
+          </div>
         </div>
       </div>
     </main>
