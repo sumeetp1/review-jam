@@ -364,9 +364,6 @@ export default function ExplorePage() {
         <div className="max-w-5xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-3">
             <Link href="/" className="text-sm text-slate-500 dark:text-slate-400 hover:underline">← Home</Link>
-            <Link href="/campaigns" className="text-sm font-medium text-slate-900 dark:text-slate-100 hover:underline">
-              Apply to review →
-            </Link>
           </div>
           <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Explore products</h1>
           <p className="text-sm text-slate-500 dark:text-slate-500 mt-0.5">

@@ -325,7 +325,13 @@ export default function ReviewCard({
           {/* Product name + context badges */}
           {review.productName && (
             <p className="text-[13px] text-slate-600 dark:text-slate-400 mb-1 flex items-center gap-1.5 flex-wrap">
-              <span>{review.productName}</span>
+              {review.productId && !review.productId.startsWith("organic_") ? (
+                <Link href={`/product/${review.productId}`} className="font-medium text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:underline transition-colors">
+                  {review.productName}
+                </Link>
+              ) : (
+                <span>{review.productName}</span>
+              )}
               {usageLabel && (
                 <span className="text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded">
                   {usageLabel}
@@ -338,15 +344,11 @@ export default function ReviewCard({
                 </span>
               )}
               {/* Seeded Review — product provided via platform inventory programme */}
-              {review.productSource === "brand_sent" ? (
+              {review.productSource === "brand_sent" && (
                 <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-400 px-1.5 py-0.5 rounded border border-violet-200 dark:border-violet-800/50">
                   📦 Seeded Review
                 </span>
-              ) : review.isCampaignReview ? (
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-800/50">
-                  📦 Product Provided
-                </span>
-              ) : null}
+              )}
               {review.channelSlug && (
                 <a href={`/channels/${review.channelSlug}`} className="text-[10px] font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded hover:underline">
                   rj/{review.channelSlug}
@@ -529,13 +531,13 @@ export default function ReviewCard({
               <span aria-hidden>↗</span>
             </button>
 
-            {/* Pool link */}
-            {showPoolLink && review.campaignId && review.campaignId !== "organic" && review.productId && (
+            {/* Product hub link */}
+            {showPoolLink && review.productId && !review.productId.startsWith("organic_") && (
               <Link
                 href={`/product/${review.productId}`}
-                className="ml-auto font-medium text-slate-600 dark:text-slate-400 hover:underline shrink-0 py-2 px-2.5 md:py-1 md:px-1.5"
+                className="ml-auto font-medium text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:underline shrink-0 py-2 px-2.5 md:py-1 md:px-1.5 transition-colors"
               >
-                Pool →
+                View hub →
               </Link>
             )}
           </div>

@@ -15,8 +15,6 @@ type Product = {
   id: string;
   name: string;
   brandName: string;
-  campaignId: string;
-  endDate: string;
 };
 
 type Channel = {
@@ -38,15 +36,6 @@ type Props = {
   activeCategoryFilter: string;
   onClearFilter: () => void;
 };
-
-function getCountdown(endDate: string) {
-  const days = Math.ceil((new Date(endDate).getTime() - Date.now()) / 86_400_000);
-  if (days <= 0) return { label: "Ended", color: "text-slate-400" };
-  if (days === 1) return { label: "1d", color: "text-red-500 dark:text-red-400 font-semibold" };
-  if (days <= 3) return { label: `${days}d`, color: "text-red-500 dark:text-red-400 font-semibold" };
-  if (days <= 7) return { label: `${days}d`, color: "text-amber-600 dark:text-amber-400" };
-  return { label: `${days}d`, color: "text-slate-400 dark:text-slate-500" };
-}
 
 // ─── Section divider + label ────────────────────────────────────────────────
 
@@ -119,7 +108,6 @@ export default function LeftSidebar({
   const [popularChannels, setPopularChannels] = useState<Channel[]>([]);
   const [showCreate, setShowCreate] = useState(false);
   const [showAllChannels, setShowAllChannels] = useState(false);
-  const [showAllCampaigns, setShowAllCampaigns] = useState(false);
   const [joining, setJoining] = useState<string | null>(null);
 
   // Load channels
@@ -153,7 +141,6 @@ export default function LeftSidebar({
     setJoining(null);
   };
 
-  const visibleCampaigns = showAllCampaigns ? products : products.slice(0, 4);
   const visibleJoined = showAllChannels ? joinedChannels : joinedChannels.slice(0, 5);
   const visiblePopular = showAllChannels ? popularChannels : popularChannels.slice(0, user ? 3 : 5);
 
@@ -187,7 +174,6 @@ export default function LeftSidebar({
           <NavRow href="/" icon="🏠" label="Home" active={pathname === "/" && activeCategoryFilter === "All"} onClick={onClearFilter} />
           <NavRow href="/explore" icon="🔍" label="Explore" active={pathname === "/explore"} />
           <NavRow href="/channels" icon="📡" label="Channels" active={pathname.startsWith("/channels")} />
-          <NavRow href="/campaigns" icon="🎯" label="Campaigns" active={pathname === "/campaigns"} />
           <NavRow href="/profile" icon="👤" label="Profile" active={pathname === "/profile"} />
           <NavRow href="/brands" icon="🏢" label="For brands" active={pathname === "/brands"} />
           <NavRow href="/admin" icon="⚡" label="Admin" active={pathname === "/admin"} />
@@ -250,33 +236,6 @@ export default function LeftSidebar({
               </button>
             )}
           </div>
-        </div>
-
-        <Divider />
-
-        {/* ── Live Campaigns ───────────────────────────── */}
-        <SectionHeader label="Live campaigns" />
-        <div className="px-1">
-          {products.length === 0 && (
-            <p className="px-2 py-1 text-[12px] text-slate-400">No active campaigns.</p>
-          )}
-          {visibleCampaigns.map((p) => {
-            const { label, color } = getCountdown(p.endDate);
-            return (
-              <NavRow key={p.id} href={`/product/${p.id}`} icon="🎁"
-                label={p.name}
-                active={false}
-                right={<span className={`text-[10px] tabular-nums ${color}`}>{label}</span>}
-              />
-            );
-          })}
-          {products.length > 4 && (
-            <button type="button" onClick={() => setShowAllCampaigns((v) => !v)}
-              className="w-full text-left px-2 py-1 text-[11px] text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition">
-              {showAllCampaigns ? "Show less" : `See ${products.length - 4} more…`}
-            </button>
-          )}
-          <NavRow href="/campaigns" icon="🗂️" label="Browse all campaigns" />
         </div>
 
         <Divider />

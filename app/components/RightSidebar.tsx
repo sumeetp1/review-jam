@@ -82,9 +82,15 @@ export default function RightSidebar({ allReviews }: Props) {
                   {i + 1}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">
-                    {r.productName}
-                  </p>
+                  {r.productId && !r.productId.startsWith("organic_") ? (
+                    <Link href={`/product/${r.productId}`} className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition hover:underline block">
+                      {r.productName}
+                    </Link>
+                  ) : (
+                    <p className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">
+                      {r.productName}
+                    </p>
+                  )}
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <Avatar name={r.reviewerName} size="xs" />
                     <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{r.reviewerName}</span>

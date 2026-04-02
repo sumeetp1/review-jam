@@ -20,7 +20,7 @@ import LeftSidebar from "./components/LeftSidebar";
 import Avatar from "./components/Avatar";
 import NotificationBell from "./components/NotificationBell";
 
-type FeedTab = "foryou" | "trending" | "campaigns";
+type FeedTab = "foryou" | "trending";
 
 export default function Home() {
   const [products, setProducts] = useState<any[]>([]);
@@ -349,20 +349,6 @@ export default function Home() {
     setReviewMode("verified");
   };
 
-  const getReviewCount = (campaignId: string) =>
-    allReviews.filter((r) => r.campaignId === campaignId).length;
-
-  const getTimeRemaining = (endDateStr: string) => {
-    if (!endDateStr) return "Ongoing";
-    const total = Date.parse(endDateStr) - currentTime;
-    if (total <= 0) return "Ended";
-    const days = Math.floor(total / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((total / 1000 / 60) % 60);
-    if (days > 0) return `${days}d ${hours}h`;
-    return `${hours}h ${minutes}m`;
-  };
-
   // ── Feed tab logic ────────────────────────────────────────────────────────
 
   // Trending: engagement velocity = likes / max(1, days since post)
@@ -387,9 +373,6 @@ export default function Home() {
   });
 
   const displayedReviews = (() => {
-    if (feedTab === "campaigns") {
-      return baseFiltered.filter((r) => r.campaignId && r.campaignId !== "organic");
-    }
     if (feedTab === "trending") {
       return [...baseFiltered].sort((a, b) => trendingScore(b) - trendingScore(a));
     }
@@ -405,9 +388,8 @@ export default function Home() {
     .slice(0, 3);
 
   const FEED_TABS: { id: FeedTab; label: string }[] = [
-    { id: "foryou",    label: "For you" },
-    { id: "trending",  label: "Trending" },
-    { id: "campaigns", label: "Campaigns" },
+    { id: "foryou",   label: "For you" },
+    { id: "trending", label: "Trending" },
   ];
 
   return (
@@ -519,12 +501,11 @@ export default function Home() {
             {/* Nav links */}
             <nav className="py-2">
               {[
-                { href: "/profile",    label: "Profile",   icon: "👤" },
-                { href: "/explore",    label: "Explore",   icon: "🔍" },
-                { href: "/campaigns",  label: "Campaigns", icon: "🎯" },
-                { href: "/brands",     label: "For brands",icon: "🏢" },
+                { href: "/profile",    label: "Profile",        icon: "👤" },
+                { href: "/explore",    label: "Explore",        icon: "🔍" },
+                { href: "/brands",     label: "For brands",     icon: "🏢" },
                 { href: "/brands/dashboard", label: "Brand dashboard", icon: "📊" },
-                { href: "/admin",      label: "Admin",     icon: "⚡" },
+                { href: "/admin",      label: "Admin",          icon: "⚡" },
               ].map((item) => (
                 <Link
                   key={item.href}
@@ -670,25 +651,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Campaigns strip — tablet only (mobile uses bottom nav Campaigns tab) */}
-          <div className="hidden md:block lg:hidden border-b border-slate-200/80 dark:border-slate-800 px-3 py-3 bg-slate-50/80 dark:bg-slate-900/40">
-            <h3 className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-2">Active pools</h3>
-            <div className="flex gap-2 overflow-x-auto snap-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-              {products.map((product) => (
-                <Link href={`/product/${product.id}`} key={product.id} className="min-w-[220px] snap-start bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
-                  <div className="flex justify-between items-start gap-2 mb-1">
-                    <h4 className="font-medium text-xs text-slate-900 dark:text-slate-100 line-clamp-1">{product.name}</h4>
-                    <span className="text-[10px] font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-1.5 py-0.5 rounded shrink-0">Live</span>
-                  </div>
-                  <div className="flex justify-between items-center text-[10px] text-slate-500 dark:text-slate-500 mt-1">
-                    <span>{getTimeRemaining(product.endDate)}</span>
-                    <span>{getReviewCount(product.campaignId)} reviews</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-
           {/* Feed */}
           <div className="divide-y divide-slate-200/80 dark:divide-slate-800">
             {isLoading ? (
@@ -698,13 +660,11 @@ export default function Home() {
                 <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-sm mb-3 text-slate-400">📝</div>
                 <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1">No posts yet</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-500 mb-5 leading-relaxed">
-                  {feedTab === "campaigns" ? "No campaign reviews yet." : "When people review in this view, they will show up here."}
+                  When people review in this view, they will show up here.
                 </p>
-                {feedTab !== "campaigns" && (
-                  <button type="button" onClick={() => { if (!user) handleLogin(); else setReviewMode("verified"); }} className="text-sm font-medium bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-4 py-2 rounded-full hover:opacity-90 transition">
-                    Write a review
-                  </button>
-                )}
+                <button type="button" onClick={() => { if (!user) handleLogin(); else setReviewMode("verified"); }} className="text-sm font-medium bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-4 py-2 rounded-full hover:opacity-90 transition">
+                  Write a review
+                </button>
               </div>
             ) : (
               displayedReviews.map((review) => (
