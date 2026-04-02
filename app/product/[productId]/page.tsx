@@ -26,6 +26,7 @@ export default function ProductPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [reviewMode, setReviewMode] = useState<"campaign" | "verified" | "generic" | null>(null);
   const [hasAlreadyReviewed, setHasAlreadyReviewed] = useState(false);
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -78,14 +79,15 @@ export default function ProductPage() {
     fetchProductAndReviews();
   }, [productId]);
 
-  // Filtered reviews based on selected variant
+  // Filtered reviews based on selected variant, then verified-only gate
   const filteredReviews =
     selectedVariantId === "all"
       ? reviews
       : reviews.filter((r) => r.variantId === selectedVariantId);
 
-  // Aggregate stats for the currently filtered set
-  const displayedReviews = filteredReviews;
+  const displayedReviews = verifiedOnly
+    ? filteredReviews.filter((r) => r.isVerifiedPurchase === true)
+    : filteredReviews;
   const avgRating =
     displayedReviews.length > 0
       ? (displayedReviews.reduce((sum, r) => sum + (r.rating || 0), 0) / displayedReviews.length).toFixed(1)
@@ -423,7 +425,7 @@ export default function ProductPage() {
 
         {/* Reviews list */}
         <div className="divide-y divide-slate-200/80 dark:divide-slate-800">
-          <div className="px-4 py-3">
+          <div className="px-4 py-3 flex items-center justify-between gap-3">
             <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wide">
               Reviews
               {selectedVariantId !== "all"
@@ -431,7 +433,23 @@ export default function ProductPage() {
                 : displayedReviews.length > 0
                 ? ` · ${displayedReviews.length}`
                 : ""}
+              {verifiedOnly && (
+                <span className="ml-1 normal-case text-emerald-600 dark:text-emerald-400">· verified only</span>
+              )}
             </h3>
+            {/* Transparency toggle */}
+            <button
+              type="button"
+              onClick={() => setVerifiedOnly((v) => !v)}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition shrink-0 ${
+                verifiedOnly
+                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-700"
+                  : "bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+              }`}
+            >
+              <span>{verifiedOnly ? "✓" : "○"}</span>
+              Verified owners only
+            </button>
           </div>
 
           {displayedReviews.length === 0 ? (

@@ -43,6 +43,7 @@ export default function Home() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [currentTime, setCurrentTime] = useState(Date.now());
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [boostedCategories, setBoostedCategories] = useState<Set<string>>(new Set());
 
   const categoriesRef = useRef<HTMLDivElement>(null);
 
@@ -104,10 +105,21 @@ export default function Home() {
   async function fetchInitialData() {
     setIsLoading(true);
     try {
-      const [prodSnap, revSnap] = await Promise.all([
+      const [prodSnap, revSnap, channelSnap] = await Promise.all([
         getDocs(collection(db, "products")),
         getDocs(collection(db, "reviews")),
+        getDocs(collection(db, "channels")),
       ]);
+
+      const boosted = new Set<string>();
+      channelSnap.forEach((d) => {
+        const ch = d.data();
+        const hasActiveBounty =
+          ch.multiplier && ch.multiplier > 1 &&
+          (!ch.multiplierExpiresAt || Date.now() < new Date(ch.multiplierExpiresAt).getTime());
+        if (hasActiveBounty && ch.category) boosted.add(ch.category as string);
+      });
+      setBoostedCategories(boosted);
 
       const fetchedProducts: any[] = [];
       prodSnap.forEach((d) => fetchedProducts.push({ id: d.id, ...d.data() }));
@@ -599,11 +611,27 @@ export default function Home() {
                   <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${activeCategoryFilter === "All" ? "bg-amber-500 text-white border-amber-500 shadow-sm shadow-amber-500/30" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-amber-300 hover:text-amber-600 dark:hover:border-amber-700 dark:hover:text-amber-400"}`}>
                     All
                   </button>
-                  {AVAILABLE_CATEGORIES.map((cat) => (
-                    <button type="button" key={cat} onClick={() => setActiveCategoryFilter(cat)} className={`whitespace-nowrap px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${activeCategoryFilter === cat ? "bg-amber-500 text-white border-amber-500 shadow-sm shadow-amber-500/30" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-amber-300 hover:text-amber-600 dark:hover:border-amber-700 dark:hover:text-amber-400"}`}>
-                      {cat}
-                    </button>
-                  ))}
+                  {AVAILABLE_CATEGORIES.map((cat) => {
+                    const isActive  = activeCategoryFilter === cat;
+                    const isBoosted = boostedCategories.has(cat);
+                    return (
+                      <button
+                        type="button"
+                        key={cat}
+                        onClick={() => setActiveCategoryFilter(cat)}
+                        className={`whitespace-nowrap flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${
+                          isActive
+                            ? "bg-amber-500 text-white border-amber-500 shadow-sm shadow-amber-500/30"
+                            : isBoosted
+                            ? "bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 border-orange-300 dark:border-orange-700 hover:bg-orange-100 dark:hover:bg-orange-900/30"
+                            : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-amber-300 hover:text-amber-600 dark:hover:border-amber-700 dark:hover:text-amber-400"
+                        }`}
+                      >
+                        {isBoosted && <span aria-hidden>🔥</span>}
+                        {cat}
+                      </button>
+                    );
+                  })}
                 </div>
                 <button type="button" onClick={() => scrollCategories("right")} className="absolute right-0 z-10 p-1 bg-gradient-to-l from-white via-white to-transparent dark:from-slate-950 dark:via-slate-950 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition h-full flex items-center justify-end w-8" aria-label="Scroll right">
                   <span className="text-lg leading-none">›</span>
@@ -617,11 +645,27 @@ export default function Home() {
                 <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3.5 py-2 rounded-full text-[13px] font-medium border transition shrink-0 ${activeCategoryFilter === "All" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"}`}>
                   All
                 </button>
-                {AVAILABLE_CATEGORIES.map((cat) => (
-                  <button type="button" key={cat} onClick={() => setActiveCategoryFilter(cat)} className={`whitespace-nowrap px-3.5 py-2 rounded-full text-[13px] font-medium border transition shrink-0 ${activeCategoryFilter === cat ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"}`}>
-                    {cat}
-                  </button>
-                ))}
+                {AVAILABLE_CATEGORIES.map((cat) => {
+                  const isActive  = activeCategoryFilter === cat;
+                  const isBoosted = boostedCategories.has(cat);
+                  return (
+                    <button
+                      type="button"
+                      key={cat}
+                      onClick={() => setActiveCategoryFilter(cat)}
+                      className={`whitespace-nowrap flex items-center gap-1 px-3.5 py-2 rounded-full text-[13px] font-medium border transition shrink-0 ${
+                        isActive
+                          ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100"
+                          : isBoosted
+                          ? "bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 border-orange-300 dark:border-orange-700"
+                          : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
+                      }`}
+                    >
+                      {isBoosted && <span aria-hidden>🔥</span>}
+                      {cat}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>

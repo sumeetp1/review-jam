@@ -6,6 +6,12 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { calculateDiscoveryRank } from "../../lib/discoveryRank";
 
+function isBoosted(channel: { multiplier?: number; multiplierExpiresAt?: string }): boolean {
+  if (!channel.multiplier || channel.multiplier <= 1) return false;
+  if (channel.multiplierExpiresAt && Date.now() > new Date(channel.multiplierExpiresAt).getTime()) return false;
+  return true;
+}
+
 type ProductEntry = {
   id: string;
   name: string;
@@ -39,14 +45,24 @@ export default function ExplorePage() {
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [sortKey, setSortKey] = useState<SortKey>("discovery");
   const [searchQuery, setSearchQuery] = useState("");
+  const [boostedCategories, setBoostedCategories] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     async function load() {
       try {
-        const [prodSnap, revSnap] = await Promise.all([
+        const [prodSnap, revSnap, channelSnap] = await Promise.all([
           getDocs(collection(db, "products")),
           getDocs(collection(db, "reviews")),
+          getDocs(collection(db, "channels")),
         ]);
+
+        // Build the set of categories that have an active bounty multiplier
+        const boosted = new Set<string>();
+        channelSnap.docs.forEach((d) => {
+          const ch = d.data();
+          if (isBoosted(ch) && ch.category) boosted.add(ch.category as string);
+        });
+        setBoostedCategories(boosted);
 
         const reviews = revSnap.docs.map((d) => d.data());
 
@@ -162,20 +178,28 @@ export default function ExplorePage() {
 
         {/* Category filter */}
         <div className="flex gap-1.5 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => setCategoryFilter(cat)}
-              className={`whitespace-nowrap px-3 py-1 rounded-md text-xs font-medium border transition ${
-                categoryFilter === cat
-                  ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100"
-                  : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+          {CATEGORIES.map((cat) => {
+            const active  = categoryFilter === cat;
+            const boosted = cat !== "All" && boostedCategories.has(cat);
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setCategoryFilter(cat)}
+                className={`whitespace-nowrap flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium border transition ${
+                  active
+                    ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100"
+                    : boosted
+                    ? "bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 border-orange-300 dark:border-orange-700 hover:bg-orange-100 dark:hover:bg-orange-900/30"
+                    : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                {boosted && <span aria-label="Boosted category">🔥</span>}
+                {cat}
+                {boosted && <span className="text-[9px] font-bold tracking-wide uppercase text-orange-600 dark:text-orange-400">Boosted</span>}
+              </button>
+            );
+          })}
         </div>
 
         {/* Results */}

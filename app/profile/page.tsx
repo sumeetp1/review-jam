@@ -13,6 +13,14 @@ import { ALL_BADGES, getBadgeById } from "../../lib/badges";
 import Avatar from "../components/Avatar";
 import { getTierLabel } from "../../lib/trustScore";
 
+function getTierStyle(score: number): { bg: string; text: string; emoji: string } {
+  if (score >= 500) return { bg: "bg-amber-100 dark:bg-amber-900/40 border border-amber-300 dark:border-amber-700", text: "text-amber-700 dark:text-amber-300", emoji: "🏆" };
+  if (score >= 250) return { bg: "bg-violet-100 dark:bg-violet-900/40 border border-violet-300 dark:border-violet-700", text: "text-violet-700 dark:text-violet-300", emoji: "⭐" };
+  if (score >= 100) return { bg: "bg-emerald-100 dark:bg-emerald-900/40 border border-emerald-300 dark:border-emerald-700", text: "text-emerald-700 dark:text-emerald-300", emoji: "✅" };
+  if (score >= 50)  return { bg: "bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700", text: "text-blue-700 dark:text-blue-300", emoji: "🔵" };
+  return { bg: "bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700", text: "text-slate-600 dark:text-slate-400", emoji: "🌱" };
+}
+
 const AVAILABLE_CATEGORIES = [
   "Tech", "Home", "SaaS", "Automotive", "Beauty",
   "Gaming", "Fitness", "Travel", "Finance",
@@ -185,6 +193,18 @@ export default function ProfilePage() {
           <div className="min-w-0 flex-1">
             <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 truncate">{user.displayName}</h2>
             <p className="text-sm text-slate-500 dark:text-slate-500 truncate">{user.email}</p>
+            {/* Trust Tier badge */}
+            {(() => {
+              const { bg, text, emoji } = getTierStyle(trustScore);
+              return (
+                <div className="mt-2">
+                  <span className={`inline-flex items-center gap-1.5 text-[12px] font-semibold px-2.5 py-1 rounded-full ${bg} ${text}`}>
+                    {emoji} {getTierLabel(trustScore)}
+                    <span className="font-normal opacity-70">· {trustScore} pts</span>
+                  </span>
+                </div>
+              );
+            })()}
             {badges.length > 0 && (
               <div className="flex gap-1.5 mt-1.5 flex-wrap">
                 {badges.map((bid) => {

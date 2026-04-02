@@ -173,7 +173,7 @@ body{
     <div class="score-row">
       <div class="ring">
         <span class="ring-num">${score > 0 ? score : "—"}</span>
-        ${score > 0 ? '<span class="ring-lbl">Score</span>' : ""}
+        ${score > 0 ? '<span class="ring-lbl">Neutral</span>' : ""}
       </div>
       <div class="meta">
         <div class="stars">${starsHtml(avgRating)}</div>
@@ -181,7 +181,7 @@ body{
           ${avgRating > 0 ? avgRating.toFixed(1) : "—"}
           <span>· ${reviewCount} review${reviewCount !== 1 ? "s" : ""}</span>
         </div>
-        <div class="hs-lbl">Health Score by Review Jam</div>
+        <div class="hs-lbl">Neutral Health Score · Review Jam</div>
       </div>
     </div>
 
