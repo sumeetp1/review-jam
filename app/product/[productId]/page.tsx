@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
   collection, query, where, getDocs, doc, getDoc,
-  updateDoc, increment, arrayUnion, arrayRemove, addDoc, orderBy,
+  updateDoc, increment, arrayUnion, arrayRemove, addDoc,
 } from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { onAuthStateChanged, User } from "firebase/auth";
@@ -302,15 +302,11 @@ export default function ProductPage() {
     async function load() {
       if (!productId) return;
       try {
-        const [productSnap, variantSnap, reviewsSnap, discussionsSnap] = await Promise.all([
+        // Core data — product, variants, reviews must all succeed together
+        const [productSnap, variantSnap, reviewsSnap] = await Promise.all([
           getDoc(doc(db, "products", productId)),
           getDocs(collection(db, "products", productId, "productVariants")),
           getDocs(query(collection(db, "reviews"), where("productId", "==", productId))),
-          getDocs(query(
-            collection(db, "productDiscussions"),
-            where("productId", "==", productId),
-            orderBy("createdAt", "desc")
-          )),
         ]);
 
         if (productSnap.exists()) setProduct({ id: productSnap.id, ...productSnap.data() });
@@ -321,12 +317,24 @@ export default function ProductPage() {
         reviewsSnap.forEach((d) => fetched.push({ id: d.id, ...d.data() }));
         fetched.sort((a, b) => (b.likesCount || 0) - (a.likesCount || 0));
         setReviews(fetched);
-
-        setDiscussions(discussionsSnap.docs.map((d) => ({ id: d.id, ...d.data() } as DiscussionPost)));
       } catch (err) {
-        console.error(err);
+        console.error("Error loading product:", err);
       } finally {
         setIsLoading(false);
+      }
+
+      // Discussions fetched separately — a missing Firestore index won't
+      // crash the product load; the Discussion tab simply shows empty.
+      try {
+        const discSnap = await getDocs(
+          query(collection(db, "productDiscussions"), where("productId", "==", productId))
+        );
+        const disc = discSnap.docs
+          .map((d) => ({ id: d.id, ...d.data() } as DiscussionPost))
+          .sort((a, b) => b.upvotes - a.upvotes);
+        setDiscussions(disc);
+      } catch {
+        // Index not ready yet — discussions tab shows empty, not a crash
       }
     }
     load();
