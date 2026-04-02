@@ -510,6 +510,223 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleSeedWidgetDemo = async () => {
+    const confirmed = window.confirm(
+      "This will add a demo campaign + 6 rich reviews for sumit.pandey75@gmail.com WITHOUT deleting any existing data. Continue?"
+    );
+    if (!confirmed) return;
+    setIsProcessing(true);
+    setStatusMessage("Creating widget demo campaign…");
+
+    try {
+      const now = new Date();
+      const day = 24 * 60 * 60 * 1000;
+      const ago = (days: number) => new Date(now.getTime() - days * day).toISOString();
+
+      // ── Create product ────────────────────────────────────────────────────
+      const productRef = await addDoc(collection(db, "products"), {
+        name: "SonicPulse X1 Wireless Earbuds",
+        brandName: "SonicPulse",
+        brandEmail: "sumit.pandey75@gmail.com",
+        category: "Tech",
+        campaignId: "camp_sonicpulse_demo",
+        description:
+          "Premium true-wireless earbuds with hybrid ANC, 32hr total battery (8hr + 24hr case), IPX5, and multipoint for two devices simultaneously.",
+        budget: 2500,
+        endDate: new Date(now.getTime() + 10 * day).toISOString(),
+        createdAt: now.toISOString(),
+      });
+
+      // ── Create variants ───────────────────────────────────────────────────
+      const variantNames = ["Obsidian Black", "Arctic White", "Midnight Navy"];
+      const variantMap: Record<string, string> = {};
+      const vBatch = writeBatch(db);
+      for (const vName of variantNames) {
+        const vRef = doc(collection(db, "products", productRef.id, "productVariants"));
+        vBatch.set(vRef, { name: vName, createdAt: now.toISOString() });
+        variantMap[vName] = vRef.id;
+      }
+      await vBatch.commit();
+
+      setStatusMessage("Creating reviews with health scores…");
+
+      // ── Reviews — rich data with computed healthScore ─────────────────────
+      const reviewSeeds = [
+        {
+          variantName: "Obsidian Black",
+          reviewerName: "Alex Chen",
+          rating: 5,
+          summary: "Best ANC earbuds under $200 — by a mile",
+          content:
+            "I commute on the London Underground every day and these have transformed the experience. The hybrid ANC actually removes the low-frequency train rumble rather than just attenuating it. Call quality is so good my colleagues thought I was in a quiet room. The 8-hour playtime per charge is class-leading at this price.",
+          pros: ["Outstanding ANC", "8hr battery", "Crystal-clear calls", "Secure fit"],
+          cons: ["Slightly bulky charging case"],
+          likesCount: 214,
+          helpfulCount: 87,
+          forkCount: 2,
+          commentCount: 5,
+          isCampaignReview: true,
+          isVerifiedPurchase: false,
+          createdAt: ago(3),
+        },
+        {
+          variantName: "Arctic White",
+          reviewerName: "Priya Singh",
+          rating: 4,
+          summary: "Multipoint is the killer feature nobody talks about",
+          content:
+            "Switching between my MacBook and iPhone happens in under two seconds. No re-pairing, no bluetooth menu diving. The ANC is excellent for open-plan offices but loses slightly to Sony at the very top. Sound signature is balanced rather than bass-heavy which I prefer for podcast listening.",
+          pros: ["Multipoint pairing", "Balanced sound", "Comfortable for long sessions"],
+          cons: ["App could be better", "ANC not quite Sony-level"],
+          likesCount: 131,
+          helpfulCount: 54,
+          forkCount: 1,
+          commentCount: 3,
+          isCampaignReview: true,
+          isVerifiedPurchase: false,
+          createdAt: ago(5),
+        },
+        {
+          variantName: "Midnight Navy",
+          reviewerName: "Sam Williams",
+          rating: 5,
+          summary: "IPX5 means I stopped worrying about the gym",
+          content:
+            "Deadlifted through a full hour of heavy sweating and these did not skip a beat. The ear hooks keep them locked in during burpees and box jumps. Navy colourway looks premium without the fingerprint magnet issues of glossy black. Honestly surprised these aren't more hyped.",
+          pros: ["IPX5 waterproofing", "Secure ear hook", "Premium look"],
+          cons: ["No wireless charging case"],
+          likesCount: 88,
+          helpfulCount: 41,
+          forkCount: 0,
+          commentCount: 2,
+          isCampaignReview: true,
+          isVerifiedPurchase: false,
+          createdAt: ago(7),
+        },
+        {
+          variantName: "Obsidian Black",
+          reviewerName: "Maria Lopez",
+          rating: 5,
+          summary: "32 hours total — I charge once a week",
+          content:
+            "The math: 8hr buds + 24hr case means a full week of one-hour commutes on a single charge cycle. The USB-C case charges to full in under an hour. This has genuinely removed battery anxiety from my daily routine. Combined with the fast-pair on Android, setup was under 60 seconds.",
+          pros: ["32hr total battery", "Fast USB-C charge", "Android fast-pair"],
+          cons: ["iOS app is basic"],
+          likesCount: 176,
+          helpfulCount: 69,
+          forkCount: 1,
+          commentCount: 4,
+          isCampaignReview: false,
+          isVerifiedPurchase: true,
+          createdAt: ago(10),
+        },
+        {
+          variantName: "Arctic White",
+          reviewerName: "Dan Torres",
+          rating: 4,
+          summary: "Transparency mode is underrated for city walking",
+          content:
+            "The transparency mode is tuned well enough that I can hear traffic and conversations without removing the earbuds. Most competitors make transparency sound digital and tinny — this actually sounds natural. Would like a bit more customisation in the EQ app.",
+          pros: ["Natural transparency mode", "Good default EQ", "Comfortable"],
+          cons: ["EQ app limited", "Touch controls take getting used to"],
+          likesCount: 97,
+          helpfulCount: 38,
+          forkCount: 0,
+          commentCount: 1,
+          isCampaignReview: false,
+          isVerifiedPurchase: true,
+          createdAt: ago(14),
+        },
+        {
+          variantName: "Midnight Navy",
+          reviewerName: "Jessica Park",
+          rating: 5,
+          summary: "Converted a confirmed Bose loyalist",
+          content:
+            "I have owned every generation of QuietComfort earbuds. My partner bought these and I kept 'borrowing' them until I finally ordered my own. The fit is more secure than Bose, the ANC is within touching distance at half the price, and the 32-hour case capacity is embarrassing for Bose to compare against.",
+          pros: ["ANC rivals Bose at half price", "Secure fit", "Huge case battery"],
+          cons: ["Call audio slightly below Bose"],
+          likesCount: 243,
+          helpfulCount: 102,
+          forkCount: 3,
+          commentCount: 6,
+          isCampaignReview: false,
+          isVerifiedPurchase: true,
+          createdAt: ago(2),
+        },
+      ];
+
+      for (const r of reviewSeeds) {
+        const { score, breakdown } = computeHealthScore(
+          {
+            content: r.content,
+            summary: r.summary,
+            pros: r.pros,
+            cons: r.cons,
+            likesCount: r.likesCount,
+            helpfulCount: r.helpfulCount,
+            forkCount: r.forkCount,
+            commentCount: r.commentCount,
+            productSource: r.isVerifiedPurchase ? "purchased" : "campaign",
+            versionCount: 1,
+            createdAt: r.createdAt,
+            mediaUrls: [],
+            subRatings: { "Sound Quality": 5, "Comfort": 4, "Battery": 5 },
+            bestFor: ["Commuters", "Gym"],
+          },
+          0,
+          0,
+        );
+
+        await addDoc(collection(db, "reviews"), {
+          productId: productRef.id,
+          productName: "SonicPulse X1 Wireless Earbuds",
+          category: "Tech",
+          campaignId: "camp_sonicpulse_demo",
+          variantId: variantMap[r.variantName] ?? null,
+          variantName: r.variantName,
+          reviewerName: r.reviewerName,
+          reviewerId: `seed_${r.reviewerName.replace(/\s/g, "_").toLowerCase()}`,
+          rating: r.rating,
+          summary: r.summary,
+          marketingQuote: r.summary,
+          content: r.content,
+          pros: r.pros,
+          cons: r.cons,
+          likesCount: r.likesCount,
+          likedBy: [],
+          helpfulCount: r.helpfulCount,
+          helpfulBy: [],
+          notHelpfulCount: 0,
+          notHelpfulBy: [],
+          commentCount: r.commentCount,
+          forkCount: r.forkCount,
+          versionCount: 1,
+          isCampaignReview: r.isCampaignReview,
+          isVerifiedPurchase: r.isVerifiedPurchase,
+          eligibleForPayout: true,
+          subRatings: { "Sound Quality": 5, "Comfort": 4, "Battery": 5 },
+          bestFor: ["Commuters", "Gym"],
+          mediaUrls: [],
+          productSource: r.isVerifiedPurchase ? "purchased" : "campaign",
+          healthScore: score,
+          healthScoreBreakdown: breakdown,
+          healthScoreUpdatedAt: now.toISOString(),
+          createdAt: r.createdAt,
+        });
+      }
+
+      setStatusMessage(
+        `✅ Widget demo ready! Campaign "SonicPulse X1" created with ${reviewSeeds.length} reviews for sumit.pandey75@gmail.com. Go to /brands/widgets to see the widget.`
+      );
+    } catch (err) {
+      console.error(err);
+      setStatusMessage("❌ Error seeding widget demo. Check console.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   async function handleDistributePayouts() {
     if (!payoutCampId || !payoutBudget) return alert("Please enter both ID and Budget.");
     const confirm = window.confirm(`Distribute $${payoutBudget} to winners of ${payoutCampId}?`);
@@ -630,6 +847,25 @@ export default function AdminDashboard() {
             className="bg-indigo-500 hover:bg-indigo-400 text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
           >
             {isProcessing ? "Injecting Data..." : "Generate Dummy Data"}
+          </button>
+        </div>
+
+        {/* --- WIDGET DEMO SEEDER --- */}
+        <div className="bg-gradient-to-r from-amber-950/60 to-orange-950/40 p-6 rounded-3xl border border-amber-700/40 mb-8 flex justify-between items-center shadow-lg">
+          <div>
+            <h2 className="text-xl font-bold text-white mb-1">🧩 Seed Widget Demo</h2>
+            <p className="text-amber-200/70 text-sm">
+              Adds a &quot;SonicPulse X1&quot; campaign with 6 rich reviews under{" "}
+              <span className="text-amber-300 font-mono">sumit.pandey75@gmail.com</span> —
+              does <strong>not</strong> delete existing data.
+            </p>
+          </div>
+          <button
+            onClick={handleSeedWidgetDemo}
+            disabled={isProcessing}
+            className="bg-amber-500 hover:bg-amber-400 text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
+          >
+            {isProcessing ? "Seeding…" : "Seed Widget Demo"}
           </button>
         </div>
 
