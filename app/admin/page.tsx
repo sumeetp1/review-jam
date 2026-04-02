@@ -195,7 +195,7 @@ export default function AdminDashboard() {
   };
 
   const handleSeedDatabase = async () => {
-    const confirmed = window.confirm("This will DELETE all existing products and reviews, then insert fresh dummy data across all categories. Continue?");
+    const confirmed = window.confirm("This will DELETE all existing products, reviews, channels, discussions, and engagement data, then insert fresh seed data. Continue?");
     if (!confirmed) return;
     setIsProcessing(true);
     setStatusMessage("Clearing existing data…");
@@ -204,14 +204,15 @@ export default function AdminDashboard() {
       const now = new Date();
       const day = 24 * 60 * 60 * 1000;
 
-      // ── Clear existing data ──────────────────────────────────────────────
-      const [prodSnap, revSnap, chSnap, cmSnap, rcSnap, rfSnap] = await Promise.all([
+      // ── Clear existing data (all collections) ────────────────────────────
+      const [prodSnap, revSnap, chSnap, cmSnap, rcSnap, rfSnap, discSnap] = await Promise.all([
         getDocs(collection(db, "products")),
         getDocs(collection(db, "reviews")),
         getDocs(collection(db, "channels")),
         getDocs(collection(db, "channelMembers")),
         getDocs(collection(db, "reviewComments")),
         getDocs(collection(db, "reviewForks")),
+        getDocs(collection(db, "productDiscussions")),
       ]);
       await Promise.all([
         ...prodSnap.docs.map((d) => deleteDoc(d.ref)),
@@ -220,81 +221,169 @@ export default function AdminDashboard() {
         ...cmSnap.docs.map((d) => deleteDoc(d.ref)),
         ...rcSnap.docs.map((d) => deleteDoc(d.ref)),
         ...rfSnap.docs.map((d) => deleteDoc(d.ref)),
+        ...discSnap.docs.map((d) => deleteDoc(d.ref)),
       ]);
 
-      setStatusMessage("Inserting campaigns…");
+      setStatusMessage("Inserting campaigns & variants…");
 
-      // ── 9 Active campaigns — one per category, with variants ──────────────
+      // ── 9 campaigns — one per category, with variants & specs ────────────
       const campaigns = [
         {
-          name: "Sony WH-1000XM6", brandName: "Sony", brandEmail: "sony@brands.com", category: "Tech",
-          campaignId: "camp_sony", description: "Next-gen noise-cancelling headphones. 40hr battery, multipoint, LDAC.",
+          name: "Sony WH-1000XM6",
+          brandName: "Sony", brandEmail: "sony@brands.com", category: "Tech",
+          campaignId: "camp_sony",
+          description: "Next-gen noise-cancelling headphones. 40hr battery, multipoint Bluetooth 5.3, LDAC Hi-Res Audio.",
           budget: 5000, endDate: new Date(now.getTime() + 6 * day).toISOString(),
           variants: ["Midnight Black", "Platinum Silver", "Indigo Blue"],
+          specs: [
+            { label: "Driver", value: "40mm dynamic" },
+            { label: "Battery", value: "40 hrs (ANC on)" },
+            { label: "Bluetooth", value: "5.3, LDAC, multipoint" },
+            { label: "Weight", value: "250 g" },
+            { label: "ANC", value: "Dual-chip QN3 processor" },
+          ],
+          verifiedSkus: ["WH1000XM6/B", "WH1000XM6/S", "WH1000XM6/L"],
         },
         {
-          name: "Lumina Smart Standing Desk", brandName: "Lumina", brandEmail: "lumina@brands.com", category: "Home",
-          campaignId: "camp_lumina", description: "OLED control panel, memory presets, cable management tray included.",
+          name: "Lumina Smart Standing Desk",
+          brandName: "Lumina", brandEmail: "lumina@brands.com", category: "Home",
+          campaignId: "camp_lumina",
+          description: "OLED control panel, 4-preset memory, integrated cable management tray, whisper-quiet dual motor.",
           budget: 3000, endDate: new Date(now.getTime() + 4 * day).toISOString(),
           variants: ["48\" Walnut Top", "60\" White Top", "72\" Black Top"],
+          specs: [
+            { label: "Height range", value: "24–50 inches" },
+            { label: "Motor", value: "Dual brushless, 120kg load" },
+            { label: "Noise level", value: "< 45 dB" },
+            { label: "Display", value: "OLED touch panel" },
+            { label: "Warranty", value: "5 years" },
+          ],
+          verifiedSkus: ["LMN-48W", "LMN-60W", "LMN-72B"],
         },
         {
-          name: "Linear — Project Management", brandName: "Linear", brandEmail: "linear@brands.com", category: "SaaS",
-          campaignId: "camp_linear", description: "The issue tracker built for high-performance teams. Free trial for reviewers.",
+          name: "Linear — Project Management",
+          brandName: "Linear", brandEmail: "linear@brands.com", category: "SaaS",
+          campaignId: "camp_linear",
+          description: "The issue tracker built for high-performance engineering teams. Keyboard-first, blazingly fast.",
           budget: 2000, endDate: new Date(now.getTime() + 14 * day).toISOString(),
-          variants: ["Free Tier", "Plus Plan", "Enterprise Plan"],
+          variants: ["Free Tier", "Plus Plan ($8/user/mo)", "Enterprise"],
+          specs: [
+            { label: "Integrations", value: "GitHub, GitLab, Figma, Slack" },
+            { label: "API", value: "GraphQL + REST" },
+            { label: "SSO", value: "SAML (Enterprise only)" },
+            { label: "Uptime SLA", value: "99.9% (Enterprise)" },
+          ],
+          verifiedSkus: [],
         },
         {
-          name: "Rivian R2 SUV", brandName: "Rivian", brandEmail: "rivian@brands.com", category: "Automotive",
-          campaignId: "camp_rivian", description: "All-electric adventure SUV. 300mi range, quad-motor, hands-free highway.",
+          name: "Rivian R2 SUV",
+          brandName: "Rivian", brandEmail: "rivian@brands.com", category: "Automotive",
+          campaignId: "camp_rivian",
+          description: "All-electric adventure SUV. 300mi range, quad-motor option, hands-free highway driving.",
           budget: 8000, endDate: new Date(now.getTime() + 10 * day).toISOString(),
           variants: ["Standard Range · RWD", "Long Range · AWD", "Max Pack · Quad-Motor"],
+          specs: [
+            { label: "Range (EPA)", value: "240 / 290 / 330 mi" },
+            { label: "0–60 mph", value: "4.5s / 3.8s / 3.0s" },
+            { label: "Charging", value: "AC (11kW) + DC (216kW)" },
+            { label: "Cargo", value: "2,500L total (frunk + trunk + gear tunnel)" },
+            { label: "ADAS", value: "Highway Assist (hands-free)" },
+          ],
+          verifiedSkus: ["R2-SR-RWD-2025", "R2-LR-AWD-2025", "R2-MAX-QM-2025"],
         },
         {
-          name: "Rhode Peptide Lip Treatment", brandName: "Rhode", brandEmail: "rhode@brands.com", category: "Beauty",
-          campaignId: "camp_rhode", description: "Peptide-rich gloss that plumps and hydrates in 30 seconds.",
+          name: "Rhode Peptide Lip Treatment",
+          brandName: "Rhode", brandEmail: "rhode@brands.com", category: "Beauty",
+          campaignId: "camp_rhode",
+          description: "Peptide-rich gloss that plumps and hydrates. 9 active ingredients including shea butter and peptide complex.",
           budget: 1500, endDate: new Date(now.getTime() + 7 * day).toISOString(),
           variants: ["Salted Caramel", "Glazed Donut", "Watermelon Slice", "Unscented"],
+          specs: [
+            { label: "Size", value: "10 mL" },
+            { label: "Key ingredients", value: "Peptide complex, shea butter, cupuaçu butter" },
+            { label: "Finish", value: "Glossy, non-sticky" },
+            { label: "Cruelty-free", value: "Yes" },
+          ],
+          verifiedSkus: ["RH-LIP-SC", "RH-LIP-GD", "RH-LIP-WM", "RH-LIP-UN"],
         },
         {
-          name: "PlayStation 5 Pro", brandName: "Sony", brandEmail: "sony@brands.com", category: "Gaming",
-          campaignId: "camp_ps5pro", description: "8K-ready, 45% faster GPU, PSSR upscaling. Free 3-month PS Plus included.",
+          name: "PlayStation 5 Pro",
+          brandName: "Sony", brandEmail: "sony@brands.com", category: "Gaming",
+          campaignId: "camp_ps5pro",
+          description: "45% faster GPU than PS5, PSSR AI upscaling, 2TB SSD. Free 3-month PS Plus for campaign reviewers.",
           budget: 6000, endDate: new Date(now.getTime() + 5 * day).toISOString(),
           variants: ["Disc Edition", "Digital Edition"],
+          specs: [
+            { label: "GPU", value: "AMD RDNA 4, 33.5 TFLOPS" },
+            { label: "CPU", value: "Zen 2, 3.85 GHz" },
+            { label: "RAM", value: "16GB GDDR6" },
+            { label: "Storage", value: "2TB NVMe SSD" },
+            { label: "Resolution", value: "Up to 8K via PSSR" },
+          ],
+          verifiedSkus: ["CFI-7000UX", "CFI-7000B01"],
         },
         {
-          name: "Whoop 5.0 Band", brandName: "Whoop", brandEmail: "whoop@brands.com", category: "Fitness",
-          campaignId: "camp_whoop", description: "Continuous health monitoring — HRV, skin temp, sleep stages. No screen.",
+          name: "Whoop 5.0 Band",
+          brandName: "Whoop", brandEmail: "whoop@brands.com", category: "Fitness",
+          campaignId: "camp_whoop",
+          description: "Continuous health monitoring — HRV, skin temperature, sleep stages, blood oxygen. No screen.",
           budget: 2500, endDate: new Date(now.getTime() + 9 * day).toISOString(),
           variants: ["Onyx Black", "Stone Grey", "Desert Tan"],
+          specs: [
+            { label: "Sensors", value: "PPG, EDA, skin temp, SPO2, accel" },
+            { label: "Battery", value: "4–5 days, slide-to-charge" },
+            { label: "Water resistance", value: "IP68, 10ATM" },
+            { label: "Subscription", value: "$30/mo or $239/yr" },
+          ],
+          verifiedSkus: [],
         },
         {
-          name: "IHG One Rewards — Indigo Hotels", brandName: "IHG", brandEmail: "ihg@brands.com", category: "Travel",
-          campaignId: "camp_ihg", description: "Experience Hotel Indigo stays worldwide. Reviewers get 2-night comp stay.",
+          name: "IHG One Rewards — Indigo Hotels",
+          brandName: "IHG", brandEmail: "ihg@brands.com", category: "Travel",
+          campaignId: "camp_ihg",
+          description: "Boutique hotel collection with neighbourhood-led design. Reviewers receive a 2-night complimentary stay.",
           budget: 10000, endDate: new Date(now.getTime() + 21 * day).toISOString(),
           variants: ["Hotel Indigo Edinburgh", "Hotel Indigo Dubai", "Hotel Indigo NYC"],
+          specs: [
+            { label: "Properties", value: "125+ worldwide" },
+            { label: "Loyalty tier", value: "Silver/Gold/Platinum/Ambassador" },
+            { label: "Points value", value: "~0.5¢ per point" },
+            { label: "Free night cert", value: "On card anniversary" },
+          ],
+          verifiedSkus: [],
         },
         {
-          name: "Robinhood Gold", brandName: "Robinhood", brandEmail: "robinhood@brands.com", category: "Finance",
-          campaignId: "camp_robinhood", description: "5% APY on uninvested cash, 3% IRA match, instant deposits up to $50K.",
+          name: "Robinhood Gold",
+          brandName: "Robinhood", brandEmail: "robinhood@brands.com", category: "Finance",
+          campaignId: "camp_robinhood",
+          description: "5% APY on uninvested cash, 3% IRA match, margin at 6.5%, instant deposits up to $50K.",
           budget: 4000, endDate: new Date(now.getTime() + 12 * day).toISOString(),
-          variants: ["Monthly Plan · $5/mo", "Annual Plan · $50/yr"],
+          variants: ["Monthly · $5/mo", "Annual · $50/yr"],
+          specs: [
+            { label: "Cash APY", value: "5.00% (Gold members)" },
+            { label: "Margin rate", value: "6.5%" },
+            { label: "IRA match", value: "3% on contributions" },
+            { label: "Instant deposit", value: "Up to $50,000" },
+            { label: "SIPC", value: "Up to $500K" },
+          ],
+          verifiedSkus: [],
         },
       ];
 
       const campDocs: Record<string, string> = {};
-      // maps campaignId → { variantName → variantId }
       const campVariantIds: Record<string, Record<string, string>> = {};
 
-      setStatusMessage("Inserting campaigns & variants…");
       for (const c of campaigns) {
-        const { variants, ...productData } = c;
-        const ref = await addDoc(collection(db, "products"), { ...productData, createdAt: now.toISOString() });
+        const { variants, specs, verifiedSkus, ...productData } = c;
+        const ref = await addDoc(collection(db, "products"), {
+          ...productData,
+          specs: specs ?? [],
+          verifiedSkus: verifiedSkus ?? [],
+          createdAt: now.toISOString(),
+        });
         campDocs[c.campaignId] = ref.id;
-
-        // Write variants to subcollection
         const varMap: Record<string, string> = {};
-        if (variants && variants.length > 0) {
+        if (variants.length > 0) {
           const batch = writeBatch(db);
           for (const vName of variants) {
             const vRef = doc(collection(db, "products", ref.id, "productVariants"));
@@ -308,88 +397,344 @@ export default function AdminDashboard() {
 
       setStatusMessage("Inserting reviews…");
 
-      // ── 45 reviews across all categories ─────────────────────────────────
       const ago = (days: number) => new Date(now.getTime() - days * day).toISOString();
+      const vid  = (campId: string, vName: string) => campVariantIds[campId]?.[vName] ?? null;
 
-      // Helper to look up a seeded variant ID by campaign + variant name
-      const vid = (campId: string, vName: string) => campVariantIds[campId]?.[vName] ?? null;
+      // ── Reviews — designed to exercise every feature ──────────────────────
+      // Features tested per review:
+      //   isVerifiedPurchase: true  → Verified Owners toggle
+      //   biasFlag: true            → Discovery Rank penalty, AI moderation log
+      //   versionCount > 1          → Ownership Journey card in the Hub
+      //   cons: []                  → Critical Balance penalty (-15 quality)
+      //   isCampaignReview: false   → organic weight boost (1.2×) in Discovery Rank
+      //   forkCount > 0             → Fork UI on ReviewCard
+      //   high likesCount           → engagement score, payout weighting
+      const reviews: any[] = [
 
-      const reviews = [
-        // ── Tech — Sony WH-1000XM6 ──────────────────────────────────────────
-        { productName: "Sony WH-1000XM6", category: "Tech", campaignId: "camp_sony", productId: campDocs["camp_sony"], variantName: "Midnight Black", variantId: vid("camp_sony", "Midnight Black"), reviewerName: "Alex Chen", rating: 5, summary: "Noise cancellation is literal black magic", content: "I work in a loud open-plan office and when I put these on, the world ceases to exist. Bass is punchy but not overwhelming and the battery easily lasts three days of heavy use. Best purchase I made this year.", pros: ["Incredible ANC", "40hr battery", "Comfortable"], cons: ["Slightly pricey"], likesCount: 214, isCampaignReview: true, createdAt: ago(3) },
-        { productName: "Sony WH-1000XM6", category: "Tech", campaignId: "camp_sony", productId: campDocs["camp_sony"], variantName: "Platinum Silver", variantId: vid("camp_sony", "Platinum Silver"), reviewerName: "Priya S.", rating: 4, summary: "Worth it for battery life alone", content: "Great sound and the multipoint connection finally works reliably. Clamping force is a touch tight on my head versus the Bose QC45. Still the best ANC headphones you can buy right now.", pros: ["Multipoint works great", "LDAC support"], cons: ["Tight clamp"], likesCount: 87, isCampaignReview: true, createdAt: ago(5) },
-        { productName: "Sony WH-1000XM6", category: "Tech", campaignId: "camp_sony", productId: campDocs["camp_sony"], variantName: "Indigo Blue", variantId: vid("camp_sony", "Indigo Blue"), reviewerName: "Sam W.", rating: 5, summary: "Indigo Blue is the best colourway Sony has ever done", content: "Sounds identical to the black version but this colourway gets compliments every single day. The matte finish resists fingerprints perfectly. If you were on the fence, get the blue.", pros: ["Stunning colourway", "Matte finish", "ANC class-leading"], cons: ["Wish it came in more colours"], likesCount: 63, isCampaignReview: true, createdAt: ago(7) },
-        { productName: "MacBook Pro M4", category: "Tech", campaignId: "organic", productId: "org_1", reviewerName: "Dan T.", rating: 5, summary: "The performance jump from M2 is real", content: "Compiling my entire React monorepo went from 4 minutes to 47 seconds. The display is still the best on any laptop. Fan never turns on even during heavy builds. This is the first laptop I have owned where I genuinely cannot find a complaint.", pros: ["M4 performance", "Silent", "Battery"], cons: [], likesCount: 341, isCampaignReview: false, createdAt: ago(12) },
-        { productName: "Kindle Scribe", category: "Tech", campaignId: "organic", productId: "org_2", reviewerName: "Maria L.", rating: 4, summary: "Finally a Kindle worth taking notes on", content: "The writing experience is close enough to paper that I have stopped keeping a physical notebook. Syncing handwritten notes to Notion still has some rough edges but Amazon is improving it monthly.", pros: ["Paper-like screen", "Massive battery"], cons: ["Note sync needs work"], likesCount: 56, isCampaignReview: false, createdAt: ago(8) },
-        { productName: "Anker MagGo 3-in-1", category: "Tech", campaignId: "organic", productId: "org_3", reviewerName: "Jake M.", rating: 5, summary: "One cable to rule my entire desk", content: "Phone, watch, and AirPods all charging simultaneously from one cable. The MagSafe click is satisfying and it holds the phone at a perfect angle for Standby mode. Bedside essential.", pros: ["Clean desk", "Fast charge"], cons: ["A bit expensive"], likesCount: 128, isCampaignReview: false, createdAt: ago(2) },
+        // ── TECH · Sony WH-1000XM6 ───────────────────────────────────────────
 
-        // ── Home — Lumina Standing Desk ─────────────────────────────────────
-        { productName: "Lumina Smart Standing Desk", category: "Home", campaignId: "camp_lumina", productId: campDocs["camp_lumina"], variantName: "60\" White Top", variantId: vid("camp_lumina", "60\" White Top"), reviewerName: "Marcus T.", rating: 5, summary: "Game changer for my ADHD", content: "The built-in OLED display for Pomodoro timers has genuinely transformed my workday. Assembly took 45 minutes solo and every cable routes cleanly through the built-in tray. Wobble at standing height is minimal.", pros: ["OLED timer", "Cable management", "Solid at height"], cons: ["Assembly instructions unclear"], likesCount: 143, isCampaignReview: true, createdAt: ago(4) },
-        { productName: "Lumina Smart Standing Desk", category: "Home", campaignId: "camp_lumina", productId: campDocs["camp_lumina"], variantName: "48\" Walnut Top", variantId: vid("camp_lumina", "48\" Walnut Top"), reviewerName: "Sophie K.", rating: 4, summary: "Best standing desk under $800", content: "I compared seven desks before choosing this one. The app integration is genuinely useful for reminding you to stand. Wish the desktop surface was a bit deeper front-to-back for dual monitors.", pros: ["App reminders", "Great price"], cons: ["Shallow desktop"], likesCount: 61, isCampaignReview: true, createdAt: ago(6) },
-        { productName: "Lumina Smart Standing Desk", category: "Home", campaignId: "camp_lumina", productId: campDocs["camp_lumina"], variantName: "72\" Black Top", variantId: vid("camp_lumina", "72\" Black Top"), reviewerName: "Derek L.", rating: 5, summary: "The 72-inch is worth every penny for dual monitors", content: "Three monitors, a laptop stand, and an ultra-wide all fit with space to spare. The black top hides cable ties perfectly. The motor is whisper-quiet — nobody in my open office can hear it moving.", pros: ["Enormous surface", "Quiet motor", "Hides cables"], cons: ["Heavy — need two people to assemble"], likesCount: 98, isCampaignReview: true, createdAt: ago(3) },
-        { productName: "Dyson V15 Detect", category: "Home", campaignId: "organic", productId: "org_4", reviewerName: "Jessica W.", rating: 5, summary: "The coolest and most disgusting feature ever", content: "The laser that reveals dust on hard floors is simultaneously amazing and deeply horrifying. I had no idea how dirty my floors actually were. Suction is unmatched and the HEPA filtration means no dust back in the air.", pros: ["Laser detect", "HEPA", "Powerful"], cons: ["Short battery on max"], likesCount: 397, isCampaignReview: false, createdAt: ago(15) },
-        { productName: "Instant Pot Duo 7-in-1", category: "Home", campaignId: "organic", productId: "org_5", reviewerName: "Rachel C.", rating: 5, summary: "Replaced five appliances with one", content: "Pressure cooker, slow cooker, rice cooker, steamer, sauté pan, yogurt maker, and warmer. My kitchen counter is finally clear. Pulled pork in 90 minutes from frozen is genuinely magic.", pros: ["7 functions", "Easy clean", "Compact"], cons: ["Learning curve for pressure"], likesCount: 213, isCampaignReview: false, createdAt: ago(20) },
+        // [0] Verified owner, organic, no bias, will get 2 version updates → Ownership Journey
+        { productName: "Sony WH-1000XM6", category: "Tech", campaignId: "organic",
+          productId: campDocs["camp_sony"], variantName: "Midnight Black", variantId: vid("camp_sony","Midnight Black"),
+          reviewerName: "Alex Chen", reviewerId: "seed_u1", rating: 5,
+          summary: "Best ANC headphones I have ever owned — 14 months in",
+          content: "Bought these the week they launched after years on the Bose QC35. The noise cancellation is in a completely different league — it removes the low-frequency London Underground rumble entirely, not just attenuates it. Battery genuinely lasts me three full work days. Multipoint pairing between my MacBook and iPhone is seamless.",
+          pros: ["Class-leading ANC", "40hr battery", "Multipoint seamless", "Comfortable all-day"],
+          cons: ["Clamping force tight on large heads", "App is bloated"],
+          likesCount: 341, helpfulCount: 112, forkCount: 2, commentCount: 3,
+          isVerifiedPurchase: true, isCampaignReview: false,
+          productSource: "purchased", usageDuration: "3_plus_months",
+          eligibleForPayout: false, reviewType: "verified",
+          createdAt: ago(45) },
 
-        // ── SaaS — Linear ───────────────────────────────────────────────────
-        { productName: "Linear — Project Management", category: "SaaS", campaignId: "camp_linear", productId: campDocs["camp_linear"], variantName: "Plus Plan", variantId: vid("camp_linear", "Plus Plan"), reviewerName: "David K.", rating: 5, summary: "Jira killer. And I mean that.", content: "Our 12-person engineering team switched from Jira six months ago and nobody wants to go back. Creating an issue takes 3 seconds. Cycles actually help us ship faster. The GitHub sync is flawless.", pros: ["Instant issue creation", "Cycle tracking", "GitHub sync"], cons: ["No Gantt chart"], likesCount: 276, isCampaignReview: true, createdAt: ago(7) },
-        { productName: "Linear — Project Management", category: "SaaS", campaignId: "camp_linear", productId: campDocs["camp_linear"], variantName: "Free Tier", variantId: vid("camp_linear", "Free Tier"), reviewerName: "Anita R.", rating: 4, summary: "Best PM tool for small teams", content: "The keyboard shortcuts alone save me an hour a week. Views are customizable enough that both our designers and engineers are happy. Wish the free tier allowed more members.", pros: ["Keyboard-first", "Fast UI"], cons: ["Free tier limit"], likesCount: 89, isCampaignReview: true, createdAt: ago(9) },
-        { productName: "Linear — Project Management", category: "SaaS", campaignId: "camp_linear", productId: campDocs["camp_linear"], variantName: "Enterprise Plan", variantId: vid("camp_linear", "Enterprise Plan"), reviewerName: "Tom R.", rating: 5, summary: "Enterprise plan is worth it for SSO alone", content: "We manage 200 engineers across 14 teams. The Enterprise audit log and SAML SSO were blockers for our security team and Linear handled both without friction. Onboarding support was outstanding.", pros: ["SAML SSO", "Audit log", "Priority support"], cons: ["Price jump from Plus is steep"], likesCount: 44, isCampaignReview: true, createdAt: ago(5) },
-        { productName: "Notion", category: "SaaS", campaignId: "organic", productId: "org_6", reviewerName: "Tom B.", rating: 5, summary: "My second brain for five years running", content: "I run my entire freelance business out of Notion — CRM, project tracker, invoices, knowledge base. The AI features are now actually good. Can get overwhelming if you over-engineer your setup.", pros: ["Flexible", "AI writing", "Great templates"], cons: ["Performance on large DBs"], likesCount: 318, isCampaignReview: false, createdAt: ago(30) },
-        { productName: "Figma", category: "SaaS", campaignId: "organic", productId: "org_7", reviewerName: "Lisa N.", rating: 5, summary: "Design collaboration solved", content: "The moment a client can comment directly on a design in their browser without installing anything, the whole handoff process changes. Dev mode has genuinely closed the gap between design and engineering.", pros: ["Browser-based", "Dev mode", "Components"], cons: ["Offline mode limited"], likesCount: 194, isCampaignReview: false, createdAt: ago(25) },
+        // [1] Campaign review, not verified, will get 1 version update
+        { productName: "Sony WH-1000XM6", category: "Tech", campaignId: "camp_sony",
+          productId: campDocs["camp_sony"], variantName: "Platinum Silver", variantId: vid("camp_sony","Platinum Silver"),
+          reviewerName: "Priya Singh", reviewerId: "seed_u2", rating: 4,
+          summary: "Worth it for multipoint alone",
+          content: "Switching between my MacBook and iPhone is instant. No Bluetooth menu diving. The LDAC support means music from Tidal sounds genuinely hi-res. Clamping force slightly tight but loosens after a week. Not quite Bose on comfort but wins on everything else.",
+          pros: ["Multipoint pairing", "LDAC Hi-Res", "Sound quality"],
+          cons: ["Tight clamp initially", "ANC not quite Bose-level on wind noise"],
+          likesCount: 178, helpfulCount: 67, forkCount: 1, commentCount: 2,
+          isVerifiedPurchase: false, isCampaignReview: true,
+          productSource: "brand_sent", usageDuration: "1_3_months",
+          eligibleForPayout: true, reviewType: "campaign",
+          createdAt: ago(30) },
 
-        // ── Automotive — Rivian R2 ──────────────────────────────────────────
-        { productName: "Rivian R2 SUV", category: "Automotive", campaignId: "camp_rivian", productId: campDocs["camp_rivian"], variantName: "Max Pack · Quad-Motor", variantId: vid("camp_rivian", "Max Pack · Quad-Motor"), reviewerName: "Chris M.", rating: 5, summary: "The EV for people who actually go outside", content: "Took this through two national parks and a cross-country road trip. The gear tunnel is genius and the air suspension adjustments for off-road feel like cheating. Highway Assist is hands-free and actually trustworthy.", pros: ["Off-road capability", "Gear tunnel", "Range"], cons: ["Charging network smaller than Tesla"], likesCount: 287, isCampaignReview: true, createdAt: ago(5) },
-        { productName: "Rivian R2 SUV", category: "Automotive", campaignId: "camp_rivian", productId: campDocs["camp_rivian"], variantName: "Long Range · AWD", variantId: vid("camp_rivian", "Long Range · AWD"), reviewerName: "Olivia P.", rating: 4, summary: "Family car of the future, today", content: "Three car seats fit without anyone losing a hip. The flat floor makes it feel enormous inside. Software updates have fixed most of the early launch bugs. Rivian service needs more locations.", pros: ["Interior space", "OTA updates", "Frunk"], cons: ["Service centers rare"], likesCount: 134, isCampaignReview: true, createdAt: ago(8) },
-        { productName: "Rivian R2 SUV", category: "Automotive", campaignId: "camp_rivian", productId: campDocs["camp_rivian"], variantName: "Standard Range · RWD", variantId: vid("camp_rivian", "Standard Range · RWD"), reviewerName: "Lena K.", rating: 4, summary: "Best value EV if you don't need the range", content: "For city driving and weekend trips the Standard Range is plenty. 240 miles covers my week easily. You save $12k over the AWD and the daily drive is identical. Only upgrade if you go off-road regularly.", pros: ["Great value", "Smooth ride", "Software polish"], cons: ["240mi range limiting for road trips"], likesCount: 77, isCampaignReview: true, createdAt: ago(11) },
-        { productName: "Tesla Model Y", category: "Automotive", campaignId: "organic", productId: "org_8", reviewerName: "Nathan F.", rating: 4, summary: "Autopilot on highway commutes changes everything", content: "After two years the initial excitement wears off but the practicality only grows. Boot space is enormous, supercharger network is unbeatable, and FSD has improved enough that I actually use it daily.", pros: ["Supercharger network", "FSD improvements", "Cargo space"], cons: ["Build quality inconsistent"], likesCount: 221, isCampaignReview: false, createdAt: ago(18) },
+        // [2] BIAS FLAG: no cons — triggers Critical Balance -15 health penalty
+        { productName: "Sony WH-1000XM6", category: "Tech", campaignId: "camp_sony",
+          productId: campDocs["camp_sony"], variantName: "Indigo Blue", variantId: vid("camp_sony","Indigo Blue"),
+          reviewerName: "BrandPartner99", reviewerId: "seed_u3", rating: 5,
+          summary: "Absolutely perfect in every way — 10/10 no notes",
+          content: "This is the most incredible product I have ever used. The sound is perfect. The ANC is perfect. The battery is perfect. The design is perfect. I cannot find a single thing wrong with it. Everyone should buy these immediately they are simply flawless.",
+          pros: ["Perfect sound", "Perfect ANC", "Perfect battery"],
+          cons: [],  // <-- triggers Critical Balance penalty
+          likesCount: 12, helpfulCount: 3, forkCount: 0, commentCount: 0,
+          isVerifiedPurchase: false, isCampaignReview: true,
+          biasFlag: true,  // <-- seeded as flagged for AI moderation log
+          productSource: "brand_sent", usageDuration: "less_1_week",
+          eligibleForPayout: true, reviewType: "campaign",
+          createdAt: ago(5) },
 
-        // ── Beauty — Rhode Lip Treatment ────────────────────────────────────
-        { productName: "Rhode Peptide Lip Treatment", category: "Beauty", campaignId: "camp_rhode", productId: campDocs["camp_rhode"], variantName: "Glazed Donut", variantId: vid("camp_rhode", "Glazed Donut"), reviewerName: "Aisha P.", rating: 5, summary: "Best lip product I have ever owned", content: "I have tried every lip mask on the market and this is the one I keep reaching for. The peptides actually do something — my lips are noticeably plumper after two weeks of daily use. The glaze finish photographs beautifully.", pros: ["Real plumping", "Great finish", "Smells amazing"], cons: ["Small tube"], likesCount: 312, isCampaignReview: true, createdAt: ago(3) },
-        { productName: "Rhode Peptide Lip Treatment", category: "Beauty", campaignId: "camp_rhode", productId: campDocs["camp_rhode"], variantName: "Salted Caramel", variantId: vid("camp_rhode", "Salted Caramel"), reviewerName: "Zoe T.", rating: 4, summary: "Hype that is actually justified", content: "I was deeply skeptical given the influencer marketing but after a month I understand the obsession. Stays on longer than most glosses and the hydration is real. Packaging could be more sustainable.", pros: ["Long-lasting", "Hydration", "Non-sticky"], cons: ["Packaging wasteful"], likesCount: 98, isCampaignReview: true, createdAt: ago(6) },
-        { productName: "Rhode Peptide Lip Treatment", category: "Beauty", campaignId: "camp_rhode", productId: campDocs["camp_rhode"], variantName: "Watermelon Slice", variantId: vid("camp_rhode", "Watermelon Slice"), reviewerName: "Mia J.", rating: 5, summary: "Watermelon Slice is summer in a tube", content: "The scent alone is worth it. Applies like a dream and the light pink tint works on every skin tone. I have repurchased three times — once for me, twice as gifts. Nobody has been disappointed.", pros: ["Beautiful scent", "Subtle tint", "Lightweight"], cons: ["Sells out fast"], likesCount: 74, isCampaignReview: true, createdAt: ago(4) },
-        { productName: "Charlotte Tilbury Flawless Filter", category: "Beauty", campaignId: "organic", productId: "org_9", reviewerName: "Monica R.", rating: 5, summary: "My skin but better in a bottle", content: "This is the product I reach for when I want to look effortless. One pump mixed into my moisturizer gives a glow that looks like you slept eight hours. Does not photograph as cakey as some primers.", pros: ["Natural glow", "Flexible coverage", "Skin prep"], cons: ["Expensive for the size"], likesCount: 167, isCampaignReview: false, createdAt: ago(11) },
-        { productName: "Fenty Beauty Pro Filt'r Foundation", category: "Beauty", campaignId: "organic", productId: "org_10", reviewerName: "Jade W.", rating: 4, summary: "Finally a shade range that respects undertones", content: "Fifty shades actually cover the full spectrum. It oxidizes slightly after an hour so buy one shade lighter than your match. Transfer-proof claim is real — it did not budge through a wedding.", pros: ["Shade range", "Transfer-proof", "Buildable"], cons: ["Slight oxidation"], likesCount: 203, isCampaignReview: false, createdAt: ago(22) },
+        // [3] Verified organic, different variant
+        { productName: "Sony WH-1000XM6", category: "Tech", campaignId: "organic",
+          productId: campDocs["camp_sony"], variantName: "Indigo Blue", variantId: vid("camp_sony","Indigo Blue"),
+          reviewerName: "Sam Williams", reviewerId: "seed_u4", rating: 5,
+          summary: "The Indigo Blue is the colourway of the year",
+          content: "Sounds identical to the black but the colour attracts compliments constantly. Matte finish resists fingerprints unlike the glossy silver. Sound-wise this sits noticeably above my old Bose QC45 — bass is deeper and treble is less fatiguing over long sessions.",
+          pros: ["Stunning matte finish", "Deep bass", "Non-fatiguing treble"],
+          cons: ["Wish more colour options existed", "App still needs work"],
+          likesCount: 89, helpfulCount: 34, forkCount: 0, commentCount: 1,
+          isVerifiedPurchase: true, isCampaignReview: false,
+          productSource: "purchased", usageDuration: "1_3_months",
+          eligibleForPayout: false, reviewType: "verified",
+          createdAt: ago(20) },
 
-        // ── Gaming — PlayStation 5 Pro ───────────────────────────────────────
-        { productName: "PlayStation 5 Pro", category: "Gaming", campaignId: "camp_ps5pro", productId: campDocs["camp_ps5pro"], variantName: "Disc Edition", variantId: vid("camp_ps5pro", "Disc Edition"), reviewerName: "Tom H.", rating: 5, summary: "This is what 4K gaming was supposed to look like", content: "PSSR upscaling genuinely competes with native 4K in most titles. Spider-Man 2 runs at a locked 60 with ray tracing that would have required a PC costing three times as much. The DualSense haptics still feel like magic.", pros: ["PSSR upscaling", "60fps RT mode", "DualSense"], cons: ["No disc drive in base model"], likesCount: 521, isCampaignReview: true, createdAt: ago(2) },
-        { productName: "PlayStation 5 Pro", category: "Gaming", campaignId: "camp_ps5pro", productId: campDocs["camp_ps5pro"], variantName: "Digital Edition", variantId: vid("camp_ps5pro", "Digital Edition"), reviewerName: "Leo S.", rating: 4, summary: "For hardcore gamers only — casuals stick with base PS5", content: "The performance difference is real but only in supported titles. If your library is mostly indie games or cross-gen titles you will not notice. For those playing Horizon, GT7, and first-party exclusives — massive upgrade.", pros: ["Performance boost", "Backward compat", "Game library"], cons: ["Premium price", "Limited PSSR titles"], likesCount: 178, isCampaignReview: true, createdAt: ago(4) },
-        { productName: "Elden Ring: Shadow of the Erdtree", category: "Gaming", campaignId: "organic", productId: "org_11", reviewerName: "Sarah L.", rating: 5, summary: "I have died 800 times and I regret nothing", content: "FromSoftware outdid themselves with the DLC. The new areas are bigger than most full games. Messmer is the best boss fight I have experienced in 30 years of gaming. If you liked the base game this is essential.", pros: ["New bosses", "Map size", "Lore"], cons: ["Steep difficulty curve"], likesCount: 634, isCampaignReview: false, createdAt: ago(14) },
-        { productName: "Nintendo Switch 2", category: "Gaming", campaignId: "organic", productId: "org_12", reviewerName: "Ben K.", rating: 5, summary: "Nintendo still makes the most fun hardware", content: "The C button for GameChat is awkward at first but the mouse-click Joy-Con is a genuine innovation. Mario Kart World is the best launch title since Breath of the Wild. Docked mode now actually holds up on a 4K TV.", pros: ["Mouse Joy-Con", "OLED screen", "GameChat"], cons: ["C button learning curve"], likesCount: 289, isCampaignReview: false, createdAt: ago(7) },
+        // ── HOME · Lumina Standing Desk ──────────────────────────────────────
 
-        // ── Fitness — Whoop 5.0 ─────────────────────────────────────────────
-        { productName: "Whoop 5.0 Band", category: "Fitness", campaignId: "camp_whoop", productId: campDocs["camp_whoop"], variantName: "Onyx Black", variantId: vid("camp_whoop", "Onyx Black"), reviewerName: "Elena R.", rating: 5, summary: "Changed how I think about recovery", content: "Three months in and I have completely restructured my training around HRV and recovery scores. Caught an oncoming illness two days before symptoms by noticing my HRV drop. Skin temperature tracking is the sleeper feature.", pros: ["HRV tracking", "Sleep staging", "Illness early warning"], cons: ["Subscription required"], likesCount: 198, isCampaignReview: true, createdAt: ago(4) },
-        { productName: "Whoop 5.0 Band", category: "Fitness", campaignId: "camp_whoop", productId: campDocs["camp_whoop"], variantName: "Stone Grey", variantId: vid("camp_whoop", "Stone Grey"), reviewerName: "James O.", rating: 4, summary: "Best fitness tracker if you are serious about data", content: "The screenless design was weird at first but I love not being distracted by notifications during workouts. Strain coach suggestions are actually intelligent. Wish the community features were more fleshed out.", pros: ["No distractions", "Smart coaching", "Battery life"], cons: ["Pricey subscription", "Community features weak"], likesCount: 87, isCampaignReview: true, createdAt: ago(7) },
-        { productName: "Whoop 5.0 Band", category: "Fitness", campaignId: "camp_whoop", productId: campDocs["camp_whoop"], variantName: "Desert Tan", variantId: vid("camp_whoop", "Desert Tan"), reviewerName: "Nina P.", rating: 5, summary: "Desert Tan looks incredible with everything", content: "I bought the Desert Tan because it pairs with gym wear and office wear equally well. The band itself is comfortable enough to sleep in — which you have to do for accurate sleep tracking. Six months in and I wouldn't swap it.", pros: ["Versatile colourway", "Sleep comfort", "Accurate data"], cons: ["Tan shows wear slightly over time"], likesCount: 52, isCampaignReview: true, createdAt: ago(6) },
-        { productName: "Peloton Bike+", category: "Fitness", campaignId: "organic", productId: "org_13", reviewerName: "Amanda C.", rating: 4, summary: "Expensive but I have not skipped a Monday in eight months", content: "The instructors make or break this purchase. Alex Toussaint's classes have genuinely improved my cardio base. Sold my gym membership and it paid for itself in six months. The rotating screen for floor workouts is underrated.", pros: ["Instructor quality", "Screen rotates", "Community"], cons: ["High upfront cost"], likesCount: 156, isCampaignReview: false, createdAt: ago(9) },
+        // [4] Verified, organic, high engagement, good balance
+        { productName: "Lumina Smart Standing Desk", category: "Home", campaignId: "organic",
+          productId: campDocs["camp_lumina"], variantName: "60\" White Top", variantId: vid("camp_lumina","60\" White Top"),
+          reviewerName: "Marcus Thompson", reviewerId: "seed_u5", rating: 5,
+          summary: "OLED Pomodoro timer changed how I work",
+          content: "The built-in OLED timer is the killer feature nobody mentions. Set a 25-minute focus block, stand for the second half — it is now completely automatic. Assembly took 40 minutes solo. Every cable routes through the integrated tray. Wobble at full height is minimal even with three monitors.",
+          pros: ["OLED timer genius", "Cable management excellent", "Stable at max height", "App integration works"],
+          cons: ["Assembly instructions could be clearer", "App occasionally disconnects"],
+          likesCount: 267, helpfulCount: 89, forkCount: 1, commentCount: 4,
+          isVerifiedPurchase: true, isCampaignReview: false,
+          productSource: "purchased", usageDuration: "3_plus_months",
+          eligibleForPayout: false, reviewType: "verified",
+          createdAt: ago(60) },
 
-        // ── Travel — IHG Indigo Hotels ──────────────────────────────────────
-        { productName: "IHG One Rewards — Indigo Hotels", category: "Travel", campaignId: "camp_ihg", productId: campDocs["camp_ihg"], variantName: "Hotel Indigo Edinburgh", variantId: vid("camp_ihg", "Hotel Indigo Edinburgh"), reviewerName: "Priya N.", rating: 5, summary: "Boutique hotel that actually has personality", content: "Stayed at Hotel Indigo Edinburgh for a long weekend. It felt genuinely connected to the neighbourhood — the staff recommended a hidden whisky bar that no travel app listed. Design is beautiful without feeling precious.", pros: ["Local character", "Staff knowledge", "Design"], cons: ["Points redemption complex"], likesCount: 143, isCampaignReview: true, createdAt: ago(5) },
-        { productName: "IHG One Rewards — Indigo Hotels", category: "Travel", campaignId: "camp_ihg", productId: campDocs["camp_ihg"], variantName: "Hotel Indigo Dubai", variantId: vid("camp_ihg", "Hotel Indigo Dubai"), reviewerName: "Carlos M.", rating: 4, summary: "Loyalty program finally worth it for frequent travelers", content: "Ambassador status means I get an upgrade almost every stay. The free weekend night certificate alone covers the annual fee twice over. App check-in works 80% of the time which is better than most chains.", pros: ["Upgrade frequency", "Free night cert", "App check-in"], cons: ["App bugs occasionally"], likesCount: 67, isCampaignReview: true, createdAt: ago(10) },
-        { productName: "IHG One Rewards — Indigo Hotels", category: "Travel", campaignId: "camp_ihg", productId: campDocs["camp_ihg"], variantName: "Hotel Indigo NYC", variantId: vid("camp_ihg", "Hotel Indigo NYC"), reviewerName: "Rachel T.", rating: 5, summary: "The NYC location is in the perfect spot", content: "Walking distance to everything Midtown without the midtown hotel premium. The art deco lobby makes every check-in feel like an event. Room was compact but brilliantly designed — zero wasted space.", pros: ["Location", "Lobby design", "Smart room layout"], cons: ["Rooms on the small side"], likesCount: 89, isCampaignReview: true, createdAt: ago(8) },
-        { productName: "Away Carry-On Luggage", category: "Travel", campaignId: "organic", productId: "org_14", reviewerName: "Hannah B.", rating: 5, summary: "The last suitcase you will ever buy", content: "Four years, 60 flights, and it still looks new. The compression mechanism lets me overpack without paying checked bag fees. The built-in battery was removed from newer models which is a shame but the shell quality is unmatched.", pros: ["Durability", "Compression", "Spinner wheels"], cons: ["No battery on new models"], likesCount: 234, isCampaignReview: false, createdAt: ago(35) },
+        // [5] Campaign review
+        { productName: "Lumina Smart Standing Desk", category: "Home", campaignId: "camp_lumina",
+          productId: campDocs["camp_lumina"], variantName: "48\" Walnut Top", variantId: vid("camp_lumina","48\" Walnut Top"),
+          reviewerName: "Sophie Kim", reviewerId: "seed_u6", rating: 4,
+          summary: "Best desk under $800 for single-monitor setups",
+          content: "Compared seven desks before choosing this. For a single monitor the 48-inch is perfect. The walnut veneer looks genuinely premium — not cheap laminate. App reminders to stand actually work because the desk itself buzzes. Wish the surface was slightly deeper front-to-back.",
+          pros: ["Premium walnut finish", "App reminders", "Solid motor"],
+          cons: ["Shallow depth for dual monitor arms", "No USB-C hub built in"],
+          likesCount: 134, helpfulCount: 45, forkCount: 0, commentCount: 2,
+          isVerifiedPurchase: false, isCampaignReview: true,
+          productSource: "brand_sent", usageDuration: "1_3_months",
+          eligibleForPayout: true, reviewType: "campaign",
+          createdAt: ago(14) },
 
-        // ── Finance — Robinhood Gold ────────────────────────────────────────
-        { productName: "Robinhood Gold", category: "Finance", campaignId: "camp_robinhood", productId: campDocs["camp_robinhood"], variantName: "Monthly Plan · $5/mo", variantId: vid("camp_robinhood", "Monthly Plan · $5/mo"), reviewerName: "Nate D.", rating: 4, summary: "5% APY on cash finally makes this account worth it", content: "The Gold subscription pays for itself with the APY on idle cash. Margin rates are still high but the instant deposit limit increase was the feature that made me upgrade. Interface is still the best in the business for quick trades.", pros: ["5% APY", "Instant deposits", "Clean UI"], cons: ["Margin rates high", "No bonds"], likesCount: 112, isCampaignReview: true, createdAt: ago(6) },
-        { productName: "Robinhood Gold", category: "Finance", campaignId: "camp_robinhood", productId: campDocs["camp_robinhood"], variantName: "Annual Plan · $50/yr", variantId: vid("camp_robinhood", "Annual Plan · $50/yr"), reviewerName: "Kenji T.", rating: 3, summary: "Great UI, thin on serious investing tools", content: "If you are day trading or just parking emergency cash the UI and APY are genuinely excellent. As a long-term investor I miss screeners, bond purchasing, and proper tax loss harvesting tools. Good for beginners, outgrown by intermediates.", pros: ["Clean interface", "APY", "Options easy"], cons: ["No bonds", "Weak screeners", "CS still poor"], likesCount: 78, isCampaignReview: true, createdAt: ago(9) },
-        { productName: "Wealthfront", category: "Finance", campaignId: "organic", productId: "org_15", reviewerName: "Grace S.", rating: 5, summary: "Set it and forget it investing that actually works", content: "Tax-loss harvesting alone has saved me more than the management fee costs. The Path planning tool showed me I could retire three years earlier than I thought. Portfolio line of credit at 5% beats any HELOC I have seen.", pros: ["Tax-loss harvesting", "Path planner", "Portfolio credit line"], cons: ["No individual stock picking"], likesCount: 189, isCampaignReview: false, createdAt: ago(28) },
+        // [6] Verified, organic
+        { productName: "Lumina Smart Standing Desk", category: "Home", campaignId: "organic",
+          productId: campDocs["camp_lumina"], variantName: "72\" Black Top", variantId: vid("camp_lumina","72\" Black Top"),
+          reviewerName: "Derek Liu", reviewerId: "seed_u7", rating: 5,
+          summary: "Triple-monitor setup, zero wobble",
+          content: "Three 27-inch monitors plus a laptop stand and the 72-inch has room to spare. Motor is whisper-quiet — nobody in my open office notices when I raise it. Black top hides cable management perfectly. Two people needed for assembly given the weight but that is expected.",
+          pros: ["Enormous surface", "Whisper-quiet motor", "Zero wobble at max height"],
+          cons: ["Heavy — needs two people to assemble", "Premium price"],
+          likesCount: 198, helpfulCount: 72, forkCount: 0, commentCount: 2,
+          isVerifiedPurchase: true, isCampaignReview: false,
+          productSource: "purchased", usageDuration: "3_plus_months",
+          eligibleForPayout: false, reviewType: "verified",
+          createdAt: ago(35) },
+
+        // ── SAAS · Linear ────────────────────────────────────────────────────
+
+        // [7] Campaign, verified purchase (unusual for SaaS but tests the toggle)
+        { productName: "Linear — Project Management", category: "SaaS", campaignId: "camp_linear",
+          productId: campDocs["camp_linear"], variantName: "Plus Plan ($8/user/mo)", variantId: vid("camp_linear","Plus Plan ($8/user/mo)"),
+          reviewerName: "David Kim", reviewerId: "seed_u8", rating: 5,
+          summary: "Jira killer — and I say that as a certified Jira admin",
+          content: "Our 18-person engineering team migrated from Jira in a single afternoon. Creating an issue is three keystrokes. Cycles give our sprints actual structure. GitHub sync means no manual status updates. Six months in, nobody has asked to go back. The keyboard shortcut system alone saves me 45 minutes a week.",
+          pros: ["Instant issue creation (3 keystrokes)", "Cycles track velocity naturally", "GitHub sync is flawless", "Fast as a native app"],
+          cons: ["No Gantt chart for stakeholders", "Free tier member limit too low"],
+          likesCount: 312, helpfulCount: 134, forkCount: 3, commentCount: 6,
+          isVerifiedPurchase: true, isCampaignReview: true,
+          productSource: "purchased", usageDuration: "3_plus_months",
+          eligibleForPayout: true, reviewType: "campaign",
+          createdAt: ago(25) },
+
+        // [8] Campaign, not verified
+        { productName: "Linear — Project Management", category: "SaaS", campaignId: "camp_linear",
+          productId: campDocs["camp_linear"], variantName: "Free Tier", variantId: vid("camp_linear","Free Tier"),
+          reviewerName: "Anita Rao", reviewerId: "seed_u9", rating: 4,
+          summary: "The free tier is legitimately useful for solo devs",
+          content: "I run a one-person dev shop and the free tier covers everything I need. Keyboard shortcuts feel native rather than learned. Issue creation is so fast I actually log things I would normally ignore. Upgrade limits are frustrating if you add contractors.",
+          pros: ["Free tier generous for solo", "Keyboard-first design", "Views are flexible"],
+          cons: ["Free tier member limit", "No time tracking built in"],
+          likesCount: 89, helpfulCount: 34, forkCount: 0, commentCount: 1,
+          isVerifiedPurchase: false, isCampaignReview: true,
+          productSource: "brand_sent", usageDuration: "1_3_months",
+          eligibleForPayout: true, reviewType: "campaign",
+          createdAt: ago(18) },
+
+        // ── AUTOMOTIVE · Rivian R2 ───────────────────────────────────────────
+
+        // [9] Verified owner, organic, high engagement, will get versions
+        { productName: "Rivian R2 SUV", category: "Automotive", campaignId: "organic",
+          productId: campDocs["camp_rivian"], variantName: "Max Pack · Quad-Motor", variantId: vid("camp_rivian","Max Pack · Quad-Motor"),
+          reviewerName: "Chris Meyers", reviewerId: "seed_u10", rating: 5,
+          summary: "10,000 miles in — still the best vehicle decision I've made",
+          content: "Took it through Zion, Arches, and a 3,000-mile cross-country trip. The gear tunnel has replaced my entire rooftop cargo setup. Highway Assist is hands-free on any divided highway and actually trustworthy. Software updates have fixed every single issue I logged in the first month. Charging network smaller than Tesla but Electrify America works without app drama.",
+          pros: ["Off-road capability genuine", "Gear tunnel genius", "OTA updates actually fix things", "Interior space class-leading"],
+          cons: ["Charging network smaller than Tesla", "Service centres too few", "Camp Mode limited vs Tesla"],
+          likesCount: 456, helpfulCount: 198, forkCount: 2, commentCount: 8,
+          isVerifiedPurchase: true, isCampaignReview: false,
+          productSource: "purchased", usageDuration: "3_plus_months",
+          eligibleForPayout: false, reviewType: "verified",
+          createdAt: ago(90) },
+
+        // [10] Campaign review
+        { productName: "Rivian R2 SUV", category: "Automotive", campaignId: "camp_rivian",
+          productId: campDocs["camp_rivian"], variantName: "Long Range · AWD", variantId: vid("camp_rivian","Long Range · AWD"),
+          reviewerName: "Olivia Park", reviewerId: "seed_u11", rating: 4,
+          summary: "Best family EV if you have kids and a driveway charger",
+          content: "Three car seats fit without anyone losing a hip — the flat floor is the trick. 290 miles of EPA range means we charge once per week at home for our 60-mile daily routine. Software updates arrive OTA and have been genuinely improving the product monthly. Service centre access remains the weak point.",
+          pros: ["Family interior space", "290mi range sufficient", "OTA updates frequent", "Frunk storage useful"],
+          cons: ["Service centre scarcity", "App still has rough edges"],
+          likesCount: 213, helpfulCount: 78, forkCount: 1, commentCount: 3,
+          isVerifiedPurchase: false, isCampaignReview: true,
+          productSource: "brand_sent", usageDuration: "1_3_months",
+          eligibleForPayout: true, reviewType: "campaign",
+          createdAt: ago(22) },
+
+        // ── BEAUTY · Rhode Lip Treatment ─────────────────────────────────────
+
+        // [11] Verified, organic, high engagement
+        { productName: "Rhode Peptide Lip Treatment", category: "Beauty", campaignId: "organic",
+          productId: campDocs["camp_rhode"], variantName: "Glazed Donut", variantId: vid("camp_rhode","Glazed Donut"),
+          reviewerName: "Aisha Patel", reviewerId: "seed_u12", rating: 5,
+          summary: "Two months in — lips are genuinely different",
+          content: "I was deeply sceptical. Lip glosses do not plump lips — that is marketing speak. Two months of daily use later and the vertical lip lines I have had since my 30s are measurably reduced. The glaze finish photographs beautifully without that sticky latex feel other glosses have. Repurchased twice.",
+          pros: ["Real plumping over time", "Non-sticky glaze finish", "Hydration lasts 4–5 hours", "Photographs well"],
+          cons: ["Small tube for the price", "Glazed Donut scent divisive"],
+          likesCount: 378, helpfulCount: 145, forkCount: 1, commentCount: 5,
+          isVerifiedPurchase: true, isCampaignReview: false,
+          productSource: "purchased", usageDuration: "3_plus_months",
+          eligibleForPayout: false, reviewType: "verified",
+          createdAt: ago(55) },
+
+        // [12] Campaign review
+        { productName: "Rhode Peptide Lip Treatment", category: "Beauty", campaignId: "camp_rhode",
+          productId: campDocs["camp_rhode"], variantName: "Watermelon Slice", variantId: vid("camp_rhode","Watermelon Slice"),
+          reviewerName: "Zoe Taylor", reviewerId: "seed_u13", rating: 4,
+          summary: "Watermelon Slice is summer in a tube — legitimately",
+          content: "The scent is genuinely watermelon rather than generic fruit candy. Light pink tint flatters every skin tone in my friend group (we tested across four people, four very different undertones). Applies clean, lasts about 3 hours before you need to reapply. Packaging could be more sustainable.",
+          pros: ["Authentic scent", "Universal tint", "Clean application", "Non-sticky"],
+          cons: ["3-hour wear before reapplication", "Plastic packaging not great"],
+          likesCount: 134, helpfulCount: 56, forkCount: 0, commentCount: 2,
+          isVerifiedPurchase: false, isCampaignReview: true,
+          productSource: "brand_sent", usageDuration: "1_3_months",
+          eligibleForPayout: true, reviewType: "campaign",
+          createdAt: ago(8) },
+
+        // ── GAMING · PlayStation 5 Pro ───────────────────────────────────────
+
+        // [13] Campaign, verified purchase, high engagement
+        { productName: "PlayStation 5 Pro", category: "Gaming", campaignId: "camp_ps5pro",
+          productId: campDocs["camp_ps5pro"], variantName: "Disc Edition", variantId: vid("camp_ps5pro","Disc Edition"),
+          reviewerName: "Tom Harrison", reviewerId: "seed_u14", rating: 5,
+          summary: "PSSR makes 60fps ray tracing actually possible",
+          content: "Spider-Man 2 at 60fps with full ray tracing is genuinely stunning — this would require a $2,000 PC to achieve natively. PSSR upscaling is not perfect on every title but the best implementations are indistinguishable from native 4K. DualSense haptics remain the most underrated innovation in gaming. The extra storage alone justifies the upgrade from base PS5 if you own more than 15 games.",
+          pros: ["PSSR enables 60fps RT in flagship titles", "2TB SSD essential", "DualSense haptics still best-in-class", "Backward compat perfect"],
+          cons: ["PSSR inconsistent across games", "Premium price", "No 8K games exist yet"],
+          likesCount: 534, helpfulCount: 234, forkCount: 3, commentCount: 9,
+          isVerifiedPurchase: true, isCampaignReview: true,
+          productSource: "brand_sent", usageDuration: "1_3_months",
+          eligibleForPayout: true, reviewType: "campaign",
+          createdAt: ago(12) },
+
+        // [14] Organic, honest mixed review
+        { productName: "PlayStation 5 Pro", category: "Gaming", campaignId: "organic",
+          productId: campDocs["camp_ps5pro"], variantName: "Digital Edition", variantId: vid("camp_ps5pro","Digital Edition"),
+          reviewerName: "Leo Santos", reviewerId: "seed_u15", rating: 3,
+          summary: "Honest take: only worth it if your library is first-party",
+          content: "The hardware is excellent. But if you predominantly play multiplatform games or indie titles the PSSR uplift is marginal. I own 40 games and maybe 8 have meaningful Pro enhancements. If your library is Spider-Man, Horizon, GT7, and first-party exclusives this is a no-brainer. If it's COD, FIFA, and Minecraft — save the $200.",
+          pros: ["Performance uplift real in supported titles", "2TB welcome", "DualSense unchanged from PS5"],
+          cons: ["PSSR support patchy", "Price premium hard to justify for multiplatform gamers", "No 4K Blu-ray on Digital"],
+          likesCount: 234, helpfulCount: 123, forkCount: 0, commentCount: 4,
+          isVerifiedPurchase: true, isCampaignReview: false,
+          productSource: "purchased", usageDuration: "1_3_months",
+          eligibleForPayout: false, reviewType: "verified",
+          createdAt: ago(8) },
+
+        // ── FITNESS · Whoop 5.0 ──────────────────────────────────────────────
+
+        // [15] Verified, organic, will get version update
+        { productName: "Whoop 5.0 Band", category: "Fitness", campaignId: "organic",
+          productId: campDocs["camp_whoop"], variantName: "Onyx Black", variantId: vid("camp_whoop","Onyx Black"),
+          reviewerName: "Elena Rodriguez", reviewerId: "seed_u16", rating: 5,
+          summary: "Caught an illness 48hrs before symptoms via HRV",
+          content: "Six months in and I have completely restructured my training blocks around recovery scores. The most useful moment was when my HRV dropped 18% below baseline for no obvious reason — I rested that day instead of training hard, and 48 hours later got a cold. The device literally predicted my illness. Skin temperature tracking is the sleeper feature — it explains the bad sleep nights I couldn't otherwise account for.",
+          pros: ["HRV genuinely predictive", "Sleep staging accurate", "Skin temp catches illness early", "Comfortable to sleep in"],
+          cons: ["Subscription model expensive long-term", "No screen means phone dependency", "Community features underdeveloped"],
+          likesCount: 289, helpfulCount: 134, forkCount: 1, commentCount: 5,
+          isVerifiedPurchase: true, isCampaignReview: false,
+          productSource: "purchased", usageDuration: "3_plus_months",
+          eligibleForPayout: false, reviewType: "verified",
+          createdAt: ago(70) },
+
+        // [16] Campaign review
+        { productName: "Whoop 5.0 Band", category: "Fitness", campaignId: "camp_whoop",
+          productId: campDocs["camp_whoop"], variantName: "Stone Grey", variantId: vid("camp_whoop","Stone Grey"),
+          reviewerName: "James Okafor", reviewerId: "seed_u17", rating: 4,
+          summary: "The data nerd's fitness tracker",
+          content: "If you want a screen showing your heart rate during workouts this is the wrong device. If you want to understand whether your body is ready to push hard or needs rest, this is the best tool available. Strain coach accuracy improves significantly after month two once the algorithm has enough baseline data.",
+          pros: ["Strain coaching gets smarter over time", "Screenless means no distraction", "Battery 4 days consistent"],
+          cons: ["Subscription expensive", "Algorithm needs 4–6 weeks to calibrate", "No GPS"],
+          likesCount: 145, helpfulCount: 67, forkCount: 0, commentCount: 2,
+          isVerifiedPurchase: false, isCampaignReview: true,
+          productSource: "brand_sent", usageDuration: "1_3_months",
+          eligibleForPayout: true, reviewType: "campaign",
+          createdAt: ago(16) },
+
+        // ── TRAVEL · IHG Indigo Hotels ───────────────────────────────────────
+
+        // [17] Verified, organic
+        { productName: "IHG One Rewards — Indigo Hotels", category: "Travel", campaignId: "organic",
+          productId: campDocs["camp_ihg"], variantName: "Hotel Indigo Edinburgh", variantId: vid("camp_ihg","Hotel Indigo Edinburgh"),
+          reviewerName: "Priya Nair", reviewerId: "seed_u18", rating: 5,
+          summary: "Staff recommended a whisky bar that isn't on any app",
+          content: "The Hotel Indigo Edinburgh experience is built around neighbourhood knowledge. The concierge sent me to a 40-year-old whisky bar that locals use, not tourists. Room design is genuinely thoughtful — the tiles reference the local geology. Not a generic hotel that happens to have a fashionable lobby. Points redemption is unnecessarily complex but the stays themselves are exceptional.",
+          pros: ["Neighbourhood character genuine", "Staff local knowledge outstanding", "Design rooted in location"],
+          cons: ["Points redemption complex", "App check-in unreliable"],
+          likesCount: 189, helpfulCount: 78, forkCount: 0, commentCount: 3,
+          isVerifiedPurchase: true, isCampaignReview: false,
+          productSource: "purchased", usageDuration: "1_4_weeks",
+          eligibleForPayout: false, reviewType: "verified",
+          createdAt: ago(40) },
+
+        // [18] Campaign review
+        { productName: "IHG One Rewards — Indigo Hotels", category: "Travel", campaignId: "camp_ihg",
+          productId: campDocs["camp_ihg"], variantName: "Hotel Indigo NYC", variantId: vid("camp_ihg","Hotel Indigo NYC"),
+          reviewerName: "Rachel Torres", reviewerId: "seed_u19", rating: 4,
+          summary: "Midtown location is genuinely underpriced for what it is",
+          content: "Walking distance to MoMA, Rockefeller, and the Park without the midtown hotel premium. The art deco lobby makes check-in feel like an arrival rather than a transaction. Rooms are compact but designed with zero wasted space — the storage solutions are actually clever. Breakfast quality inconsistent across visits.",
+          pros: ["Location unbeatable for midtown", "Art deco lobby", "Room layout clever", "Upgrade on Ambassador tier"],
+          cons: ["Rooms genuinely small", "Breakfast inconsistent", "Gym basic"],
+          likesCount: 123, helpfulCount: 56, forkCount: 0, commentCount: 2,
+          isVerifiedPurchase: false, isCampaignReview: true,
+          productSource: "brand_sent", usageDuration: "1_4_weeks",
+          eligibleForPayout: true, reviewType: "campaign",
+          createdAt: ago(11) },
+
+        // ── FINANCE · Robinhood Gold ─────────────────────────────────────────
+
+        // [19] Verified, honest mixed — tests low health score
+        { productName: "Robinhood Gold", category: "Finance", campaignId: "organic",
+          productId: campDocs["camp_robinhood"], variantName: "Annual · $50/yr", variantId: vid("camp_robinhood","Annual · $50/yr"),
+          reviewerName: "Nate Diaz", reviewerId: "seed_u20", rating: 3,
+          summary: "Great UI, outgrown by anyone beyond beginner level",
+          content: "For parking emergency cash at 5% APY and trading options on your phone, Robinhood Gold is genuinely excellent. As a long-term investor trying to build a serious portfolio, I hit its ceiling quickly. No screeners, no bond purchasing, no proper tax-loss harvesting, customer support is email-only and slow. The interface is the best in the industry — I wish the tools matched it.",
+          pros: ["5% APY on cash competitive", "UI best in class", "Options trading simple", "Instant deposits convenient"],
+          cons: ["No bond purchasing", "Weak screeners", "Customer support email-only and slow", "No true tax-loss harvesting"],
+          likesCount: 156, helpfulCount: 89, forkCount: 0, commentCount: 3,
+          isVerifiedPurchase: true, isCampaignReview: false,
+          productSource: "purchased", usageDuration: "3_plus_months",
+          eligibleForPayout: false, reviewType: "verified",
+          createdAt: ago(35) },
+
+        // [20] Campaign review
+        { productName: "Robinhood Gold", category: "Finance", campaignId: "camp_robinhood",
+          productId: campDocs["camp_robinhood"], variantName: "Monthly · $5/mo", variantId: vid("camp_robinhood","Monthly · $5/mo"),
+          reviewerName: "Kenji Tanaka", reviewerId: "seed_u21", rating: 4,
+          summary: "APY alone covers the subscription fee in the first month",
+          content: "On $20,000 in idle cash, the 5% APY generates $83/month — the subscription costs $5. The math is obvious. Instant deposit limit increase from $1,000 to $50,000 was the feature that made me upgrade. Margin rates at 6.5% are competitive with Interactive Brokers. Interface is genuinely the best for quick trades.",
+          pros: ["APY pays for itself immediately", "Instant deposit increase", "Margin rate competitive", "Slick interface"],
+          cons: ["No fixed income products", "Customer support still weak"],
+          likesCount: 112, helpfulCount: 45, forkCount: 0, commentCount: 1,
+          isVerifiedPurchase: false, isCampaignReview: true,
+          productSource: "brand_sent", usageDuration: "1_3_months",
+          eligibleForPayout: true, reviewType: "campaign",
+          createdAt: ago(9) },
       ];
 
+      // Write reviews with computed health scores
       const reviewIds: string[] = [];
       for (const rev of reviews) {
         const reviewData = {
           ...rev,
-          reviewerId: "seed_user",
-          likedBy: [],
-          helpfulCount: 0,
-          helpfulBy: [],
+          likedBy: [], helpfulBy: [], notHelpfulBy: [],
           notHelpfulCount: 0,
-          notHelpfulBy: [],
-          commentCount: 0,
-          forkCount: 0,
           versionCount: 1,
-          eligibleForPayout: rev.isCampaignReview,
-          reviewType: rev.isCampaignReview ? "campaign" : "verified",
           mediaUrls: [],
+          subRatings: {},
         };
         const { score, breakdown } = computeHealthScore(reviewData, 0, 0);
         const ref = await addDoc(collection(db, "reviews"), {
@@ -401,14 +746,31 @@ export default function AdminDashboard() {
         reviewIds.push(ref.id);
       }
 
-      setStatusMessage("Inserting channels…");
+      setStatusMessage("Inserting channels (with one boosted category)…");
 
-      // ── Sample channels ──────────────────────────────────────────────────
+      // ── Channels — one has multiplier > 1 to test Boosted badge ─────────
       const sampleChannels = [
-        { name: "Smartphones", slug: "smartphones", description: "Reviews of the latest smartphones, cases, and accessories", category: "Tech", iconEmoji: "📱" },
-        { name: "Standing Desks", slug: "standing-desks", description: "Standing desk reviews, ergonomics tips, and setup inspiration", category: "Home", iconEmoji: "🪑" },
-        { name: "Skincare", slug: "skincare", description: "Skincare product reviews, routines, and ingredient breakdowns", category: "Beauty", iconEmoji: "✨" },
-        { name: "Electric Vehicles", slug: "electric-vehicles", description: "EV reviews, charging tips, and road trip reports", category: "Automotive", iconEmoji: "⚡" },
+        { name: "Noise-Cancelling Headphones", slug: "anc-headphones",
+          description: "ANC headphone reviews, comparison threads, and EQ tips.", category: "Tech", iconEmoji: "🎧",
+          multiplier: 1, multiplierExpiresAt: null },
+        { name: "Standing Desks & Ergonomics", slug: "standing-desks",
+          description: "Desk reviews, ergonomics deep dives, and setup inspiration.", category: "Home", iconEmoji: "🖥️",
+          multiplier: 1, multiplierExpiresAt: null },
+        { name: "Skincare Science", slug: "skincare",
+          description: "Ingredient-led beauty reviews and routine breakdowns.", category: "Beauty", iconEmoji: "✨",
+          // BOOSTED — tests the 🔥 Boosted badge on Explore + Home pages
+          multiplier: 2.0,
+          multiplierExpiresAt: new Date(now.getTime() + 30 * day).toISOString(),
+          multiplierSponsoredBy: "Rhode" },
+        { name: "Electric Vehicles", slug: "electric-vehicles",
+          description: "EV ownership logs, charging tips, and road trip reports.", category: "Automotive", iconEmoji: "⚡",
+          multiplier: 1, multiplierExpiresAt: null },
+        { name: "Dev Tools & SaaS", slug: "dev-saas",
+          description: "SaaS reviews from working developers. No fluff.", category: "SaaS", iconEmoji: "💻",
+          // BOOSTED — second boosted category
+          multiplier: 1.5,
+          multiplierExpiresAt: new Date(now.getTime() + 30 * day).toISOString(),
+          multiplierSponsoredBy: "Linear" },
       ];
 
       const channelIds: Record<string, string> = {};
@@ -417,105 +779,204 @@ export default function AdminDashboard() {
           ...ch,
           creatorId: "seed_admin",
           creatorName: "Admin",
-          memberCount: 5,
+          memberCount: Math.floor(Math.random() * 200) + 20,
           reviewCount: 0,
-          multiplier: 1,
           createdAt: now.toISOString(),
           isOfficial: true,
         });
         channelIds[ch.slug] = ref.id;
       }
 
-      setStatusMessage("Adding engagement data…");
+      setStatusMessage("Adding version updates (Ownership Journey cards)…");
 
-      // ── Version updates on first 2 reviews ───────────────────────────────
-      if (reviewIds.length >= 2) {
-        // 3-month update on first review
+      // ── Version updates — tests the Ownership Journey card in the Hub ────
+      // Review [0] — Alex Chen's Sony review gets 3-month and 6-month updates
+      if (reviewIds[0]) {
         await addDoc(collection(db, "reviews", reviewIds[0], "versions"), {
-          versionNumber: 2,
-          versionLabel: "3 Month Update",
-          content: "Three months in and the noise cancellation is still best-in-class. The ear cushions have broken in nicely and comfort has improved significantly. Battery still holds 38+ hours.",
-          rating: 5,
-          subRatings: {},
-          pros: ["Broken-in comfort", "Consistent ANC"],
-          cons: ["App still bloated"],
-          mediaUrls: [],
-          createdAt: ago(1),
+          versionNumber: 2, versionLabel: "3 Month Update",
+          content: "Three months in and the ear cushions have broken in perfectly — now the most comfortable headphones I have owned. ANC is still class-leading. Battery performance unchanged at 38+ hours. App had a major update that simplified the equaliser. Still my daily driver.",
+          rating: 5, pros: ["Ear cushions broken in nicely", "App improved"], cons: ["App was poor initially"], subRatings: {}, mediaUrls: [],
+          createdAt: ago(15),
+        });
+        await addDoc(collection(db, "reviews", reviewIds[0], "versions"), {
+          versionNumber: 3, versionLabel: "6 Month Update",
+          content: "Six months and 400+ hours of use. The headband padding has flattened slightly but comfort is still excellent. I flew Tokyo-London with these and the ANC handled the cabin drone better than anything else I tested on the flight. I lent them to a colleague and she ordered a pair the same day.",
+          rating: 5, pros: ["Still best-in-class ANC", "Held up to intensive use"], cons: ["Headband padding flattening slightly"], subRatings: {}, mediaUrls: [],
+          createdAt: ago(2),
         });
         await updateDoc(doc(db, "reviews", reviewIds[0]), {
-          versionCount: 2,
-          latestVersionLabel: "3 Month Update",
-          lastUpdatedAt: ago(1),
-        });
-
-        // 6-month update on second review
-        await addDoc(collection(db, "reviews", reviewIds[1], "versions"), {
-          versionNumber: 2,
-          versionLabel: "6 Month Update",
-          content: "After six months of daily use, the headband padding shows slight wear but the sound quality is unchanged. Multipoint has become essential for my workflow switching between phone and laptop.",
-          rating: 4,
-          subRatings: {},
-          pros: ["Multipoint essential", "Sound quality holds"],
-          cons: ["Headband wear"],
-          mediaUrls: [],
-          createdAt: ago(1),
-        });
-        await updateDoc(doc(db, "reviews", reviewIds[1]), {
-          versionCount: 2,
-          latestVersionLabel: "6 Month Update",
-          lastUpdatedAt: ago(1),
+          versionCount: 3, latestVersionLabel: "6 Month Update", lastUpdatedAt: ago(2),
         });
       }
 
-      // ── Fork: third review forks the first ───────────────────────────────
-      if (reviewIds.length >= 3) {
-        await updateDoc(doc(db, "reviews", reviewIds[2]), {
+      // Review [9] — Chris Meyers' Rivian review gets 3-month and 1-year updates
+      if (reviewIds[9]) {
+        await addDoc(collection(db, "reviews", reviewIds[9], "versions"), {
+          versionNumber: 2, versionLabel: "3 Month Update",
+          content: "5,000 miles in. First service was mobile — Rivian sent a technician to my driveway. A tonneau cover fit perfectly and expanded cargo utility further. One OTA update added bidirectional charging (V2H) which is genuinely useful during power outages. Charging anxiety gone after installing a Level 2 home charger.",
+          rating: 5, pros: ["Mobile service outstanding", "OTA added V2H charging", "Charging anxiety gone with home L2"], cons: ["Third-party accessory ecosystem still thin"], subRatings: {}, mediaUrls: [],
+          createdAt: ago(60),
+        });
+        await addDoc(collection(db, "reviews", reviewIds[9], "versions"), {
+          versionNumber: 3, versionLabel: "1 Year Update",
+          content: "10,000 miles and the R2 continues to improve through software. The latest update added predictive range calculation that accounts for my actual driving patterns rather than EPA estimates. Rear seat entertainment system added via OTA. One hardware issue — a door seal replacement handled perfectly under warranty within 48 hours. Best vehicle I have owned.",
+          rating: 5, pros: ["OTA improvements continuous", "Predictive range excellent now", "Warranty service fast"], cons: ["Charging network still Tesla-size gap"], subRatings: {}, mediaUrls: [],
+          createdAt: ago(3),
+        });
+        await updateDoc(doc(db, "reviews", reviewIds[9]), {
+          versionCount: 3, latestVersionLabel: "1 Year Update", lastUpdatedAt: ago(3),
+        });
+      }
+
+      // Review [15] — Elena's Whoop review gets a 1-year update
+      if (reviewIds[15]) {
+        await addDoc(collection(db, "reviews", reviewIds[15], "versions"), {
+          versionNumber: 2, versionLabel: "1 Year Update",
+          content: "One year in. The algorithm has become eerily accurate — it predicted a period of overtraining I was heading into before I noticed the symptoms. Sleep stage accuracy verified against a clinical sleep study (I did one for work reasons) and it was within 7% on all stages. The subscription is expensive but the health insight ROI is real for me.",
+          rating: 5, pros: ["Algorithm accuracy improves continuously", "Sleep staging near-clinical accuracy after 1yr"], cons: ["Annual subscription adds up", "Band material showing wear on clasp after 12mo"], subRatings: {}, mediaUrls: [],
+          createdAt: ago(5),
+        });
+        await updateDoc(doc(db, "reviews", reviewIds[15]), {
+          versionCount: 2, latestVersionLabel: "1 Year Update", lastUpdatedAt: ago(5),
+        });
+      }
+
+      setStatusMessage("Adding forks…");
+
+      // ── Forks — tests fork badge and fork count on ReviewCard ────────────
+      // Review [1] forks review [0] (Priya forks Alex's Sony review)
+      if (reviewIds[0] && reviewIds[1]) {
+        await updateDoc(doc(db, "reviews", reviewIds[1]), {
           forkedFromReviewId: reviewIds[0],
           forkedFromReviewerName: "Alex Chen",
         });
-        await updateDoc(doc(db, "reviews", reviewIds[0]), { forkCount: 1 });
+        await updateDoc(doc(db, "reviews", reviewIds[0]), { forkCount: 2 });
         await addDoc(collection(db, "reviewForks"), {
-          originalReviewId: reviewIds[0],
-          forkReviewId: reviewIds[2],
-          forkerId: "seed_user",
-          forkerName: "Dan T.",
-          createdAt: ago(10),
+          originalReviewId: reviewIds[0], forkReviewId: reviewIds[1],
+          forkerId: "seed_u2", forkerName: "Priya Singh", createdAt: ago(28),
         });
       }
 
-      // ── Threaded comments ────────────────────────────────────────────────
-      if (reviewIds.length >= 1) {
+      // Review [10] forks review [9] (Olivia forks Chris's Rivian review)
+      if (reviewIds[9] && reviewIds[10]) {
+        await updateDoc(doc(db, "reviews", reviewIds[10]), {
+          forkedFromReviewId: reviewIds[9],
+          forkedFromReviewerName: "Chris Meyers",
+        });
+        await updateDoc(doc(db, "reviews", reviewIds[9]), { forkCount: 2 });
+        await addDoc(collection(db, "reviewForks"), {
+          originalReviewId: reviewIds[9], forkReviewId: reviewIds[10],
+          forkerId: "seed_u11", forkerName: "Olivia Park", createdAt: ago(20),
+        });
+      }
+
+      setStatusMessage("Adding threaded comments…");
+
+      // ── Comments — tests nested comments & commentCount badge ─────────────
+      if (reviewIds[0]) {
         const c1 = await addDoc(collection(db, "reviewComments"), {
-          reviewId: reviewIds[0],
-          userId: "seed_user_2",
-          userName: "Marcus T.",
-          content: "Totally agree about the ANC. Have you tried them on a plane?",
-          createdAt: ago(2),
-          parentCommentId: null,
-          depth: 0,
+          reviewId: reviewIds[0], userId: "seed_u5", userName: "Marcus Thompson",
+          content: "Completely agree on the ANC. Have you tried these on a long-haul flight? Curious how they handle cabin pressure.",
+          createdAt: ago(12), parentCommentId: null, depth: 0,
         });
         await addDoc(collection(db, "reviewComments"), {
-          reviewId: reviewIds[0],
-          userId: "seed_user",
-          userName: "Alex Chen",
-          content: "Yes! Used them on a 12-hour flight to Tokyo. Complete silence even during takeoff.",
-          createdAt: ago(1),
-          parentCommentId: c1.id,
-          depth: 1,
+          reviewId: reviewIds[0], userId: "seed_u1", userName: "Alex Chen",
+          content: "Tokyo-London and the cabin drone was almost completely gone. Way better than the QC45 I used on the same route last year.",
+          createdAt: ago(11), parentCommentId: c1.id, depth: 1,
         });
         await addDoc(collection(db, "reviewComments"), {
-          reviewId: reviewIds[0],
-          userId: "seed_user_3",
-          userName: "Sophie K.",
-          content: "How do they compare to the Bose QC Ultra?",
-          createdAt: ago(1),
-          parentCommentId: null,
-          depth: 0,
+          reviewId: reviewIds[0], userId: "seed_u4", userName: "Sam Williams",
+          content: "Just to add — I wear the Indigo Blue on flights and can confirm the same experience. The low-frequency rumble disappears entirely.",
+          createdAt: ago(10), parentCommentId: c1.id, depth: 1,
         });
-        await updateDoc(doc(db, "reviews", reviewIds[0]), { commentCount: 3 });
+        const c2 = await addDoc(collection(db, "reviewComments"), {
+          reviewId: reviewIds[0], userId: "seed_u9", userName: "Anita Rao",
+          content: "How do these compare to the Bose QC Ultra? That's my current set.",
+          createdAt: ago(8), parentCommentId: null, depth: 0,
+        });
+        await addDoc(collection(db, "reviewComments"), {
+          reviewId: reviewIds[0], userId: "seed_u1", userName: "Alex Chen",
+          content: "ANC is better on the Sony for low-frequency (engines, traffic). Bose is still ahead on mid-frequency (voices, AC). Comfort goes to Bose slightly. Sound quality Sony wins clearly with LDAC.",
+          createdAt: ago(7), parentCommentId: c2.id, depth: 1,
+        });
+        await updateDoc(doc(db, "reviews", reviewIds[0]), { commentCount: 5 });
       }
 
-      setStatusMessage(`✅ Done! Inserted ${campaigns.length} campaigns, ${reviews.length} reviews, ${sampleChannels.length} channels, version updates, forks, and threaded comments.`);
+      if (reviewIds[7]) {
+        const c1 = await addDoc(collection(db, "reviewComments"), {
+          reviewId: reviewIds[7], userId: "seed_u8", userName: "David Kim",
+          content: "For anyone coming from Jira — the migration is easier than you think. Linear has a Jira importer that took our 3,000 issues in under an hour.",
+          createdAt: ago(20), parentCommentId: null, depth: 0,
+        });
+        await addDoc(collection(db, "reviewComments"), {
+          reviewId: reviewIds[7], userId: "seed_u9", userName: "Anita Rao",
+          content: "Can confirm this. Solo dev migration from Jira was 20 minutes including cleaning up old closed issues.",
+          createdAt: ago(19), parentCommentId: c1.id, depth: 1,
+        });
+        await addDoc(collection(db, "reviewComments"), {
+          reviewId: reviewIds[7], userId: "seed_u6", userName: "Sophie Kim",
+          content: "Does the Gantt chart gap cause issues with stakeholder reporting? That is my team's main concern.",
+          createdAt: ago(18), parentCommentId: null, depth: 0,
+        });
+        await updateDoc(doc(db, "reviews", reviewIds[7]), { commentCount: 3 });
+      }
+
+      setStatusMessage("Adding Discussion posts…");
+
+      // ── Discussion posts — tests the Discussion tab in the Product Hub ───
+      // Sony product discussions
+      if (campDocs["camp_sony"]) {
+        await addDoc(collection(db, "productDiscussions"), {
+          productId: campDocs["camp_sony"], authorId: "seed_u5", authorName: "Marcus Thompson",
+          type: "question", body: "Does anyone know if these work well with hearing aids? My dad has mild hearing loss and is considering them for air travel.",
+          upvotes: 12, upvotedBy: [], createdAt: ago(5),
+        });
+        await addDoc(collection(db, "productDiscussions"), {
+          productId: campDocs["camp_sony"], authorId: "seed_u9", authorName: "Anita Rao",
+          type: "comparison", body: "Sony XM6 vs Bose QC Ultra — I tested both for two weeks. Sony wins on: ANC (especially engine noise), sound quality (LDAC), battery. Bose wins on: comfort (especially clamping), mid-frequency ANC (voices/AC), build quality. For commuting: Sony. For office all-day wear: Bose.",
+          upvotes: 34, upvotedBy: [], createdAt: ago(8),
+        });
+        await addDoc(collection(db, "productDiscussions"), {
+          productId: campDocs["camp_sony"], authorId: "seed_u3", authorName: "BrandPartner99",
+          type: "issue", body: "Anyone else getting Bluetooth dropout when walking past microwaves? Noticed it twice in my office kitchen.",
+          upvotes: 7, upvotedBy: [], createdAt: ago(3),
+        });
+      }
+
+      // Rivian product discussions
+      if (campDocs["camp_rivian"]) {
+        await addDoc(collection(db, "productDiscussions"), {
+          productId: campDocs["camp_rivian"], authorId: "seed_u10", authorName: "Chris Meyers",
+          type: "tip", body: "Pro tip: enable camp mode via the vehicle settings menu, not the app. The app version has a bug where it turns off after 4 hours. Vehicle menu version runs all night. Took me three camping trips to figure this out.",
+          upvotes: 67, upvotedBy: [], createdAt: ago(15),
+        });
+        await addDoc(collection(db, "productDiscussions"), {
+          productId: campDocs["camp_rivian"], authorId: "seed_u11", authorName: "Olivia Park",
+          type: "question", body: "What third-party cargo accessories are compatible with the gear tunnel? Specifically looking for a bike-rack adapter.",
+          upvotes: 23, upvotedBy: [], createdAt: ago(7),
+        });
+        await addDoc(collection(db, "productDiscussions"), {
+          productId: campDocs["camp_rivian"], authorId: "seed_u20", authorName: "Nate Diaz",
+          type: "rant", body: "Service centre situation is genuinely unacceptable. Nearest one to me is 280 miles away. Had a door seal issue (minor) and getting it fixed required a 560-mile round trip or waiting 6 weeks for mobile service. Love the vehicle, but Rivian need to address this before expanding sales further.",
+          upvotes: 89, upvotedBy: [], createdAt: ago(4),
+        });
+      }
+
+      // Linear product discussions
+      if (campDocs["camp_linear"]) {
+        await addDoc(collection(db, "productDiscussions"), {
+          productId: campDocs["camp_linear"], authorId: "seed_u8", authorName: "David Kim",
+          type: "tip", body: "Keyboard shortcut that changed my life: 'C' to create issue from anywhere, then Tab-Tab to set priority, Tab-Tab-Tab to set assignee. Never touch the mouse for issue creation again.",
+          upvotes: 45, upvotedBy: [], createdAt: ago(10),
+        });
+        await addDoc(collection(db, "productDiscussions"), {
+          productId: campDocs["camp_linear"], authorId: "seed_u6", authorName: "Sophie Kim",
+          type: "question", body: "How do you handle stakeholder roadmap visibility? We moved to Linear from Jira and PMs are asking for a Gantt view. What's everyone using?",
+          upvotes: 31, upvotedBy: [], createdAt: ago(6),
+        });
+      }
+
+      setStatusMessage(`✅ Done! Seeded ${campaigns.length} products, ${reviews.length} reviews (${reviews.filter(r => r.isVerifiedPurchase).length} verified, ${reviews.filter(r => r.biasFlag).length} bias-flagged), ${sampleChannels.length} channels (${sampleChannels.filter(c => c.multiplier > 1).length} boosted), 3 ownership journeys with version updates, 2 forks, threaded comments, and discussion posts across 3 products.`);
     } catch (error) {
       console.error(error);
       setStatusMessage("❌ Error seeding data. Check console.");
