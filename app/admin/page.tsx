@@ -406,6 +406,7 @@ export default function AdminDashboard() {
           creatorName: "Admin",
           memberCount: 5,
           reviewCount: 0,
+          multiplier: 1,
           createdAt: now.toISOString(),
           isOfficial: true,
         });

@@ -147,6 +147,7 @@ export default function Home() {
         interests: selectedInterests,
         walletBalance: 0,
         totalEarned: 0,
+        trustScore: 0,
         badges: [],
         createdAt: new Date().toISOString(),
       });

@@ -60,6 +60,7 @@ export default function CreateChannelModal({ userId, userName, onClose, onCreate
         memberCount: 1,
         reviewCount: 0,
         iconEmoji: iconEmoji || "📦",
+        multiplier: 1,
         createdAt: new Date().toISOString(),
         isOfficial: false,
       });
