@@ -60,8 +60,8 @@ export default function AdminDashboard() {
   const [isLoadingApplications, setIsLoadingApplications] = useState(true);
   const [appStatusFilter, setAppStatusFilter] = useState<"all" | "applied" | "approved" | "rejected" | "product_sent">("applied");
   const [updatingAppId, setUpdatingAppId] = useState<string | null>(null);
-  const [payoutCampId, setPayoutCampId] = useState("");
-  const [payoutBudget, setPayoutBudget] = useState("");
+  const [globalPool, setGlobalPool] = useState("");
+  const [dividendStats, setDividendStats] = useState<{ totalReviews: number; eligibleReviews: number; payoutsMade: number; uniqueReviewers: number; totalDistributed: number } | null>(null);
   const [aiCheckEnabled, setAiCheckEnabled] = useState(true);
   const [isTogglingAi, setIsTogglingAi] = useState(false);
   const [moderationEvents, setModerationEvents] = useState<ModerationEvent[]>([]);
@@ -728,30 +728,36 @@ export default function AdminDashboard() {
     }
   };
 
-  async function handleDistributePayouts() {
-    if (!payoutCampId || !payoutBudget) return alert("Please enter both ID and Budget.");
-    const confirm = window.confirm(`Distribute $${payoutBudget} to winners of ${payoutCampId}?`);
-    if (!confirm) return;
-    
+  async function handleDistributeDividend() {
+    const pool = Number(globalPool);
+    if (!pool || pool <= 0) return alert("Enter a positive Global Pool amount.");
+    const confirmed = window.confirm(
+      `Distribute $${pool.toFixed(2)} as a platform-wide monthly dividend?\n\nOnly reviews with a verified purchase receipt qualify. This cannot be undone.`
+    );
+    if (!confirmed) return;
+
     setIsProcessing(true);
-    setStatusMessage(`Calculating payouts for ${payoutCampId}...`);
+    setDividendStats(null);
+    setStatusMessage("Scanning verified reviews and computing weighted scores…");
 
     try {
       const response = await fetch("/api/payout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // USING THE DYNAMIC INPUTS HERE:
-        body: JSON.stringify({ campaignId: payoutCampId, budget: Number(payoutBudget) }), 
+        body: JSON.stringify({ globalPool: pool }),
       });
       const data = await response.json();
-      if (data.success) setStatusMessage(`✅ Success: ${data.message}`);
-      else setStatusMessage(`❌ Error: ${data.error}`);
-    } catch (error) {
-      setStatusMessage("❌ Critical Error: Could not reach the payout agent.");
+      if (data.success) {
+        setStatusMessage(`✅ ${data.message}`);
+        setDividendStats(data.stats ?? null);
+        setGlobalPool("");
+      } else {
+        setStatusMessage(`❌ ${data.error}`);
+      }
+    } catch {
+      setStatusMessage("❌ Critical Error: Could not reach the payout service.");
     } finally {
       setIsProcessing(false);
-      setPayoutCampId("");
-      setPayoutBudget("");
     }
   }
 
@@ -993,28 +999,60 @@ export default function AdminDashboard() {
             </form>
           </div>
 
-          {/* RIGHT COLUMN: Payout Manager */}
+          {/* RIGHT COLUMN: Monthly Dividend */}
           <div className="bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl">
-            <h2 className="text-2xl font-bold mb-6">💰 Manage Payouts</h2>
+            <h2 className="text-2xl font-bold mb-1">💰 Monthly Dividend</h2>
+            <p className="text-sm text-slate-400 mb-6 leading-relaxed">
+              Platform-wide distribution. Only reviews with a <span className="text-green-400 font-semibold">verified purchase receipt</span> qualify.
+              Each reviewer's share = <code className="text-xs text-indigo-300 bg-slate-900 px-1 py-0.5 rounded">Pool × (score × multiplier) / Σ scores</code>
+            </p>
+
             <div className="bg-slate-900 p-6 rounded-2xl border border-slate-700 mb-4 space-y-4">
-              
               <div>
-                <label className="block text-sm font-bold text-slate-400 mb-1">Target Campaign ID</label>
-                <input type="text" value={payoutCampId} onChange={e => setPayoutCampId(e.target.value)} placeholder="e.g. camp_123" className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white outline-none" />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-bold text-slate-400 mb-1">Total Pool Budget ($)</label>
-                <input type="number" value={payoutBudget} onChange={e => setPayoutBudget(e.target.value)} placeholder="1000" className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white outline-none" />
+                <label className="block text-sm font-bold text-slate-400 mb-1">Global Pool Amount ($)</label>
+                <input
+                  type="number"
+                  min="1"
+                  step="0.01"
+                  value={globalPool}
+                  onChange={(e) => setGlobalPool(e.target.value)}
+                  placeholder="e.g. 5000"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white outline-none focus:border-green-500 transition"
+                />
               </div>
 
-              <button onClick={handleDistributePayouts} disabled={isProcessing} className={`w-full py-4 mt-2 rounded-xl font-black shadow-lg transition-all ${isProcessing ? "bg-slate-700 text-slate-400" : "bg-green-500 hover:bg-green-400 text-slate-900"}`}>
-                {isProcessing ? "Processing Blockchain Tx..." : "Distribute Funds"}
+              <button
+                type="button"
+                onClick={handleDistributeDividend}
+                disabled={isProcessing || !globalPool}
+                className={`w-full py-4 mt-2 rounded-xl font-black shadow-lg transition-all text-base ${
+                  isProcessing || !globalPool
+                    ? "bg-slate-700 text-slate-400 cursor-not-allowed"
+                    : "bg-green-500 hover:bg-green-400 text-slate-900"
+                }`}
+              >
+                {isProcessing ? "Calculating & distributing…" : "🏦 Distribute Monthly Dividend"}
               </button>
             </div>
-            
+
+            {dividendStats && (
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                {[
+                  { label: "Total reviews", value: dividendStats.totalReviews },
+                  { label: "Eligible (verified)", value: dividendStats.eligibleReviews },
+                  { label: "Payouts made", value: dividendStats.payoutsMade },
+                  { label: "Unique reviewers", value: dividendStats.uniqueReviewers },
+                ].map((s) => (
+                  <div key={s.label} className="bg-slate-900 rounded-xl border border-slate-700 p-3 text-center">
+                    <p className="text-xl font-bold text-white tabular-nums">{s.value}</p>
+                    <p className="text-[11px] text-slate-500 uppercase tracking-wide mt-0.5">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {statusMessage && (
-              <div className={`mt-4 p-4 rounded-xl border font-mono text-sm font-bold ${statusMessage.includes('❌') ? 'bg-red-900/30 border-red-500/50 text-red-400' : 'bg-green-900/30 border-green-500/50 text-green-400'}`}>
+              <div className={`p-4 rounded-xl border font-mono text-sm font-bold ${statusMessage.includes("❌") ? "bg-red-900/30 border-red-500/50 text-red-400" : "bg-green-900/30 border-green-500/50 text-green-400"}`}>
                 {statusMessage}
               </div>
             )}
