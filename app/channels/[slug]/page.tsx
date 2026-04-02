@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   collection, query, where, getDocs, addDoc, doc, updateDoc,
@@ -249,9 +251,13 @@ export default function ChannelPage({ params }: { params: Promise<{ slug: string
     <div className="min-h-screen bg-white dark:bg-slate-950 pb-24">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-2xl mx-auto px-4 py-3">
+        <div className="max-w-5xl mx-auto px-4 py-3">
           <div className="flex items-center gap-3">
-            <button type="button" onClick={() => router.push("/channels")} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 shrink-0">
+            <Link href="/" className="shrink-0 mr-1">
+              <Image src="/logo.svg" alt="Review Jam" width={90} height={22} className="dark:hidden" />
+              <Image src="/logo-dark.svg" alt="Review Jam" width={90} height={22} className="hidden dark:block" />
+            </Link>
+            <button type="button" onClick={() => router.push("/channels")} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 shrink-0 text-lg leading-none">
               ←
             </button>
             <span className="text-2xl leading-none">{channel.iconEmoji}</span>
@@ -262,7 +268,7 @@ export default function ChannelPage({ params }: { params: Promise<{ slug: string
             <button
               type="button"
               onClick={handleJoinLeave}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition shrink-0 ${
                 isMember
                   ? "border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
                   : "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:opacity-90"
@@ -294,7 +300,7 @@ export default function ChannelPage({ params }: { params: Promise<{ slug: string
       </header>
 
       {/* Reviews */}
-      <div className="max-w-2xl mx-auto divide-y divide-slate-100 dark:divide-slate-800/60">
+      <div className="max-w-5xl mx-auto divide-y divide-slate-100 dark:divide-slate-800/60">
         {sorted.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-slate-400 dark:text-slate-500 text-sm mb-2">No reviews in this channel yet</p>

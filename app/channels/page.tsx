@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { db, auth } from "../../lib/firebase";
@@ -65,21 +66,25 @@ export default function ChannelsPage() {
     <div className="min-h-screen bg-white dark:bg-slate-950 pb-24">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100">Channels</h1>
-          {user && (
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+          <Link href="/" className="shrink-0">
+            <Image src="/logo.svg" alt="Review Jam" width={110} height={26} className="dark:hidden" />
+            <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} className="hidden dark:block" />
+          </Link>
+          <h1 className="text-base font-bold text-slate-900 dark:text-slate-100">Channels</h1>
+          {user ? (
             <button
               type="button"
               onClick={() => setShowCreate(true)}
-              className="px-3 py-1.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg text-sm font-medium hover:opacity-90 transition"
+              className="px-3 py-1.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg text-sm font-medium hover:opacity-90 transition shrink-0"
             >
               + Create
             </button>
-          )}
+          ) : <div className="w-[76px]" />}
         </div>
 
         {/* Search + filter */}
-        <div className="max-w-2xl mx-auto px-4 pb-3 flex gap-2">
+        <div className="max-w-5xl mx-auto px-4 pb-3 flex gap-2">
           <input
             type="text"
             value={search}
@@ -101,7 +106,7 @@ export default function ChannelsPage() {
       </header>
 
       {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-4">
+      <div className="max-w-5xl mx-auto px-4 py-4">
         {loading ? (
           <p className="text-center text-sm text-slate-400 py-12">Loading channels...</p>
         ) : filtered.length === 0 ? (
@@ -117,7 +122,7 @@ export default function ChannelsPage() {
           Array.from(grouped.entries()).map(([category, chs]) => (
             <div key={category} className="mb-6">
               <h2 className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">{category}</h2>
-              <div className="space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 {chs.map((ch) => (
                   <Link
                     key={ch.id}

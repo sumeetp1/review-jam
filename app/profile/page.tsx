@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   doc, getDoc, updateDoc,
   collection, query, where, getDocs, orderBy, limit,
@@ -175,18 +176,23 @@ export default function ProfilePage() {
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200">
       {/* Nav */}
-      <nav className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-8 py-3 flex justify-between items-center">
-        <Link href="/" className="text-sm font-medium text-slate-900 dark:text-slate-100 hover:underline">← Home</Link>
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 px-2 py-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-900"
-        >
-          Sign out
-        </button>
+      <nav className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div className="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+          <Link href="/" className="shrink-0">
+            <Image src="/logo.svg" alt="Review Jam" width={110} height={26} className="dark:hidden" />
+            <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} className="hidden dark:block" />
+          </Link>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 px-2 py-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-900"
+          >
+            Sign out
+          </button>
+        </div>
       </nav>
 
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         {/* Identity card */}
         <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-4">
           <Avatar name={user.displayName} src={user.photoURL} size="lg" />

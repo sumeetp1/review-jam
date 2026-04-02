@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../lib/firebase";
@@ -360,15 +361,18 @@ export default function ExplorePage() {
         />
       )}
       {/* Header */}
-      <div className="border-b border-slate-200/80 dark:border-slate-800">
-        <div className="max-w-5xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-3">
-            <Link href="/" className="text-sm text-slate-500 dark:text-slate-400 hover:underline">← Home</Link>
+      <div className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-4">
+          <Link href="/" className="shrink-0">
+            <Image src="/logo.svg" alt="Review Jam" width={110} height={26} className="dark:hidden" />
+            <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} className="hidden dark:block" />
+          </Link>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100 leading-tight">Explore products</h1>
+            <p className="text-[12px] text-slate-500 dark:text-slate-500 hidden sm:block">
+              Authentic, engagement-ranked reviews
+            </p>
           </div>
-          <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Explore products</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-500 mt-0.5">
-            Discover products with authentic, engagement-ranked reviews.
-          </p>
         </div>
       </div>
 

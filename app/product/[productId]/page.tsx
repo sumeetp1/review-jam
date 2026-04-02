@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   collection, query, where, getDocs, doc, getDoc,
   updateDoc, increment, arrayUnion, arrayRemove, addDoc,
@@ -509,9 +510,13 @@ export default function ProductPage() {
       )}
 
       {/* ── Page header ─────────────────────────────────────────────────── */}
-      <div className="bg-white dark:bg-slate-950 border-b border-slate-200/80 dark:border-slate-800">
-        <div className="max-w-5xl mx-auto px-4 py-3">
-          <Link href="/" className="text-sm text-slate-500 dark:text-slate-400 hover:underline">← Home</Link>
+      <div className="sticky top-0 z-30 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
+          <Link href="/" className="shrink-0">
+            <Image src="/logo.svg" alt="Review Jam" width={100} height={24} className="dark:hidden" />
+            <Image src="/logo-dark.svg" alt="Review Jam" width={100} height={24} className="hidden dark:block" />
+          </Link>
+          <Link href="/explore" className="text-sm text-slate-500 dark:text-slate-400 hover:underline ml-2">← Explore</Link>
         </div>
         <div className="max-w-5xl mx-auto px-4 pb-4">
           <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-0.5">{product.category}</p>
