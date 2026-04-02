@@ -13,10 +13,12 @@ import { db, auth, googleProvider, storage } from "../lib/firebase";
 import { updateUserBadges } from "../lib/badges";
 import ReviewWizard, { ReviewFormData, AVAILABLE_CATEGORIES } from "./components/ReviewWizard";
 import { calculateDiscoveryRank } from "../lib/discoveryRank";
+import { incrementTrustScore } from "../lib/trustScore";
 import ReviewCard, { type ReviewData } from "./components/ReviewCard";
 import RightSidebar from "./components/RightSidebar";
 import LeftSidebar from "./components/LeftSidebar";
 import Avatar from "./components/Avatar";
+import NotificationBell from "./components/NotificationBell";
 
 type FeedTab = "foryou" | "trending" | "campaigns";
 
@@ -260,6 +262,17 @@ export default function Home() {
     setAllReviews((prev) => [{ id: docRef.id, ...newReview } as ReviewData, ...prev]);
     setForkSource(null);
 
+    if (data.forkedFromReviewId) {
+      // Give trust score to the original reviewer whose content inspired the fork
+      const originalReview = allReviews.find((r) => r.id === data.forkedFromReviewId);
+      if (originalReview?.reviewerId) {
+        incrementTrustScore(originalReview.reviewerId, "fork", 10).catch(() => {});
+      }
+    } else {
+      // Organic review — reward the submitter
+      incrementTrustScore(user.uid, "organic_review", 5).catch(() => {});
+    }
+
     if (data.reviewType !== "generic") updateUserBadges(user.uid).catch(() => {});
   };
 
@@ -287,6 +300,12 @@ export default function Home() {
       helpfulCount: increment(has ? -1 : 1),
       helpfulBy: has ? arrayRemove(user.uid) : arrayUnion(user.uid),
     });
+    if (!has) {
+      const review = allReviews.find((r) => r.id === reviewId);
+      if (review?.reviewerId) {
+        incrementTrustScore(review.reviewerId, "helpful_vote", 3).catch(() => {});
+      }
+    }
   };
 
   const handleNotHelpful = async (reviewId: string, notHelpfulBy: string[] = []) => {
@@ -536,8 +555,9 @@ export default function Home() {
         <main className="w-full md:w-[600px] md:max-w-[600px] md:shrink-0 md:border-x border-slate-200/80 dark:border-slate-800 min-h-screen">
 
           <div className="sticky top-12 md:top-0 z-30 bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm border-b border-slate-200/80 dark:border-slate-800">
-            <div className="hidden md:flex items-center h-12 px-4 border-b border-slate-100 dark:border-slate-800/80">
+            <div className="hidden md:flex items-center justify-between h-12 px-4 border-b border-slate-100 dark:border-slate-800/80">
               <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Home</h1>
+              {user && <NotificationBell userId={user.uid} />}
             </div>
 
             {/* Feed Tabs */}

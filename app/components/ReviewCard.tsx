@@ -98,10 +98,12 @@ type Props = {
 
 function CommentThread({
   reviewId,
+  reviewerId,
   currentUserId,
   currentUserName,
 }: {
   reviewId: string;
+  reviewerId?: string;
   currentUserId?: string;
   currentUserName?: string;
 }) {
@@ -147,6 +149,16 @@ function CommentThread({
       const ref = await addDoc(collection(db, "reviewComments"), commentData);
       setComments((prev) => [...prev, { id: ref.id, ...commentData } as Comment]);
       await updateDoc(doc(db, "reviews", reviewId), { commentCount: increment(1) });
+      if (reviewerId && reviewerId !== currentUserId) {
+        addDoc(collection(db, "notifications"), {
+          userId: reviewerId,
+          type: "comment",
+          title: "New comment on your review",
+          body: `${currentUserName || "Someone"}: ${newComment.trim().slice(0, 80)}`,
+          read: false,
+          createdAt: new Date().toISOString(),
+        }).catch(() => {});
+      }
       setNewComment("");
       setReplyingTo(null);
     } finally {
@@ -542,6 +554,7 @@ export default function ReviewCard({
           {showComments && (
             <CommentThread
               reviewId={review.id}
+              reviewerId={review.reviewerId}
               currentUserId={currentUserId}
               currentUserName={currentUserName}
             />

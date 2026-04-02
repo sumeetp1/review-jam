@@ -87,6 +87,15 @@ export async function POST(req: Request) {
           paidAt,
         });
 
+        await addDoc(collection(db, "notifications"), {
+          userId: review.reviewerId,
+          type: "payout_approved",
+          title: "Payout received!",
+          body: `$${share.toFixed(2)} from ${review.productName || "campaign"}`,
+          read: false,
+          createdAt: paidAt,
+        });
+
         payoutsMade++;
       }
     }

@@ -11,6 +11,7 @@ import { db, auth } from "../../lib/firebase";
 import VersionUpdateWizard from "../components/VersionUpdateWizard";
 import { ALL_BADGES, getBadgeById } from "../../lib/badges";
 import Avatar from "../components/Avatar";
+import { getTierLabel } from "../../lib/trustScore";
 
 const AVAILABLE_CATEGORIES = [
   "Tech", "Home", "SaaS", "Automotive", "Beauty",
@@ -47,6 +48,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [walletBalance, setWalletBalance] = useState(0);
   const [totalEarned, setTotalEarned] = useState(0);
+  const [trustScore, setTrustScore] = useState(0);
   const [interests, setInterests] = useState<string[]>([]);
   const [badges, setBadges] = useState<string[]>([]);
   const [ledger, setLedger] = useState<LedgerEntry[]>([]);
@@ -79,6 +81,7 @@ export default function ProfilePage() {
       const data = snap.data();
       setWalletBalance(data.walletBalance || 0);
       setTotalEarned(data.totalEarned || data.walletBalance || 0);
+      setTrustScore(data.trustScore || 0);
       setInterests(data.interests || []);
       setBadges(data.badges || []);
     }
@@ -198,15 +201,19 @@ export default function ProfilePage() {
         </div>
 
         {/* Stats row */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { label: "Reviews", value: myReviews.length },
             { label: "Avg rating", value: avgRating ? `★ ${avgRating}` : "—" },
             { label: "Total earned", value: `$${totalEarned.toFixed(2)}` },
+            { label: "Trust score", value: trustScore, sub: getTierLabel(trustScore) },
           ].map((s) => (
             <div key={s.label} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 text-center">
               <p className="text-xl font-semibold text-slate-900 dark:text-slate-100 tabular-nums">{s.value}</p>
               <p className="text-[11px] text-slate-500 dark:text-slate-500 mt-0.5 uppercase tracking-wide">{s.label}</p>
+              {"sub" in s && s.sub && (
+                <p className="text-[10px] text-amber-500 dark:text-amber-400 font-medium mt-0.5">{s.sub}</p>
+              )}
             </div>
           ))}
         </div>
