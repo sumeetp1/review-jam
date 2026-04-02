@@ -515,8 +515,27 @@ export default function ProductPage() {
         </div>
         <div className="max-w-5xl mx-auto px-4 pb-4">
           <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-0.5">{product.category}</p>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 leading-snug">{product.name}</h1>
+          <div className="flex items-start gap-2.5 flex-wrap">
+            <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 leading-snug">{product.name}</h1>
+            {/* Community Seeded badge — shown until a verified owner posts */}
+            {product.communitySeeded && !reviews.some((r: any) => r.isVerifiedPurchase === true) && (
+              <span className="mt-0.5 shrink-0 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-2 py-1 rounded-full">
+                🌱 Community Seeded
+              </span>
+            )}
+            {/* Verified badge — once a verified owner has reviewed */}
+            {product.communitySeeded && reviews.some((r: any) => r.isVerifiedPurchase === true) && (
+              <span className="mt-0.5 shrink-0 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 px-2 py-1 rounded-full">
+                ✅ Verified
+              </span>
+            )}
+          </div>
           <p className="text-sm text-slate-500 dark:text-slate-500">{product.brandName}</p>
+          {product.communitySeeded && !reviews.some((r: any) => r.isVerifiedPurchase === true) && (
+            <p className="text-[11px] text-amber-600 dark:text-amber-500 mt-1">
+              This hub was seeded by the community. Be the first verified owner to post a review.
+            </p>
+          )}
         </div>
       </div>
 
