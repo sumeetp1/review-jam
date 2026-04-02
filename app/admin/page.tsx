@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { collection, addDoc, getDocs, limit, orderBy, query, doc, updateDoc, setDoc, getDoc, deleteDoc, writeBatch } from "firebase/firestore";
+import { collection, addDoc, getDocs, limit, orderBy, query, where, doc, updateDoc, setDoc, getDoc, deleteDoc, writeBatch } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase";
 import { computeHealthScore } from "../../lib/healthScore";
 
@@ -62,6 +62,19 @@ export default function AdminDashboard() {
   const [updatingAppId, setUpdatingAppId] = useState<string | null>(null);
   const [globalPool, setGlobalPool] = useState("");
   const [dividendStats, setDividendStats] = useState<{ totalReviews: number; eligibleReviews: number; payoutsMade: number; uniqueReviewers: number; totalDistributed: number } | null>(null);
+  // Expert Seeding
+  const [seedInventory, setSeedInventory] = useState<{ id: string; productName: string; brandName: string; category: string; quantity: number; status: string }[]>([]);
+  const [trustedReviewers, setTrustedReviewers] = useState<{ id: string; displayName?: string; email?: string; trustScore?: number }[]>([]);
+  const [isLoadingReviewers, setIsLoadingReviewers] = useState(false);
+  const [invProduct, setInvProduct] = useState("");
+  const [invBrand, setInvBrand] = useState("");
+  const [invCategory, setInvCategory] = useState("Tech");
+  const [invQty, setInvQty] = useState("1");
+  const [invNotes, setInvNotes] = useState("");
+  const [invitingUserId, setInvitingUserId] = useState<string | null>(null);
+  const [selectedInvId, setSelectedInvId] = useState("");
+  const [seedingMessage, setSeedingMessage] = useState("");
+
   const [aiCheckEnabled, setAiCheckEnabled] = useState(true);
   const [isTogglingAi, setIsTogglingAi] = useState(false);
   const [moderationEvents, setModerationEvents] = useState<ModerationEvent[]>([]);
@@ -728,6 +741,77 @@ export default function AdminDashboard() {
     }
   };
 
+  // ── Expert Seeding handlers ───────────────────────────────────────────────
+  async function handleAddInventory(e: React.FormEvent) {
+    e.preventDefault();
+    setSeedingMessage("");
+    try {
+      const ref = await addDoc(collection(db, "inventory"), {
+        productName: invProduct.trim(),
+        brandName: invBrand.trim(),
+        category: invCategory,
+        quantity: Number(invQty),
+        notes: invNotes.trim(),
+        status: "available",
+        createdAt: new Date().toISOString(),
+      });
+      setSeedInventory((prev) => [
+        ...prev,
+        { id: ref.id, productName: invProduct.trim(), brandName: invBrand.trim(), category: invCategory, quantity: Number(invQty), status: "available" },
+      ]);
+      setSeedingMessage(`✅ "${invProduct.trim()}" added to seeding inventory.`);
+      setInvProduct(""); setInvBrand(""); setInvQty("1"); setInvNotes("");
+    } catch {
+      setSeedingMessage("❌ Failed to add inventory item.");
+    }
+  }
+
+  async function loadTrustedReviewers() {
+    setIsLoadingReviewers(true);
+    setSeedingMessage("");
+    try {
+      const q = query(
+        collection(db, "users"),
+        where("trustScore", ">", 250),
+        orderBy("trustScore", "desc"),
+        limit(50),
+      );
+      const snap = await getDocs(q);
+      setTrustedReviewers(snap.docs.map((d) => ({ id: d.id, ...d.data() } as any)));
+    } catch {
+      setSeedingMessage("❌ Could not load reviewers — ensure a Firestore index exists on trustScore.");
+    } finally {
+      setIsLoadingReviewers(false);
+    }
+  }
+
+  async function handleInviteReviewer(reviewer: { id: string; displayName?: string }) {
+    setInvitingUserId(reviewer.id);
+    setSeedingMessage("");
+    try {
+      await addDoc(collection(db, "seedingInvites"), {
+        userId: reviewer.id,
+        userName: reviewer.displayName || "Unknown",
+        inventoryId: selectedInvId || null,
+        status: "invited",
+        invitedAt: new Date().toISOString(),
+      });
+      await addDoc(collection(db, "notifications"), {
+        userId: reviewer.id,
+        type: "seeding_invite",
+        title: "You've been invited to review a product!",
+        body: "Review Jam has selected you as a trusted reviewer for a seeding opportunity. Check your email for details.",
+        read: false,
+        createdAt: new Date().toISOString(),
+      });
+      setSeedingMessage(`✅ Invite sent to ${reviewer.displayName || reviewer.id}.`);
+    } catch {
+      setSeedingMessage("❌ Failed to send invite.");
+    } finally {
+      setInvitingUserId(null);
+    }
+  }
+
   async function handleDistributeDividend() {
     const pool = Number(globalPool);
     if (!pool || pool <= 0) return alert("Enter a positive Global Pool amount.");
@@ -1058,6 +1142,133 @@ export default function AdminDashboard() {
             )}
           </div>
 
+        </div>
+
+        {/* ── Expert Seeding ── */}
+        <div className="mt-8 bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-2xl font-bold">🧪 Expert Seeding</h2>
+            <span className="text-xs px-3 py-1 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 font-semibold">
+              Brand inventory → trusted reviewers
+            </span>
+          </div>
+          <p className="text-slate-400 text-sm mb-6">
+            Log products sent by brands for seeding, then invite reviewers with a Trust Score &gt; 250 to write anchor reviews.
+          </p>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* LEFT: Add inventory item */}
+            <div>
+              <h3 className="text-base font-bold text-slate-300 mb-4">Add inventory item</h3>
+              <form onSubmit={handleAddInventory} className="space-y-3">
+                <input
+                  type="text" required value={invProduct} onChange={(e) => setInvProduct(e.target.value)}
+                  placeholder="Product name"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none focus:border-violet-500 transition text-sm"
+                />
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    type="text" required value={invBrand} onChange={(e) => setInvBrand(e.target.value)}
+                    placeholder="Brand name"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none text-sm"
+                  />
+                  <select
+                    value={invCategory} onChange={(e) => setInvCategory(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none text-sm"
+                  >
+                    {["Tech","Home","SaaS","Beauty","Gaming","Automotive","Fitness","Travel","Finance"].map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    type="number" min="1" value={invQty} onChange={(e) => setInvQty(e.target.value)}
+                    placeholder="Quantity"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none text-sm"
+                  />
+                  <input
+                    type="text" value={invNotes} onChange={(e) => setInvNotes(e.target.value)}
+                    placeholder="Notes (optional)"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none text-sm"
+                  />
+                </div>
+                <button type="submit" className="w-full bg-violet-600 hover:bg-violet-500 text-white font-bold py-3 rounded-xl transition text-sm">
+                  + Add to Inventory
+                </button>
+              </form>
+
+              {/* Inventory list */}
+              {seedInventory.length > 0 && (
+                <div className="mt-4 space-y-2">
+                  <p className="text-xs text-slate-500 uppercase tracking-wide font-semibold">This session</p>
+                  {seedInventory.map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => setSelectedInvId(item.id)}
+                      className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition text-sm ${
+                        selectedInvId === item.id
+                          ? "border-violet-500 bg-violet-900/20 text-white"
+                          : "border-slate-700 bg-slate-900 text-slate-300 hover:border-slate-500"
+                      }`}
+                    >
+                      <div>
+                        <p className="font-medium">{item.productName}</p>
+                        <p className="text-[11px] text-slate-500">{item.brandName} · {item.category} · qty {item.quantity}</p>
+                      </div>
+                      {selectedInvId === item.id && <span className="text-violet-400 text-xs font-bold">Selected</span>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* RIGHT: Trusted reviewers */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-bold text-slate-300">Trusted reviewers</h3>
+                <button
+                  type="button"
+                  onClick={loadTrustedReviewers}
+                  disabled={isLoadingReviewers}
+                  className="text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold px-3 py-1.5 rounded-lg transition disabled:opacity-50"
+                >
+                  {isLoadingReviewers ? "Loading…" : "Load (trust > 250)"}
+                </button>
+              </div>
+
+              {trustedReviewers.length === 0 && !isLoadingReviewers && (
+                <p className="text-sm text-slate-500 text-center py-8">
+                  Click "Load" to fetch reviewers with trust score &gt; 250.
+                </p>
+              )}
+
+              <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                {trustedReviewers.map((r) => (
+                  <div key={r.id} className="flex items-center justify-between bg-slate-900 border border-slate-700 rounded-xl p-3">
+                    <div>
+                      <p className="text-sm font-semibold text-white">{r.displayName || r.id}</p>
+                      <p className="text-[11px] text-slate-500">{r.email} · ⭐ {r.trustScore} trust</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleInviteReviewer(r)}
+                      disabled={invitingUserId === r.id}
+                      className="text-xs bg-violet-600 hover:bg-violet-500 text-white font-bold px-3 py-1.5 rounded-lg transition disabled:opacity-50 shrink-0 ml-3"
+                    >
+                      {invitingUserId === r.id ? "Sending…" : "Invite"}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {seedingMessage && (
+            <div className={`mt-5 p-3 rounded-xl border text-sm font-bold font-mono ${seedingMessage.includes("❌") ? "bg-red-900/30 border-red-500/50 text-red-400" : "bg-green-900/30 border-green-500/50 text-green-400"}`}>
+              {seedingMessage}
+            </div>
+          )}
         </div>
 
         {/* ── Campaign Applications ── */}

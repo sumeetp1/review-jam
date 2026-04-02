@@ -50,7 +50,14 @@ export async function POST(req: Request) {
       if (channelCache[channelId] !== undefined) return channelCache[channelId];
       try {
         const snap = await getDoc(doc(db, "channels", channelId));
-        const mult = snap.exists() ? (snap.data().multiplier ?? 1) : 1;
+        if (!snap.exists()) { channelCache[channelId] = 1; return 1; }
+        const data = snap.data();
+        let mult: number = data.multiplier ?? 1;
+        // Honour expiry: if a brand-sponsored bounty has lapsed, fall back to 1×
+        if (data.multiplierExpiresAt) {
+          const expiresMs = new Date(data.multiplierExpiresAt).getTime();
+          if (Date.now() > expiresMs) mult = 1;
+        }
         channelCache[channelId] = mult;
         return mult;
       } catch {

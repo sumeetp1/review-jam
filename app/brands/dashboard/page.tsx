@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  collection, getDocs, query, where,
+  collection, getDocs, query, where, doc, updateDoc,
 } from "firebase/firestore";
 import { onAuthStateChanged, signInWithPopup, User } from "firebase/auth";
 import { db, auth, googleProvider } from "../../../lib/firebase";
@@ -45,6 +45,10 @@ export default function BrandDashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<string>("all");
+  const [bountyCategory, setBountyCategory] = useState("");
+  const [bountyTier, setBountyTier] = useState<1.5 | 2.0>(1.5);
+  const [isBountyLoading, setIsBountyLoading] = useState(false);
+  const [bountyMessage, setBountyMessage] = useState("");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
@@ -88,6 +92,37 @@ export default function BrandDashboardPage() {
   const handleLogin = async () => {
     try { await signInWithPopup(auth, googleProvider); } catch {}
   };
+
+  const uniqueCategories = [...new Set(campaigns.map((c) => c.category).filter(Boolean))];
+
+  async function handleSponsorCategory() {
+    if (!bountyCategory) return;
+    setIsBountyLoading(true);
+    setBountyMessage("");
+    try {
+      const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      const channelSnap = await getDocs(
+        query(collection(db, "channels"), where("category", "==", bountyCategory)),
+      );
+      if (channelSnap.empty) {
+        setBountyMessage(`No channels found for "${bountyCategory}". The multiplier will apply when channels in this category are created.`);
+        setIsBountyLoading(false);
+        return;
+      }
+      for (const ch of channelSnap.docs) {
+        await updateDoc(doc(db, "channels", ch.id), {
+          multiplier: bountyTier,
+          multiplierExpiresAt: expiresAt,
+          multiplierSponsoredBy: user?.email ?? "brand",
+        });
+      }
+      setBountyMessage(`✅ ${channelSnap.size} "${bountyCategory}" channel${channelSnap.size !== 1 ? "s" : ""} boosted to ${bountyTier}× for 30 days.`);
+    } catch {
+      setBountyMessage("❌ Failed to apply bounty. Please try again.");
+    } finally {
+      setIsBountyLoading(false);
+    }
+  }
 
   const filteredReviews = selectedCampaign === "all"
     ? allReviews
@@ -237,6 +272,80 @@ export default function BrandDashboardPage() {
               <p className="text-xs text-slate-400 uppercase tracking-wide mt-0.5">{s.label}</p>
             </div>
           ))}
+        </div>
+
+        {/* ── Sponsor a Category ── */}
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                🚀 Sponsor a Category
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase tracking-wide">Bounty</span>
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                Boost the payout multiplier for all channels in a category for 30 days. Verified reviewers writing in those channels earn a higher share of the global dividend pool.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            {/* Category picker */}
+            <div className="flex-1">
+              <label className="block text-[11px] text-slate-500 uppercase tracking-wide mb-1 font-semibold">Category</label>
+              <select
+                value={bountyCategory}
+                onChange={(e) => setBountyCategory(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-sm outline-none focus:border-amber-500 transition"
+              >
+                <option value="">— Select —</option>
+                {uniqueCategories.length > 0
+                  ? uniqueCategories.map((c) => <option key={c} value={c}>{c}</option>)
+                  : ["Tech","Home","SaaS","Beauty","Gaming","Automotive","Fitness","Travel","Finance"].map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))
+                }
+              </select>
+            </div>
+
+            {/* Tier picker */}
+            <div>
+              <label className="block text-[11px] text-slate-500 uppercase tracking-wide mb-1 font-semibold">Multiplier</label>
+              <div className="flex gap-2">
+                {([1.5, 2.0] as const).map((tier) => (
+                  <button
+                    key={tier}
+                    type="button"
+                    onClick={() => setBountyTier(tier)}
+                    className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-bold border transition ${
+                      bountyTier === tier
+                        ? "bg-amber-500 text-slate-900 border-amber-500"
+                        : "bg-slate-900 text-slate-300 border-slate-700 hover:border-amber-500/50"
+                    }`}
+                  >
+                    {tier}×
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Activate button */}
+            <div className="flex items-end">
+              <button
+                type="button"
+                onClick={handleSponsorCategory}
+                disabled={isBountyLoading || !bountyCategory}
+                className="w-full sm:w-auto px-5 py-2.5 bg-amber-500 hover:bg-amber-400 disabled:bg-slate-700 disabled:text-slate-500 text-slate-900 font-black rounded-lg text-sm transition"
+              >
+                {isBountyLoading ? "Activating…" : "Activate Bounty"}
+              </button>
+            </div>
+          </div>
+
+          {bountyMessage && (
+            <p className={`mt-3 text-xs font-semibold ${bountyMessage.startsWith("✅") ? "text-green-400" : "text-red-400"}`}>
+              {bountyMessage}
+            </p>
+          )}
         </div>
 
         {/* Top marketing quotes */}

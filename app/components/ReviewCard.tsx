@@ -337,12 +337,16 @@ export default function ReviewCard({
                   ✓ Verified Owner
                 </span>
               )}
-              {/* Product Provided tag — campaign transparency disclosure */}
-              {review.isCampaignReview && (
+              {/* Seeded Review — product provided via platform inventory programme */}
+              {review.productSource === "brand_sent" ? (
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-400 px-1.5 py-0.5 rounded border border-violet-200 dark:border-violet-800/50">
+                  📦 Seeded Review
+                </span>
+              ) : review.isCampaignReview ? (
                 <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-800/50">
                   📦 Product Provided
                 </span>
-              )}
+              ) : null}
               {review.channelSlug && (
                 <a href={`/channels/${review.channelSlug}`} className="text-[10px] font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded hover:underline">
                   rj/{review.channelSlug}
