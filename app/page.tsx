@@ -12,6 +12,7 @@ import { signInWithPopup, signOut, onAuthStateChanged, User } from "firebase/aut
 import { db, auth, googleProvider, storage } from "../lib/firebase";
 import { updateUserBadges } from "../lib/badges";
 import ReviewWizard, { ReviewFormData, AVAILABLE_CATEGORIES } from "./components/ReviewWizard";
+import { calculateDiscoveryRank } from "../lib/discoveryRank";
 import ReviewCard, { type ReviewData } from "./components/ReviewCard";
 import RightSidebar from "./components/RightSidebar";
 import LeftSidebar from "./components/LeftSidebar";
@@ -112,7 +113,14 @@ export default function Home() {
 
       const fetchedReviews: any[] = [];
       revSnap.forEach((d) => fetchedReviews.push({ id: d.id, ...d.data() }));
-      fetchedReviews.sort((a, b) => (b.likesCount || 0) - (a.likesCount || 0));
+      // Sort by Discovery Rank by default so the "For You" feed surfaces the
+      // most engaging recent reviews rather than all-time like leaders.
+      // Each review's own DR is computed as a single-item product (itself).
+      fetchedReviews.sort((a, b) => {
+        const drA = calculateDiscoveryRank([{ healthScore: a.healthScore, isCampaignReview: a.isCampaignReview, createdAt: a.createdAt }]);
+        const drB = calculateDiscoveryRank([{ healthScore: b.healthScore, isCampaignReview: b.isCampaignReview, createdAt: b.createdAt }]);
+        return drB - drA;
+      });
       setAllReviews(fetchedReviews);
     } catch (error) {
       console.error("Error fetching data:", error);

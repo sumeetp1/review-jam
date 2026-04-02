@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../lib/firebase";
+import { calculateDiscoveryRank } from "../../lib/discoveryRank";
 
 type ProductEntry = {
   id: string;
@@ -17,24 +18,26 @@ type ProductEntry = {
   avgRating: number;
   topQuote: string;
   totalLikes: number;
+  discoveryRank: number;
 };
 
 const CATEGORIES = ["All", "Tech", "Home", "SaaS", "Automotive", "Beauty", "Gaming", "Fitness", "Travel", "Finance"];
 
-type SortKey = "reviews" | "rating" | "likes" | "newest";
+type SortKey = "discovery" | "reviews" | "rating" | "likes" | "newest";
 
 const SORT_OPTIONS: { key: SortKey; label: string }[] = [
-  { key: "likes",   label: "Most liked" },
-  { key: "reviews", label: "Most reviewed" },
-  { key: "rating",  label: "Highest rated" },
-  { key: "newest",  label: "Newest" },
+  { key: "discovery", label: "🔥 Discovery" },
+  { key: "likes",     label: "Most liked" },
+  { key: "reviews",   label: "Most reviewed" },
+  { key: "rating",    label: "Highest rated" },
+  { key: "newest",    label: "Newest" },
 ];
 
 export default function ExplorePage() {
   const [products, setProducts] = useState<ProductEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState("All");
-  const [sortKey, setSortKey] = useState<SortKey>("likes");
+  const [sortKey, setSortKey] = useState<SortKey>("discovery");
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -58,6 +61,13 @@ export default function ExplorePage() {
           const totalLikes = prodReviews.reduce((s, r) => s + (r.likesCount || 0), 0);
           const topReview = [...prodReviews].sort((a, b) => (b.likesCount || 0) - (a.likesCount || 0))[0];
           const topQuote = topReview?.summary || topReview?.marketingQuote || "";
+          const discoveryRank = calculateDiscoveryRank(
+            prodReviews.map((r) => ({
+              healthScore: r.healthScore,
+              isCampaignReview: r.isCampaignReview,
+              createdAt: r.createdAt,
+            }))
+          );
 
           return {
             id: d.id,
@@ -70,6 +80,7 @@ export default function ExplorePage() {
             avgRating,
             totalLikes,
             topQuote,
+            discoveryRank,
           };
         });
 
@@ -95,9 +106,10 @@ export default function ExplorePage() {
       p.brandName.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .sort((a, b) => {
-      if (sortKey === "reviews") return b.reviewCount - a.reviewCount;
-      if (sortKey === "rating")  return b.avgRating - a.avgRating;
-      if (sortKey === "likes")   return b.totalLikes - a.totalLikes;
+      if (sortKey === "discovery") return b.discoveryRank - a.discoveryRank;
+      if (sortKey === "reviews")   return b.reviewCount - a.reviewCount;
+      if (sortKey === "rating")    return b.avgRating - a.avgRating;
+      if (sortKey === "likes")     return b.totalLikes - a.totalLikes;
       // newest
       return new Date(b.endDate || 0).getTime() - new Date(a.endDate || 0).getTime();
     });
@@ -207,6 +219,11 @@ export default function ExplorePage() {
                 <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-500 mt-auto pt-1 border-t border-slate-100 dark:border-slate-800">
                   <span>{p.reviewCount} review{p.reviewCount !== 1 ? "s" : ""}</span>
                   <span>👍 {p.totalLikes} likes</span>
+                  {sortKey === "discovery" && p.discoveryRank > 0 && (
+                    <span className="ml-auto text-amber-600 dark:text-amber-400 font-semibold">
+                      🔥 {p.discoveryRank.toFixed(1)}
+                    </span>
+                  )}
                 </div>
               </Link>
             ))}
