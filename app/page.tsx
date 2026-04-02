@@ -119,8 +119,8 @@ export default function Home() {
       // most engaging recent reviews rather than all-time like leaders.
       // Each review's own DR is computed as a single-item product (itself).
       fetchedReviews.sort((a, b) => {
-        const drA = calculateDiscoveryRank([{ healthScore: a.healthScore, isCampaignReview: a.isCampaignReview, createdAt: a.createdAt }]);
-        const drB = calculateDiscoveryRank([{ healthScore: b.healthScore, isCampaignReview: b.isCampaignReview, createdAt: b.createdAt }]);
+        const drA = calculateDiscoveryRank([{ healthScore: a.healthScore, isCampaignReview: a.isCampaignReview, biasFlag: a.biasFlag, createdAt: a.createdAt }]);
+        const drB = calculateDiscoveryRank([{ healthScore: b.healthScore, isCampaignReview: b.isCampaignReview, biasFlag: b.biasFlag, createdAt: b.createdAt }]);
         return drB - drA;
       });
       setAllReviews(fetchedReviews);
@@ -174,6 +174,7 @@ export default function Home() {
     }
 
     let marketingQuote = data.summary || "";
+    let biasFlag = false;
 
     // Generic reviews skip AI validation and are not eligible for payouts
     if (data.reviewType !== "generic") {
@@ -201,6 +202,7 @@ export default function Home() {
         throw new Error(`AI Quality Control: ${agentData.analysis.reason || "Review quality check failed."}`);
       }
       marketingQuote = agentData.analysis?.marketingQuote || data.summary || "";
+      biasFlag = agentData.analysis?.biasFlag ?? false;
     }
 
     const newReview: Record<string, unknown> = {
@@ -236,6 +238,7 @@ export default function Home() {
       isCampaignReview: false,
       eligibleForPayout: data.reviewType !== "generic",
       isVerifiedPurchase: data.isVerifiedPurchase ?? false,
+      biasFlag,
       createdAt: new Date().toISOString(),
     };
 

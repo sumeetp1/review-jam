@@ -15,10 +15,11 @@ type ReviewAnalysis = {
   isGenuine: boolean;
   reason: string;
   marketingQuote: string;
+  biasFlag: boolean;
 };
 
 function reject(reason: string): ReviewAnalysis {
-  return { isGenuine: false, reason, marketingQuote: "" };
+  return { isGenuine: false, reason, marketingQuote: "", biasFlag: false };
 }
 
 function runDeterministicChecks(reviewContent: string): ReviewAnalysis | null {
@@ -61,6 +62,7 @@ function normalizeAnalysis(raw: Record<string, unknown>): ReviewAnalysis | null 
     isGenuine: raw.isGenuine,
     reason: str(raw.reason),
     marketingQuote: str(raw.marketingQuote),
+    biasFlag: raw.biasFlag === true,
   };
 }
 
@@ -94,6 +96,7 @@ async function logModerationEvent(args: {
       isGenuine: args.analysis.isGenuine,
       reason: args.analysis.reason || "",
       marketingQuote: args.analysis.marketingQuote || "",
+      biasFlag: args.analysis.biasFlag ?? false,
       source: args.source,
       createdAt: new Date().toISOString(),
     });
@@ -159,6 +162,7 @@ export async function POST(req: Request) {
           isGenuine: true,
           reason: "",
           marketingQuote: summary?.trim() || reviewContent.slice(0, 80),
+          biasFlag: false,
         };
         return NextResponse.json({ success: true, analysis: bypassAnalysis });
       }
@@ -193,13 +197,14 @@ export async function POST(req: Request) {
       .join("\n");
 
     const systemInstruction = `
-You are a strict Quality Control Agent for a product review marketplace. Your job is to assess whether a review is genuine, helpful, and from real product experience.
+You are a strict Quality Control Agent for a product review marketplace. Your job is to assess whether a review is genuine, balanced, and from real product experience.
 
 You MUST return a JSON object with this exact structure:
 {
   "isGenuine": boolean,
   "reason": "string",
-  "marketingQuote": "string"
+  "marketingQuote": "string",
+  "biasFlag": boolean
 }
 
 RULES FOR REJECTION (set isGenuine to false):
@@ -208,6 +213,13 @@ RULES FOR REJECTION (set isGenuine to false):
 3. Review is completely unrelated to any real product experience.
 4. Pure promotional text with no personal experience or opinion.
 5. Contradictions between the headline, pros/cons, and main text that suggest the reviewer didn't use the product.
+
+BIAS FLAG (set biasFlag to true — does NOT reject the review, just flags it):
+- The review reads like marketing copy: excessive superlatives ("absolutely amazing", "life-changing", "the best I've ever used"), no acknowledgement of any weakness or trade-off.
+- Over-positivity: every single aspect is praised with zero criticism or nuance.
+- Language that feels written to sell rather than to inform a buyer making a decision.
+- Absence of any concrete negative detail despite the reviewer claiming long-term use.
+Set biasFlag to false if the review is balanced, contains meaningful criticism, or is negative/mixed overall.
 
 APPROVAL CRITERIA:
 - Personal first-hand experience with the product is evident.

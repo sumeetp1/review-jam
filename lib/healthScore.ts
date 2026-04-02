@@ -26,6 +26,7 @@ type ReviewInput = {
   commentCount?: number;
   forkCount?: number;
   productSource?: string;
+  isVerifiedPurchase?: boolean;
   versionCount?: number;
   createdAt?: string;
 };
@@ -35,7 +36,7 @@ export function computeHealthScore(
   reviewerBadgeCount: number,
   reviewerReviewCount: number,
 ): HealthResult {
-  // ── Quality (40 pts) ──────────────────────────────────────────────────────
+  // ── Quality (40 pts, with Critical Balance penalty) ───────────────────────
   const contentLen = (review.content ?? "").length;
   const contentPts = contentLen >= 300 ? 10 : contentLen >= 100 ? 5 : contentLen >= 50 ? 2 : 0;
   const prosPts    = Math.min((review.pros?.length ?? 0), 5);
@@ -45,7 +46,9 @@ export function computeHealthScore(
   const mediaPts   = (review.mediaUrls?.length ?? 0) > 0 ? 5 : 0;
   const summaryPts = (review.summary ?? "").length >= 10 ? 5 : 0;
   const bestForPts = (review.bestFor?.length ?? 0) > 0 ? 5 : 0;
-  const quality    = contentPts + prosPts + consPts + subPts + mediaPts + summaryPts + bestForPts;
+  // Critical Balance penalty: no cons listed signals an overly one-sided review
+  const balancePenalty = (review.cons?.length ?? 0) === 0 ? 15 : 0;
+  const quality    = Math.max(0, contentPts + prosPts + consPts + subPts + mediaPts + summaryPts + bestForPts - balancePenalty);
 
   // ── Engagement (25 pts) ───────────────────────────────────────────────────
   const likesPts   = Math.min(Math.log2((review.likesCount ?? 0) + 1) * 2, 8);
@@ -54,10 +57,14 @@ export function computeHealthScore(
   const forkPts    = Math.min((review.forkCount ?? 0) * 2.5, 5);
   const engagement = likesPts + helpPts + commentPts + forkPts;
 
-  // ── Credibility (20 pts) ──────────────────────────────────────────────────
+  // ── Credibility (max 35 pts) ──────────────────────────────────────────────
   const badgePts      = Math.min(reviewerBadgeCount * 2, 10);
   const reviewCtPts   = Math.min(reviewerReviewCount, 5);
-  const verifiedPts   = review.productSource === "purchased" ? 5 : 0;
+  // isVerifiedPurchase (receipt-verified) is weighted much higher than a
+  // self-declared "purchased" source signal (+20 vs +5)
+  const verifiedPts   = review.isVerifiedPurchase ? 20
+                      : review.productSource === "purchased" ? 5
+                      : 0;
   const credibility   = badgePts + reviewCtPts + verifiedPts;
 
   // ── Freshness (15 pts) ────────────────────────────────────────────────────

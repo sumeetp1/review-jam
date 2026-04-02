@@ -108,6 +108,7 @@ export default function ChannelPage({ params }: { params: Promise<{ slug: string
     }
 
     let marketingQuote = data.summary || "";
+    let biasFlag = false;
     if (data.reviewType !== "generic") {
       const resp = await fetch("/api/agent", {
         method: "POST",
@@ -121,8 +122,9 @@ export default function ChannelPage({ params }: { params: Promise<{ slug: string
         }),
       });
       const result = await resp.json();
-      if (result.isGenuine === false) throw new Error(result.reason || "Review did not pass quality check.");
-      if (result.marketingQuote) marketingQuote = result.marketingQuote;
+      if (result.analysis?.isGenuine === false) throw new Error(result.analysis?.reason || "Review did not pass quality check.");
+      if (result.analysis?.marketingQuote) marketingQuote = result.analysis.marketingQuote;
+      biasFlag = result.analysis?.biasFlag ?? false;
     }
 
     const { score, breakdown } = computeHealthScore(
@@ -159,6 +161,7 @@ export default function ChannelPage({ params }: { params: Promise<{ slug: string
       productSource: data.productSource,
       usageDuration: data.usageDuration,
       eligibleForPayout: data.reviewType !== "generic",
+      biasFlag,
       channelId: channel.id,
       channelSlug: channel.slug,
       healthScore: score,
