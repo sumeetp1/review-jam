@@ -36,7 +36,7 @@ export default function CreateChannelModal({ userId, userName, onClose, onCreate
 
   const handleSubmit = async () => {
     setError("");
-    if (!name.trim()) { setError("Please enter a channel name."); return; }
+    if (!name.trim()) { setError("Please enter a community name."); return; }
     if (!slug.trim()) { setError("Please enter a valid slug."); return; }
     if (description.trim().length < 10) { setError("Description must be at least 10 characters."); return; }
 
@@ -45,7 +45,7 @@ export default function CreateChannelModal({ userId, userName, onClose, onCreate
       // Check slug uniqueness
       const existing = await getDocs(query(collection(db, "channels"), where("slug", "==", slug)));
       if (!existing.empty) {
-        setError(`Channel "rj/${slug}" already exists. Choose a different name.`);
+        setError(`Community "rj/${slug}" already exists. Choose a different name.`);
         setSubmitting(false);
         return;
       }
@@ -75,7 +75,7 @@ export default function CreateChannelModal({ userId, userName, onClose, onCreate
       onCreated?.(slug);
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create channel.");
+      setError(err instanceof Error ? err.message : "Failed to create community.");
     } finally {
       setSubmitting(false);
     }
@@ -86,7 +86,7 @@ export default function CreateChannelModal({ userId, userName, onClose, onCreate
       <div className="bg-white dark:bg-slate-900 rounded-xl max-w-lg w-full shadow-lg border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh]">
         {/* Header */}
         <div className="flex justify-between items-start px-5 pt-5 pb-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
-          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Create a Channel</h2>
+          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Create a Community</h2>
           <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-sm">
             ✕
           </button>
@@ -95,7 +95,7 @@ export default function CreateChannelModal({ userId, userName, onClose, onCreate
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
           <div>
-            <label className="block text-[12px] font-medium text-slate-700 dark:text-slate-300 mb-1.5">Channel name</label>
+            <label className="block text-[12px] font-medium text-slate-700 dark:text-slate-300 mb-1.5">Community name</label>
             <input
               type="text"
               value={name}
@@ -123,7 +123,7 @@ export default function CreateChannelModal({ userId, userName, onClose, onCreate
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              placeholder="What is this channel about?"
+              placeholder="What is this community about?"
               className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-slate-100 resize-none"
             />
           </div>
@@ -163,7 +163,7 @@ export default function CreateChannelModal({ userId, userName, onClose, onCreate
             disabled={submitting}
             className="w-full py-2.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition"
           >
-            {submitting ? "Creating..." : "Create Channel"}
+            {submitting ? "Creating..." : "Create Community"}
           </button>
         </div>
       </div>

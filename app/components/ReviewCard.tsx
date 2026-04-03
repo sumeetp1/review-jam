@@ -355,9 +355,9 @@ export default function ReviewCard({
                   📦 Seeded Review
                 </span>
               )}
-              {review.channelSlug && (
-                <a href={`/c/${review.channelSlug}`} className="text-[10px] font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded hover:underline">
-                  rj/{review.channelSlug}
+              {(review.communitySlug || review.channelSlug) && (
+                <a href={`/c/${review.communitySlug || review.channelSlug}`} className="text-[10px] font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded hover:underline">
+                  rj/{review.communitySlug || review.channelSlug}
                 </a>
               )}
               {review.variantName && (

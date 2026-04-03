@@ -182,15 +182,15 @@ export default function LeftSidebar({
         <Divider />
 
         {/* ── Your Channels ───────────────────────────── */}
-        <SectionHeader label="Your channels" />
+        <SectionHeader label="Your communities" />
         <div className="px-1">
           {joinedChannels.length === 0 && !user && (
             <p className="px-2 py-1 text-[12px] text-slate-400 dark:text-slate-500">
-              <button type="button" onClick={onLogin} className="text-amber-600 dark:text-amber-400 hover:underline">Sign in</button> to join channels
+              <button type="button" onClick={onLogin} className="text-amber-600 dark:text-amber-400 hover:underline">Sign in</button> to join communities
             </p>
           )}
           {joinedChannels.length === 0 && user && (
-            <p className="px-2 py-1 text-[12px] text-slate-400 dark:text-slate-500">No channels joined yet.</p>
+            <p className="px-2 py-1 text-[12px] text-slate-400 dark:text-slate-500">No communities joined yet.</p>
           )}
           {visibleJoined.map((ch) => (
             <NavRow key={ch.id} href={`/c/${ch.slug}`} icon={ch.iconEmoji} label={`rj/${ch.slug}`}
