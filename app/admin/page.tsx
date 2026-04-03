@@ -234,6 +234,7 @@ export default function AdminDashboard() {
           name: "Sony WH-1000XM6",
           brandName: "Sony", brandEmail: "sony@brands.com", category: "Tech",
           campaignId: "camp_sony",
+          slug: "sony-wh-1000xm6", communitySlug: "tech", communityTags: [],
           description: "Next-gen noise-cancelling headphones. 40hr battery, multipoint Bluetooth 5.3, LDAC Hi-Res Audio.",
           budget: 5000, endDate: new Date(now.getTime() + 6 * day).toISOString(),
           variants: ["Midnight Black", "Platinum Silver", "Indigo Blue"],
@@ -250,6 +251,7 @@ export default function AdminDashboard() {
           name: "Lumina Smart Standing Desk",
           brandName: "Lumina", brandEmail: "lumina@brands.com", category: "Home",
           campaignId: "camp_lumina",
+          slug: "lumina-smart-standing-desk", communitySlug: "home", communityTags: [],
           description: "OLED control panel, 4-preset memory, integrated cable management tray, whisper-quiet dual motor.",
           budget: 3000, endDate: new Date(now.getTime() + 4 * day).toISOString(),
           variants: ["48\" Walnut Top", "60\" White Top", "72\" Black Top"],
@@ -266,6 +268,7 @@ export default function AdminDashboard() {
           name: "Linear — Project Management",
           brandName: "Linear", brandEmail: "linear@brands.com", category: "SaaS",
           campaignId: "camp_linear",
+          slug: "linear-project-management", communitySlug: "saas", communityTags: [],
           description: "The issue tracker built for high-performance engineering teams. Keyboard-first, blazingly fast.",
           budget: 2000, endDate: new Date(now.getTime() + 14 * day).toISOString(),
           variants: ["Free Tier", "Plus Plan ($8/user/mo)", "Enterprise"],
@@ -281,6 +284,7 @@ export default function AdminDashboard() {
           name: "Rivian R2 SUV",
           brandName: "Rivian", brandEmail: "rivian@brands.com", category: "Automotive",
           campaignId: "camp_rivian",
+          slug: "rivian-r2-suv", communitySlug: "automotive", communityTags: [],
           description: "All-electric adventure SUV. 300mi range, quad-motor option, hands-free highway driving.",
           budget: 8000, endDate: new Date(now.getTime() + 10 * day).toISOString(),
           variants: ["Standard Range · RWD", "Long Range · AWD", "Max Pack · Quad-Motor"],
@@ -297,6 +301,7 @@ export default function AdminDashboard() {
           name: "Rhode Peptide Lip Treatment",
           brandName: "Rhode", brandEmail: "rhode@brands.com", category: "Beauty",
           campaignId: "camp_rhode",
+          slug: "rhode-peptide-lip-treatment", communitySlug: "beauty", communityTags: [],
           description: "Peptide-rich gloss that plumps and hydrates. 9 active ingredients including shea butter and peptide complex.",
           budget: 1500, endDate: new Date(now.getTime() + 7 * day).toISOString(),
           variants: ["Salted Caramel", "Glazed Donut", "Watermelon Slice", "Unscented"],
@@ -312,6 +317,7 @@ export default function AdminDashboard() {
           name: "PlayStation 5 Pro",
           brandName: "Sony", brandEmail: "sony@brands.com", category: "Gaming",
           campaignId: "camp_ps5pro",
+          slug: "playstation-5-pro", communitySlug: "gaming", communityTags: [],
           description: "45% faster GPU than PS5, PSSR AI upscaling, 2TB SSD. Free 3-month PS Plus for campaign reviewers.",
           budget: 6000, endDate: new Date(now.getTime() + 5 * day).toISOString(),
           variants: ["Disc Edition", "Digital Edition"],
@@ -328,6 +334,7 @@ export default function AdminDashboard() {
           name: "Whoop 5.0 Band",
           brandName: "Whoop", brandEmail: "whoop@brands.com", category: "Fitness",
           campaignId: "camp_whoop",
+          slug: "whoop-5-0-band", communitySlug: "fitness", communityTags: [],
           description: "Continuous health monitoring — HRV, skin temperature, sleep stages, blood oxygen. No screen.",
           budget: 2500, endDate: new Date(now.getTime() + 9 * day).toISOString(),
           variants: ["Onyx Black", "Stone Grey", "Desert Tan"],
@@ -343,6 +350,7 @@ export default function AdminDashboard() {
           name: "IHG One Rewards — Indigo Hotels",
           brandName: "IHG", brandEmail: "ihg@brands.com", category: "Travel",
           campaignId: "camp_ihg",
+          slug: "ihg-one-rewards-indigo-hotels", communitySlug: "travel", communityTags: [],
           description: "Boutique hotel collection with neighbourhood-led design. Reviewers receive a 2-night complimentary stay.",
           budget: 10000, endDate: new Date(now.getTime() + 21 * day).toISOString(),
           variants: ["Hotel Indigo Edinburgh", "Hotel Indigo Dubai", "Hotel Indigo NYC"],
@@ -358,6 +366,7 @@ export default function AdminDashboard() {
           name: "Robinhood Gold",
           brandName: "Robinhood", brandEmail: "robinhood@brands.com", category: "Finance",
           campaignId: "camp_robinhood",
+          slug: "robinhood-gold", communitySlug: "finance", communityTags: [],
           description: "5% APY on uninvested cash, 3% IRA match, margin at 6.5%, instant deposits up to $50K.",
           budget: 4000, endDate: new Date(now.getTime() + 12 * day).toISOString(),
           variants: ["Monthly · $5/mo", "Annual · $50/yr"],
@@ -417,7 +426,8 @@ export default function AdminDashboard() {
 
         // [0] Verified owner, organic, no bias, will get 2 version updates → Ownership Journey
         { productName: "Sony WH-1000XM6", category: "Tech", campaignId: "organic",
-          productId: campDocs["camp_sony"], variantName: "Midnight Black", variantId: vid("camp_sony","Midnight Black"),
+          productId: campDocs["camp_sony"], productSlug: "sony-wh-1000xm6", communitySlug: "tech",
+          variantName: "Midnight Black", variantId: vid("camp_sony","Midnight Black"),
           reviewerName: "Alex Chen", reviewerId: "seed_u1", rating: 5,
           summary: "Best ANC headphones I have ever owned — 14 months in",
           content: "Bought these the week they launched after years on the Bose QC35. The noise cancellation is in a completely different league — it removes the low-frequency London Underground rumble entirely, not just attenuates it. Battery genuinely lasts me three full work days. Multipoint pairing between my MacBook and iPhone is seamless.",
@@ -431,7 +441,8 @@ export default function AdminDashboard() {
 
         // [1] Campaign review, not verified, will get 1 version update
         { productName: "Sony WH-1000XM6", category: "Tech", campaignId: "camp_sony",
-          productId: campDocs["camp_sony"], variantName: "Platinum Silver", variantId: vid("camp_sony","Platinum Silver"),
+          productId: campDocs["camp_sony"], productSlug: "sony-wh-1000xm6", communitySlug: "tech",
+          variantName: "Platinum Silver", variantId: vid("camp_sony","Platinum Silver"),
           reviewerName: "Priya Singh", reviewerId: "seed_u2", rating: 4,
           summary: "Worth it for multipoint alone",
           content: "Switching between my MacBook and iPhone is instant. No Bluetooth menu diving. The LDAC support means music from Tidal sounds genuinely hi-res. Clamping force slightly tight but loosens after a week. Not quite Bose on comfort but wins on everything else.",
@@ -445,7 +456,8 @@ export default function AdminDashboard() {
 
         // [2] BIAS FLAG: no cons — triggers Critical Balance -15 health penalty
         { productName: "Sony WH-1000XM6", category: "Tech", campaignId: "camp_sony",
-          productId: campDocs["camp_sony"], variantName: "Indigo Blue", variantId: vid("camp_sony","Indigo Blue"),
+          productId: campDocs["camp_sony"], productSlug: "sony-wh-1000xm6", communitySlug: "tech",
+          variantName: "Indigo Blue", variantId: vid("camp_sony","Indigo Blue"),
           reviewerName: "BrandPartner99", reviewerId: "seed_u3", rating: 5,
           summary: "Absolutely perfect in every way — 10/10 no notes",
           content: "This is the most incredible product I have ever used. The sound is perfect. The ANC is perfect. The battery is perfect. The design is perfect. I cannot find a single thing wrong with it. Everyone should buy these immediately they are simply flawless.",
@@ -460,7 +472,8 @@ export default function AdminDashboard() {
 
         // [3] Verified organic, different variant
         { productName: "Sony WH-1000XM6", category: "Tech", campaignId: "organic",
-          productId: campDocs["camp_sony"], variantName: "Indigo Blue", variantId: vid("camp_sony","Indigo Blue"),
+          productId: campDocs["camp_sony"], productSlug: "sony-wh-1000xm6", communitySlug: "tech",
+          variantName: "Indigo Blue", variantId: vid("camp_sony","Indigo Blue"),
           reviewerName: "Sam Williams", reviewerId: "seed_u4", rating: 5,
           summary: "The Indigo Blue is the colourway of the year",
           content: "Sounds identical to the black but the colour attracts compliments constantly. Matte finish resists fingerprints unlike the glossy silver. Sound-wise this sits noticeably above my old Bose QC45 — bass is deeper and treble is less fatiguing over long sessions.",
@@ -476,7 +489,8 @@ export default function AdminDashboard() {
 
         // [4] Verified, organic, high engagement, good balance
         { productName: "Lumina Smart Standing Desk", category: "Home", campaignId: "organic",
-          productId: campDocs["camp_lumina"], variantName: "60\" White Top", variantId: vid("camp_lumina","60\" White Top"),
+          productId: campDocs["camp_lumina"], productSlug: "lumina-smart-standing-desk", communitySlug: "home",
+          variantName: "60\" White Top", variantId: vid("camp_lumina","60\" White Top"),
           reviewerName: "Marcus Thompson", reviewerId: "seed_u5", rating: 5,
           summary: "OLED Pomodoro timer changed how I work",
           content: "The built-in OLED timer is the killer feature nobody mentions. Set a 25-minute focus block, stand for the second half — it is now completely automatic. Assembly took 40 minutes solo. Every cable routes through the integrated tray. Wobble at full height is minimal even with three monitors.",
@@ -490,7 +504,8 @@ export default function AdminDashboard() {
 
         // [5] Campaign review
         { productName: "Lumina Smart Standing Desk", category: "Home", campaignId: "camp_lumina",
-          productId: campDocs["camp_lumina"], variantName: "48\" Walnut Top", variantId: vid("camp_lumina","48\" Walnut Top"),
+          productId: campDocs["camp_lumina"], productSlug: "lumina-smart-standing-desk", communitySlug: "home",
+          variantName: "48\" Walnut Top", variantId: vid("camp_lumina","48\" Walnut Top"),
           reviewerName: "Sophie Kim", reviewerId: "seed_u6", rating: 4,
           summary: "Best desk under $800 for single-monitor setups",
           content: "Compared seven desks before choosing this. For a single monitor the 48-inch is perfect. The walnut veneer looks genuinely premium — not cheap laminate. App reminders to stand actually work because the desk itself buzzes. Wish the surface was slightly deeper front-to-back.",
@@ -504,7 +519,8 @@ export default function AdminDashboard() {
 
         // [6] Verified, organic
         { productName: "Lumina Smart Standing Desk", category: "Home", campaignId: "organic",
-          productId: campDocs["camp_lumina"], variantName: "72\" Black Top", variantId: vid("camp_lumina","72\" Black Top"),
+          productId: campDocs["camp_lumina"], productSlug: "lumina-smart-standing-desk", communitySlug: "home",
+          variantName: "72\" Black Top", variantId: vid("camp_lumina","72\" Black Top"),
           reviewerName: "Derek Liu", reviewerId: "seed_u7", rating: 5,
           summary: "Triple-monitor setup, zero wobble",
           content: "Three 27-inch monitors plus a laptop stand and the 72-inch has room to spare. Motor is whisper-quiet — nobody in my open office notices when I raise it. Black top hides cable management perfectly. Two people needed for assembly given the weight but that is expected.",
@@ -520,7 +536,8 @@ export default function AdminDashboard() {
 
         // [7] Campaign, verified purchase (unusual for SaaS but tests the toggle)
         { productName: "Linear — Project Management", category: "SaaS", campaignId: "camp_linear",
-          productId: campDocs["camp_linear"], variantName: "Plus Plan ($8/user/mo)", variantId: vid("camp_linear","Plus Plan ($8/user/mo)"),
+          productId: campDocs["camp_linear"], productSlug: "linear-project-management", communitySlug: "saas",
+          variantName: "Plus Plan ($8/user/mo)", variantId: vid("camp_linear","Plus Plan ($8/user/mo)"),
           reviewerName: "David Kim", reviewerId: "seed_u8", rating: 5,
           summary: "Jira killer — and I say that as a certified Jira admin",
           content: "Our 18-person engineering team migrated from Jira in a single afternoon. Creating an issue is three keystrokes. Cycles give our sprints actual structure. GitHub sync means no manual status updates. Six months in, nobody has asked to go back. The keyboard shortcut system alone saves me 45 minutes a week.",
@@ -534,7 +551,8 @@ export default function AdminDashboard() {
 
         // [8] Campaign, not verified
         { productName: "Linear — Project Management", category: "SaaS", campaignId: "camp_linear",
-          productId: campDocs["camp_linear"], variantName: "Free Tier", variantId: vid("camp_linear","Free Tier"),
+          productId: campDocs["camp_linear"], productSlug: "linear-project-management", communitySlug: "saas",
+          variantName: "Free Tier", variantId: vid("camp_linear","Free Tier"),
           reviewerName: "Anita Rao", reviewerId: "seed_u9", rating: 4,
           summary: "The free tier is legitimately useful for solo devs",
           content: "I run a one-person dev shop and the free tier covers everything I need. Keyboard shortcuts feel native rather than learned. Issue creation is so fast I actually log things I would normally ignore. Upgrade limits are frustrating if you add contractors.",
@@ -550,7 +568,8 @@ export default function AdminDashboard() {
 
         // [9] Verified owner, organic, high engagement, will get versions
         { productName: "Rivian R2 SUV", category: "Automotive", campaignId: "organic",
-          productId: campDocs["camp_rivian"], variantName: "Max Pack · Quad-Motor", variantId: vid("camp_rivian","Max Pack · Quad-Motor"),
+          productId: campDocs["camp_rivian"], productSlug: "rivian-r2-suv", communitySlug: "automotive",
+          variantName: "Max Pack · Quad-Motor", variantId: vid("camp_rivian","Max Pack · Quad-Motor"),
           reviewerName: "Chris Meyers", reviewerId: "seed_u10", rating: 5,
           summary: "10,000 miles in — still the best vehicle decision I've made",
           content: "Took it through Zion, Arches, and a 3,000-mile cross-country trip. The gear tunnel has replaced my entire rooftop cargo setup. Highway Assist is hands-free on any divided highway and actually trustworthy. Software updates have fixed every single issue I logged in the first month. Charging network smaller than Tesla but Electrify America works without app drama.",
@@ -564,7 +583,8 @@ export default function AdminDashboard() {
 
         // [10] Campaign review
         { productName: "Rivian R2 SUV", category: "Automotive", campaignId: "camp_rivian",
-          productId: campDocs["camp_rivian"], variantName: "Long Range · AWD", variantId: vid("camp_rivian","Long Range · AWD"),
+          productId: campDocs["camp_rivian"], productSlug: "rivian-r2-suv", communitySlug: "automotive",
+          variantName: "Long Range · AWD", variantId: vid("camp_rivian","Long Range · AWD"),
           reviewerName: "Olivia Park", reviewerId: "seed_u11", rating: 4,
           summary: "Best family EV if you have kids and a driveway charger",
           content: "Three car seats fit without anyone losing a hip — the flat floor is the trick. 290 miles of EPA range means we charge once per week at home for our 60-mile daily routine. Software updates arrive OTA and have been genuinely improving the product monthly. Service centre access remains the weak point.",
@@ -580,7 +600,8 @@ export default function AdminDashboard() {
 
         // [11] Verified, organic, high engagement
         { productName: "Rhode Peptide Lip Treatment", category: "Beauty", campaignId: "organic",
-          productId: campDocs["camp_rhode"], variantName: "Glazed Donut", variantId: vid("camp_rhode","Glazed Donut"),
+          productId: campDocs["camp_rhode"], productSlug: "rhode-peptide-lip-treatment", communitySlug: "beauty",
+          variantName: "Glazed Donut", variantId: vid("camp_rhode","Glazed Donut"),
           reviewerName: "Aisha Patel", reviewerId: "seed_u12", rating: 5,
           summary: "Two months in — lips are genuinely different",
           content: "I was deeply sceptical. Lip glosses do not plump lips — that is marketing speak. Two months of daily use later and the vertical lip lines I have had since my 30s are measurably reduced. The glaze finish photographs beautifully without that sticky latex feel other glosses have. Repurchased twice.",
@@ -594,7 +615,8 @@ export default function AdminDashboard() {
 
         // [12] Campaign review
         { productName: "Rhode Peptide Lip Treatment", category: "Beauty", campaignId: "camp_rhode",
-          productId: campDocs["camp_rhode"], variantName: "Watermelon Slice", variantId: vid("camp_rhode","Watermelon Slice"),
+          productId: campDocs["camp_rhode"], productSlug: "rhode-peptide-lip-treatment", communitySlug: "beauty",
+          variantName: "Watermelon Slice", variantId: vid("camp_rhode","Watermelon Slice"),
           reviewerName: "Zoe Taylor", reviewerId: "seed_u13", rating: 4,
           summary: "Watermelon Slice is summer in a tube — legitimately",
           content: "The scent is genuinely watermelon rather than generic fruit candy. Light pink tint flatters every skin tone in my friend group (we tested across four people, four very different undertones). Applies clean, lasts about 3 hours before you need to reapply. Packaging could be more sustainable.",
@@ -610,7 +632,8 @@ export default function AdminDashboard() {
 
         // [13] Campaign, verified purchase, high engagement
         { productName: "PlayStation 5 Pro", category: "Gaming", campaignId: "camp_ps5pro",
-          productId: campDocs["camp_ps5pro"], variantName: "Disc Edition", variantId: vid("camp_ps5pro","Disc Edition"),
+          productId: campDocs["camp_ps5pro"], productSlug: "playstation-5-pro", communitySlug: "gaming",
+          variantName: "Disc Edition", variantId: vid("camp_ps5pro","Disc Edition"),
           reviewerName: "Tom Harrison", reviewerId: "seed_u14", rating: 5,
           summary: "PSSR makes 60fps ray tracing actually possible",
           content: "Spider-Man 2 at 60fps with full ray tracing is genuinely stunning — this would require a $2,000 PC to achieve natively. PSSR upscaling is not perfect on every title but the best implementations are indistinguishable from native 4K. DualSense haptics remain the most underrated innovation in gaming. The extra storage alone justifies the upgrade from base PS5 if you own more than 15 games.",
@@ -624,7 +647,8 @@ export default function AdminDashboard() {
 
         // [14] Organic, honest mixed review
         { productName: "PlayStation 5 Pro", category: "Gaming", campaignId: "organic",
-          productId: campDocs["camp_ps5pro"], variantName: "Digital Edition", variantId: vid("camp_ps5pro","Digital Edition"),
+          productId: campDocs["camp_ps5pro"], productSlug: "playstation-5-pro", communitySlug: "gaming",
+          variantName: "Digital Edition", variantId: vid("camp_ps5pro","Digital Edition"),
           reviewerName: "Leo Santos", reviewerId: "seed_u15", rating: 3,
           summary: "Honest take: only worth it if your library is first-party",
           content: "The hardware is excellent. But if you predominantly play multiplatform games or indie titles the PSSR uplift is marginal. I own 40 games and maybe 8 have meaningful Pro enhancements. If your library is Spider-Man, Horizon, GT7, and first-party exclusives this is a no-brainer. If it's COD, FIFA, and Minecraft — save the $200.",
@@ -640,7 +664,8 @@ export default function AdminDashboard() {
 
         // [15] Verified, organic, will get version update
         { productName: "Whoop 5.0 Band", category: "Fitness", campaignId: "organic",
-          productId: campDocs["camp_whoop"], variantName: "Onyx Black", variantId: vid("camp_whoop","Onyx Black"),
+          productId: campDocs["camp_whoop"], productSlug: "whoop-5-0-band", communitySlug: "fitness",
+          variantName: "Onyx Black", variantId: vid("camp_whoop","Onyx Black"),
           reviewerName: "Elena Rodriguez", reviewerId: "seed_u16", rating: 5,
           summary: "Caught an illness 48hrs before symptoms via HRV",
           content: "Six months in and I have completely restructured my training blocks around recovery scores. The most useful moment was when my HRV dropped 18% below baseline for no obvious reason — I rested that day instead of training hard, and 48 hours later got a cold. The device literally predicted my illness. Skin temperature tracking is the sleeper feature — it explains the bad sleep nights I couldn't otherwise account for.",
@@ -654,7 +679,8 @@ export default function AdminDashboard() {
 
         // [16] Campaign review
         { productName: "Whoop 5.0 Band", category: "Fitness", campaignId: "camp_whoop",
-          productId: campDocs["camp_whoop"], variantName: "Stone Grey", variantId: vid("camp_whoop","Stone Grey"),
+          productId: campDocs["camp_whoop"], productSlug: "whoop-5-0-band", communitySlug: "fitness",
+          variantName: "Stone Grey", variantId: vid("camp_whoop","Stone Grey"),
           reviewerName: "James Okafor", reviewerId: "seed_u17", rating: 4,
           summary: "The data nerd's fitness tracker",
           content: "If you want a screen showing your heart rate during workouts this is the wrong device. If you want to understand whether your body is ready to push hard or needs rest, this is the best tool available. Strain coach accuracy improves significantly after month two once the algorithm has enough baseline data.",
@@ -670,7 +696,8 @@ export default function AdminDashboard() {
 
         // [17] Verified, organic
         { productName: "IHG One Rewards — Indigo Hotels", category: "Travel", campaignId: "organic",
-          productId: campDocs["camp_ihg"], variantName: "Hotel Indigo Edinburgh", variantId: vid("camp_ihg","Hotel Indigo Edinburgh"),
+          productId: campDocs["camp_ihg"], productSlug: "ihg-one-rewards-indigo-hotels", communitySlug: "travel",
+          variantName: "Hotel Indigo Edinburgh", variantId: vid("camp_ihg","Hotel Indigo Edinburgh"),
           reviewerName: "Priya Nair", reviewerId: "seed_u18", rating: 5,
           summary: "Staff recommended a whisky bar that isn't on any app",
           content: "The Hotel Indigo Edinburgh experience is built around neighbourhood knowledge. The concierge sent me to a 40-year-old whisky bar that locals use, not tourists. Room design is genuinely thoughtful — the tiles reference the local geology. Not a generic hotel that happens to have a fashionable lobby. Points redemption is unnecessarily complex but the stays themselves are exceptional.",
@@ -684,7 +711,8 @@ export default function AdminDashboard() {
 
         // [18] Campaign review
         { productName: "IHG One Rewards — Indigo Hotels", category: "Travel", campaignId: "camp_ihg",
-          productId: campDocs["camp_ihg"], variantName: "Hotel Indigo NYC", variantId: vid("camp_ihg","Hotel Indigo NYC"),
+          productId: campDocs["camp_ihg"], productSlug: "ihg-one-rewards-indigo-hotels", communitySlug: "travel",
+          variantName: "Hotel Indigo NYC", variantId: vid("camp_ihg","Hotel Indigo NYC"),
           reviewerName: "Rachel Torres", reviewerId: "seed_u19", rating: 4,
           summary: "Midtown location is genuinely underpriced for what it is",
           content: "Walking distance to MoMA, Rockefeller, and the Park without the midtown hotel premium. The art deco lobby makes check-in feel like an arrival rather than a transaction. Rooms are compact but designed with zero wasted space — the storage solutions are actually clever. Breakfast quality inconsistent across visits.",
@@ -700,7 +728,8 @@ export default function AdminDashboard() {
 
         // [19] Verified, honest mixed — tests low health score
         { productName: "Robinhood Gold", category: "Finance", campaignId: "organic",
-          productId: campDocs["camp_robinhood"], variantName: "Annual · $50/yr", variantId: vid("camp_robinhood","Annual · $50/yr"),
+          productId: campDocs["camp_robinhood"], productSlug: "robinhood-gold", communitySlug: "finance",
+          variantName: "Annual · $50/yr", variantId: vid("camp_robinhood","Annual · $50/yr"),
           reviewerName: "Nate Diaz", reviewerId: "seed_u20", rating: 3,
           summary: "Great UI, outgrown by anyone beyond beginner level",
           content: "For parking emergency cash at 5% APY and trading options on your phone, Robinhood Gold is genuinely excellent. As a long-term investor trying to build a serious portfolio, I hit its ceiling quickly. No screeners, no bond purchasing, no proper tax-loss harvesting, customer support is email-only and slow. The interface is the best in the industry — I wish the tools matched it.",
@@ -714,7 +743,8 @@ export default function AdminDashboard() {
 
         // [20] Campaign review
         { productName: "Robinhood Gold", category: "Finance", campaignId: "camp_robinhood",
-          productId: campDocs["camp_robinhood"], variantName: "Monthly · $5/mo", variantId: vid("camp_robinhood","Monthly · $5/mo"),
+          productId: campDocs["camp_robinhood"], productSlug: "robinhood-gold", communitySlug: "finance",
+          variantName: "Monthly · $5/mo", variantId: vid("camp_robinhood","Monthly · $5/mo"),
           reviewerName: "Kenji Tanaka", reviewerId: "seed_u21", rating: 4,
           summary: "APY alone covers the subscription fee in the first month",
           content: "On $20,000 in idle cash, the 5% APY generates $83/month — the subscription costs $5. The math is obvious. Instant deposit limit increase from $1,000 to $50,000 was the feature that made me upgrade. Margin rates at 6.5% are competitive with Interactive Brokers. Interface is genuinely the best for quick trades.",
@@ -750,29 +780,42 @@ export default function AdminDashboard() {
 
       setStatusMessage("Inserting channels (with one boosted category)…");
 
-      // ── Channels — one has multiplier > 1 to test Boosted badge ─────────
+      // ── Communities — one per product category, slugs match product.communitySlug ─
+      // Two are BOOSTED to test the 🔥 Boosted badge on Explore + Home pages
       const sampleChannels = [
-        { name: "Noise-Cancelling Headphones", slug: "anc-headphones",
-          description: "ANC headphone reviews, comparison threads, and EQ tips.", category: "Tech", iconEmoji: "🎧",
+        { name: "Tech", slug: "tech",
+          description: "Consumer tech reviews, comparisons, and buyer guides.", category: "Tech", iconEmoji: "💻",
           multiplier: 1, multiplierExpiresAt: null },
-        { name: "Standing Desks & Ergonomics", slug: "standing-desks",
-          description: "Desk reviews, ergonomics deep dives, and setup inspiration.", category: "Home", iconEmoji: "🖥️",
+        { name: "Home & Ergonomics", slug: "home",
+          description: "Smart home, furniture, and ergonomics reviews.", category: "Home", iconEmoji: "🏠",
           multiplier: 1, multiplierExpiresAt: null },
-        { name: "Skincare Science", slug: "skincare",
-          description: "Ingredient-led beauty reviews and routine breakdowns.", category: "Beauty", iconEmoji: "✨",
-          // BOOSTED — tests the 🔥 Boosted badge on Explore + Home pages
-          multiplier: 2.0,
-          multiplierExpiresAt: new Date(now.getTime() + 30 * day).toISOString(),
-          multiplierSponsoredBy: "Rhode" },
-        { name: "Electric Vehicles", slug: "electric-vehicles",
-          description: "EV ownership logs, charging tips, and road trip reports.", category: "Automotive", iconEmoji: "⚡",
-          multiplier: 1, multiplierExpiresAt: null },
-        { name: "Dev Tools & SaaS", slug: "dev-saas",
-          description: "SaaS reviews from working developers. No fluff.", category: "SaaS", iconEmoji: "💻",
-          // BOOSTED — second boosted category
+        { name: "SaaS & Dev Tools", slug: "saas",
+          description: "Software reviews from real users and developers. No fluff.", category: "SaaS", iconEmoji: "⚙️",
+          // BOOSTED — tests the 🔥 Boosted badge
           multiplier: 1.5,
           multiplierExpiresAt: new Date(now.getTime() + 30 * day).toISOString(),
           multiplierSponsoredBy: "Linear" },
+        { name: "Automotive & EV", slug: "automotive",
+          description: "Car, EV, and transport ownership reviews.", category: "Automotive", iconEmoji: "🚗",
+          multiplier: 1, multiplierExpiresAt: null },
+        { name: "Beauty & Skincare", slug: "beauty",
+          description: "Ingredient-led beauty reviews and routine breakdowns.", category: "Beauty", iconEmoji: "✨",
+          // BOOSTED — tests the 🔥 Boosted badge
+          multiplier: 2.0,
+          multiplierExpiresAt: new Date(now.getTime() + 30 * day).toISOString(),
+          multiplierSponsoredBy: "Rhode" },
+        { name: "Gaming", slug: "gaming",
+          description: "Console and PC gaming reviews and comparisons.", category: "Gaming", iconEmoji: "🎮",
+          multiplier: 1, multiplierExpiresAt: null },
+        { name: "Fitness & Health", slug: "fitness",
+          description: "Fitness trackers, gym gear, and wellness reviews.", category: "Fitness", iconEmoji: "💪",
+          multiplier: 1, multiplierExpiresAt: null },
+        { name: "Travel & Hospitality", slug: "travel",
+          description: "Hotel, airline, and travel product reviews.", category: "Travel", iconEmoji: "✈️",
+          multiplier: 1, multiplierExpiresAt: null },
+        { name: "Finance & Investing", slug: "finance",
+          description: "Fintech and investing platform reviews.", category: "Finance", iconEmoji: "💰",
+          multiplier: 1, multiplierExpiresAt: null },
       ];
 
       const channelIds: Record<string, string> = {};
@@ -1091,7 +1134,7 @@ export default function AdminDashboard() {
         }
       }
 
-      setStatusMessage(`✅ Done! Seeded ${campaigns.length} products, ${reviews.length} reviews (${reviews.filter(r => r.isVerifiedPurchase).length} verified, ${reviews.filter(r => r.biasFlag).length} bias-flagged), ${sampleChannels.length} channels (${sampleChannels.filter(c => c.multiplier > 1).length} boosted), 3 ownership journeys, 4 forks (Sony, Rivian, PS5, Whoop), threaded comments, discussion posts, and Q&A answers with Verified Owner badges.`);
+      setStatusMessage(`✅ Done! Seeded ${campaigns.length} products (with slug + communitySlug), ${reviews.length} reviews (${reviews.filter(r => r.isVerifiedPurchase).length} verified, ${reviews.filter(r => r.biasFlag).length} bias-flagged), ${sampleChannels.length} communities (${sampleChannels.filter(c => c.multiplier > 1).length} boosted), 3 ownership journeys, 4 forks (Sony, Rivian, PS5, Whoop), threaded comments, discussion posts, and Q&A answers. All product links now route via /c/[community]/[slug].`);
     } catch (error) {
       console.error(error);
       setStatusMessage("❌ Error seeding data. Check console.");
