@@ -251,7 +251,7 @@ export default function ProfilePage() {
             <p className="text-2xl font-semibold tabular-nums text-slate-900 dark:text-slate-100">${walletBalance.toFixed(2)}</p>
           </div>
           <span className="text-xs text-slate-400 dark:text-slate-600 max-w-[140px] text-right leading-relaxed">
-            Credited when campaigns close
+            Credited based on engagement
           </span>
         </div>
 
@@ -327,7 +327,7 @@ export default function ProfilePage() {
                         )}
                         <span>{new Date(r.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>
                         {r.campaignId !== "organic" && (
-                          <span className="text-emerald-600 dark:text-emerald-400 font-medium">Campaign</span>
+                          <span className="text-emerald-600 dark:text-emerald-400 font-medium">Sponsored</span>
                         )}
                         {(r.versionCount ?? 0) > 1 && (
                           <span className="text-blue-600 dark:text-blue-400 font-medium">{r.versionCount} updates</span>
@@ -368,7 +368,7 @@ export default function ProfilePage() {
             {activeTab === "earnings" && (
               <div className="space-y-3">
                 {ledger.length === 0 ? (
-                  <p className="text-sm text-slate-500 dark:text-slate-500">No payouts yet. Earn by getting likes on your campaign reviews.</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-500">No payouts yet. Earn by getting likes on your verified reviews.</p>
                 ) : (
                   <>
                     <div className="overflow-x-auto -mx-1">

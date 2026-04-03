@@ -733,12 +733,12 @@ function FullReviewWizard({
 
   const headerLabel =
     mode === "verified" ? "Verified purchase review" :
-    mode === "campaign" ? "Campaign review" :
+    mode === "campaign" ? "Sponsored review" :
     "Write a review";
 
   const headerSub =
     mode === "verified" ? "Earns based on engagement · Verify with your product code" :
-    mode === "campaign" ? "Earns based on engagement · Disclosed as campaign review" :
+    mode === "campaign" ? "Earns based on engagement · Disclosed as sponsored review" :
     null;
 
   return (
@@ -1199,7 +1199,7 @@ function FullReviewWizard({
                 <label className="flex items-start gap-2.5">
                   <input type="checkbox" checked readOnly className="mt-0.5 accent-slate-900 shrink-0" />
                   <span className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                    I received this product as part of a brand review campaign.
+                    I received this product as part of a brand review program.
                   </span>
                 </label>
               )}

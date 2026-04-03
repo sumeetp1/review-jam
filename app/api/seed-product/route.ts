@@ -8,9 +8,9 @@ import { db } from "../../../lib/firebase";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 const MODEL_CANDIDATES = [
   process.env.GEMINI_MODEL,
+  "gemini-2.5-flash",
+  "gemini-2.5-flash-lite-preview-06-17",
   "gemini-2.0-flash",
-  "gemini-2.0-flash-lite",
-  "gemini-1.5-flash",
 ].filter(Boolean) as string[];
 
 const VALID_CATEGORIES = [
