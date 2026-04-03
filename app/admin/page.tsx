@@ -235,6 +235,7 @@ export default function AdminDashboard() {
           brandName: "Sony", brandEmail: "sony@brands.com", category: "Tech",
           campaignId: "camp_sony",
           slug: "sony-wh-1000xm6", communitySlug: "tech", communityTags: [],
+          coverImage: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80&fit=crop",
           description: "Next-gen noise-cancelling headphones. 40hr battery, multipoint Bluetooth 5.3, LDAC Hi-Res Audio.",
           budget: 5000, endDate: new Date(now.getTime() + 6 * day).toISOString(),
           variants: ["Midnight Black", "Platinum Silver", "Indigo Blue"],
@@ -252,6 +253,7 @@ export default function AdminDashboard() {
           brandName: "Lumina", brandEmail: "lumina@brands.com", category: "Home",
           campaignId: "camp_lumina",
           slug: "lumina-smart-standing-desk", communitySlug: "home", communityTags: [],
+          coverImage: "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?w=800&q=80&fit=crop",
           description: "OLED control panel, 4-preset memory, integrated cable management tray, whisper-quiet dual motor.",
           budget: 3000, endDate: new Date(now.getTime() + 4 * day).toISOString(),
           variants: ["48\" Walnut Top", "60\" White Top", "72\" Black Top"],
@@ -269,6 +271,7 @@ export default function AdminDashboard() {
           brandName: "Linear", brandEmail: "linear@brands.com", category: "SaaS",
           campaignId: "camp_linear",
           slug: "linear-project-management", communitySlug: "saas", communityTags: [],
+          coverImage: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=800&q=80&fit=crop",
           description: "The issue tracker built for high-performance engineering teams. Keyboard-first, blazingly fast.",
           budget: 2000, endDate: new Date(now.getTime() + 14 * day).toISOString(),
           variants: ["Free Tier", "Plus Plan ($8/user/mo)", "Enterprise"],
@@ -285,6 +288,7 @@ export default function AdminDashboard() {
           brandName: "Rivian", brandEmail: "rivian@brands.com", category: "Automotive",
           campaignId: "camp_rivian",
           slug: "rivian-r2-suv", communitySlug: "automotive", communityTags: [],
+          coverImage: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&q=80&fit=crop",
           description: "All-electric adventure SUV. 300mi range, quad-motor option, hands-free highway driving.",
           budget: 8000, endDate: new Date(now.getTime() + 10 * day).toISOString(),
           variants: ["Standard Range · RWD", "Long Range · AWD", "Max Pack · Quad-Motor"],
@@ -302,6 +306,7 @@ export default function AdminDashboard() {
           brandName: "Rhode", brandEmail: "rhode@brands.com", category: "Beauty",
           campaignId: "camp_rhode",
           slug: "rhode-peptide-lip-treatment", communitySlug: "beauty", communityTags: [],
+          coverImage: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&q=80&fit=crop",
           description: "Peptide-rich gloss that plumps and hydrates. 9 active ingredients including shea butter and peptide complex.",
           budget: 1500, endDate: new Date(now.getTime() + 7 * day).toISOString(),
           variants: ["Salted Caramel", "Glazed Donut", "Watermelon Slice", "Unscented"],
@@ -318,6 +323,7 @@ export default function AdminDashboard() {
           brandName: "Sony", brandEmail: "sony@brands.com", category: "Gaming",
           campaignId: "camp_ps5pro",
           slug: "playstation-5-pro", communitySlug: "gaming", communityTags: [],
+          coverImage: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?w=800&q=80&fit=crop",
           description: "45% faster GPU than PS5, PSSR AI upscaling, 2TB SSD. Free 3-month PS Plus for campaign reviewers.",
           budget: 6000, endDate: new Date(now.getTime() + 5 * day).toISOString(),
           variants: ["Disc Edition", "Digital Edition"],
@@ -335,6 +341,7 @@ export default function AdminDashboard() {
           brandName: "Whoop", brandEmail: "whoop@brands.com", category: "Fitness",
           campaignId: "camp_whoop",
           slug: "whoop-5-0-band", communitySlug: "fitness", communityTags: [],
+          coverImage: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80&fit=crop",
           description: "Continuous health monitoring — HRV, skin temperature, sleep stages, blood oxygen. No screen.",
           budget: 2500, endDate: new Date(now.getTime() + 9 * day).toISOString(),
           variants: ["Onyx Black", "Stone Grey", "Desert Tan"],
@@ -351,6 +358,7 @@ export default function AdminDashboard() {
           brandName: "IHG", brandEmail: "ihg@brands.com", category: "Travel",
           campaignId: "camp_ihg",
           slug: "ihg-one-rewards-indigo-hotels", communitySlug: "travel", communityTags: [],
+          coverImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80&fit=crop",
           description: "Boutique hotel collection with neighbourhood-led design. Reviewers receive a 2-night complimentary stay.",
           budget: 10000, endDate: new Date(now.getTime() + 21 * day).toISOString(),
           variants: ["Hotel Indigo Edinburgh", "Hotel Indigo Dubai", "Hotel Indigo NYC"],
@@ -367,6 +375,7 @@ export default function AdminDashboard() {
           brandName: "Robinhood", brandEmail: "robinhood@brands.com", category: "Finance",
           campaignId: "camp_robinhood",
           slug: "robinhood-gold", communitySlug: "finance", communityTags: [],
+          coverImage: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80&fit=crop",
           description: "5% APY on uninvested cash, 3% IRA match, margin at 6.5%, instant deposits up to $50K.",
           budget: 4000, endDate: new Date(now.getTime() + 12 * day).toISOString(),
           variants: ["Monthly · $5/mo", "Annual · $50/yr"],
@@ -437,6 +446,10 @@ export default function AdminDashboard() {
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "3_plus_months",
           eligibleForPayout: false, reviewType: "verified",
+          mediaUrls: [
+            "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80&fit=crop",
+            "https://images.unsplash.com/photo-1572536147248-ac59a8abfa4b?w=500&q=80&fit=crop",
+          ],
           createdAt: ago(45) },
 
         // [1] Campaign review, not verified, will get 1 version update
@@ -500,6 +513,10 @@ export default function AdminDashboard() {
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "3_plus_months",
           eligibleForPayout: false, reviewType: "verified",
+          mediaUrls: [
+            "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?w=500&q=80&fit=crop",
+            "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80&fit=crop",
+          ],
           createdAt: ago(60) },
 
         // [5] Campaign review
@@ -579,6 +596,10 @@ export default function AdminDashboard() {
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "3_plus_months",
           eligibleForPayout: false, reviewType: "verified",
+          mediaUrls: [
+            "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=500&q=80&fit=crop",
+            "https://images.unsplash.com/photo-1558618047-3e8e001c1e1e?w=500&q=80&fit=crop",
+          ],
           createdAt: ago(90) },
 
         // [10] Campaign review
@@ -643,6 +664,10 @@ export default function AdminDashboard() {
           isVerifiedPurchase: true, isCampaignReview: true,
           productSource: "brand_sent", usageDuration: "1_3_months",
           eligibleForPayout: true, reviewType: "campaign",
+          mediaUrls: [
+            "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?w=500&q=80&fit=crop",
+            "https://images.unsplash.com/photo-1622297845775-5ff3fef71d13?w=500&q=80&fit=crop",
+          ],
           createdAt: ago(12) },
 
         // [14] Organic, honest mixed review
@@ -675,6 +700,9 @@ export default function AdminDashboard() {
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "3_plus_months",
           eligibleForPayout: false, reviewType: "verified",
+          mediaUrls: [
+            "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=500&q=80&fit=crop",
+          ],
           createdAt: ago(70) },
 
         // [16] Campaign review
@@ -761,12 +789,12 @@ export default function AdminDashboard() {
       const reviewIds: string[] = [];
       for (const rev of reviews) {
         const reviewData = {
-          ...rev,
           likedBy: [], helpfulBy: [], notHelpfulBy: [],
           notHelpfulCount: 0,
           versionCount: 1,
           mediaUrls: [],
           subRatings: {},
+          ...rev,
         };
         const { score, breakdown } = computeHealthScore(reviewData, 0, 0);
         const ref = await addDoc(collection(db, "reviews"), {

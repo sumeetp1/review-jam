@@ -70,7 +70,7 @@ function NavRow({
 }) {
   const cls = `flex items-center gap-2.5 px-2 py-1.5 rounded-md text-[13px] transition select-none cursor-pointer ${
     active
-      ? "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 font-semibold"
+      ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30 font-semibold"
       : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900/60 font-medium"
   }`;
 
@@ -163,7 +163,7 @@ export default function LeftSidebar({
             <span>✍️</span> Post a review
           </button>
           <button type="button" onClick={user ? onQuickReview : onLogin}
-            className="w-full text-[12px] text-slate-500 dark:text-slate-400 py-1.5 px-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-amber-300 hover:text-amber-600 dark:hover:border-amber-800 dark:hover:text-amber-400 transition">
+            className="w-full text-[12px] text-slate-500 dark:text-slate-400 py-1.5 px-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-indigo-300 hover:text-indigo-600 dark:hover:border-indigo-800 dark:hover:text-indigo-400 transition">
             Quick review (no payout)
           </button>
         </div>
@@ -186,7 +186,7 @@ export default function LeftSidebar({
         <div className="px-1">
           {joinedChannels.length === 0 && !user && (
             <p className="px-2 py-1 text-[12px] text-slate-400 dark:text-slate-500">
-              <button type="button" onClick={onLogin} className="text-amber-600 dark:text-amber-400 hover:underline">Sign in</button> to join communities
+              <button type="button" onClick={onLogin} className="text-indigo-600 dark:text-indigo-400 hover:underline">Sign in</button> to join communities
             </p>
           )}
           {joinedChannels.length === 0 && user && (
@@ -200,7 +200,7 @@ export default function LeftSidebar({
           ))}
           {joinedChannels.length > 5 && (
             <button type="button" onClick={() => setShowAllChannels((v) => !v)}
-              className="w-full text-left px-2 py-1 text-[11px] text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition">
+              className="w-full text-left px-2 py-1 text-[11px] text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
               {showAllChannels ? "Show less" : `See ${joinedChannels.length - 5} more…`}
             </button>
           )}
@@ -216,7 +216,7 @@ export default function LeftSidebar({
               active={pathname === `/c/${ch.slug}`}
               right={
                 <button type="button" onClick={(e) => handleJoin(e, ch)} disabled={joining === ch.id}
-                  className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full border border-amber-400 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 disabled:opacity-50 transition">
+                  className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full border border-indigo-400 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 disabled:opacity-50 transition">
                   {joining === ch.id ? "…" : "+ Join"}
                 </button>
               }
@@ -224,14 +224,14 @@ export default function LeftSidebar({
           ))}
           {popularChannels.length > (user ? 3 : 5) && (
             <button type="button" onClick={() => setShowAllChannels((v) => !v)}
-              className="w-full text-left px-2 py-1 text-[11px] text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition">
+              className="w-full text-left px-2 py-1 text-[11px] text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
               {showAllChannels ? "Show less" : `See ${popularChannels.length - (user ? 3 : 5)} more…`}
             </button>
           )}
           <div className="flex gap-2 px-2 py-1">
-            <Link href="/c" className="text-[11px] text-amber-600 dark:text-amber-400 hover:underline font-medium">All communities</Link>
+            <Link href="/c" className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline font-medium">All communities</Link>
             {user && (
-              <button type="button" onClick={() => setShowCreate(true)} className="text-[11px] text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition">
+              <button type="button" onClick={() => setShowCreate(true)} className="text-[11px] text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
                 + Create
               </button>
             )}
@@ -256,7 +256,7 @@ export default function LeftSidebar({
           <span className="cursor-pointer hover:text-slate-600">Privacy</span>
           <Link href="/brands" className="hover:text-slate-600">Brands</Link>
           <p className="w-full mt-1 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
             © 2026 Review Jam
           </p>
         </div>

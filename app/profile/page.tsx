@@ -238,7 +238,7 @@ export default function ProfilePage() {
               <p className="text-xl font-semibold text-slate-900 dark:text-slate-100 tabular-nums">{s.value}</p>
               <p className="text-[11px] text-slate-500 dark:text-slate-500 mt-0.5 uppercase tracking-wide">{s.label}</p>
               {"sub" in s && s.sub && (
-                <p className="text-[10px] text-amber-500 dark:text-amber-400 font-medium mt-0.5">{s.sub}</p>
+                <p className="text-[10px] text-indigo-500 dark:text-indigo-400 font-medium mt-0.5">{s.sub}</p>
               )}
             </div>
           ))}

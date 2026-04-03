@@ -566,7 +566,7 @@ export default function Home() {
                   onClick={() => setFeedTab(tab.id)}
                   className={`flex-1 py-3.5 md:py-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
                     feedTab === tab.id
-                      ? "border-amber-500 text-amber-600 dark:text-amber-400"
+                      ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
                       : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
                   }`}
                 >
@@ -589,7 +589,7 @@ export default function Home() {
                   <span className="text-lg leading-none">‹</span>
                 </button>
                 <div ref={categoriesRef} className="flex gap-1.5 overflow-x-auto snap-x scroll-smooth px-7 w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                  <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${activeCategoryFilter === "All" ? "bg-amber-500 text-white border-amber-500 shadow-sm shadow-amber-500/30" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-amber-300 hover:text-amber-600 dark:hover:border-amber-700 dark:hover:text-amber-400"}`}>
+                  <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${activeCategoryFilter === "All" ? "bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-500/20" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-indigo-300 hover:text-indigo-600 dark:hover:border-indigo-700 dark:hover:text-indigo-400"}`}>
                     All
                   </button>
                   {AVAILABLE_CATEGORIES.map((cat) => {
@@ -602,10 +602,10 @@ export default function Home() {
                         onClick={() => setActiveCategoryFilter(cat)}
                         className={`whitespace-nowrap flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${
                           isActive
-                            ? "bg-amber-500 text-white border-amber-500 shadow-sm shadow-amber-500/30"
+                            ? "bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-500/20"
                             : isBoosted
-                            ? "bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 border-orange-300 dark:border-orange-700 hover:bg-orange-100 dark:hover:bg-orange-900/30"
-                            : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-amber-300 hover:text-amber-600 dark:hover:border-amber-700 dark:hover:text-amber-400"
+                            ? "bg-violet-50 dark:bg-violet-950/30 text-violet-700 dark:text-violet-400 border-violet-300 dark:border-violet-700 hover:bg-violet-100 dark:hover:bg-violet-900/30"
+                            : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-indigo-300 hover:text-indigo-600 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
                         }`}
                       >
                         {isBoosted && <span aria-hidden>🔥</span>}
@@ -638,7 +638,7 @@ export default function Home() {
                         isActive
                           ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100"
                           : isBoosted
-                          ? "bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 border-orange-300 dark:border-orange-700"
+                          ? "bg-violet-50 dark:bg-violet-950/30 text-violet-700 dark:text-violet-400 border-violet-300 dark:border-violet-700"
                           : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
                       }`}
                     >

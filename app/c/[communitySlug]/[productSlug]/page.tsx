@@ -75,9 +75,9 @@ function CounterTakePanel({ original, forks }: { original: any; forks: any[] }) 
     ...forkCons.filter((c) => !origCons.includes(c)),
   ];
   return (
-    <div className="mt-3 rounded-xl border border-amber-200 dark:border-amber-800/50 overflow-hidden text-[12px]">
+    <div className="mt-3 rounded-xl border border-slate-200 dark:border-slate-700/60 overflow-hidden text-[12px]">
       <div className="grid grid-cols-1 sm:grid-cols-2">
-        <div className="p-3 space-y-2 border-b sm:border-b-0 sm:border-r border-amber-200 dark:border-amber-800/50">
+        <div className="p-3 space-y-2 border-b sm:border-b-0 sm:border-r border-slate-200 dark:border-slate-700/60">
           <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Original</p>
           <p className="font-semibold text-slate-800 dark:text-slate-200">{original.reviewerName ?? "Anonymous"}</p>
           <div className="flex gap-0.5">{[1,2,3,4,5].map((n) => <span key={n} className={n <= (original.rating || 0) ? "text-amber-400" : "text-slate-200 dark:text-slate-700"}>★</span>)}</div>
@@ -85,8 +85,8 @@ function CounterTakePanel({ original, forks }: { original: any; forks: any[] }) 
           {origCons.length > 0 && <div className="flex flex-wrap gap-1">{origCons.slice(0,4).map((c,i) => <span key={i} className="bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 px-2 py-0.5 rounded-full text-[10px]">{c}</span>)}</div>}
           {original.content && <p className="text-slate-600 dark:text-slate-400 line-clamp-3">{original.content}</p>}
         </div>
-        <div className="p-3 space-y-2 bg-amber-50/40 dark:bg-amber-950/10">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400">⑂ Counter-take</p>
+        <div className="p-3 space-y-2 bg-indigo-50/40 dark:bg-indigo-950/10">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">⑂ Counter-take</p>
           <p className="font-semibold text-slate-800 dark:text-slate-200">{fork.reviewerName ?? "Anonymous"}</p>
           <div className="flex gap-0.5">{[1,2,3,4,5].map((n) => <span key={n} className={n <= (fork.rating || 0) ? "text-amber-400" : "text-slate-200 dark:text-slate-700"}>★</span>)}</div>
           {forkPros.length > 0 && <div className="flex flex-wrap gap-1">{forkPros.slice(0,4).map((p,i) => <span key={i} className="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full text-[10px]">{p}</span>)}</div>}
@@ -95,12 +95,12 @@ function CounterTakePanel({ original, forks }: { original: any; forks: any[] }) 
         </div>
       </div>
       {disagreements.length > 0 && (
-        <div className="px-3 py-2 bg-amber-50/60 dark:bg-amber-950/20 border-t border-amber-200 dark:border-amber-800/50">
-          <p className="text-[10px] font-bold text-amber-700 dark:text-amber-400 mb-1">Disagrees on</p>
-          <div className="flex flex-wrap gap-1">{disagreements.slice(0,8).map((d,i) => <span key={i} className="bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full text-[10px]">{d}</span>)}</div>
+        <div className="px-3 py-2 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-200 dark:border-slate-700/60">
+          <p className="text-[10px] font-bold text-slate-600 dark:text-slate-400 mb-1">Disagrees on</p>
+          <div className="flex flex-wrap gap-1">{disagreements.slice(0,8).map((d,i) => <span key={i} className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-full text-[10px]">{d}</span>)}</div>
         </div>
       )}
-      {forks.length > 1 && <div className="px-3 py-2 border-t border-amber-200 dark:border-amber-800/50 text-[10px] text-amber-600 dark:text-amber-500 text-center">+{forks.length - 1} more counter-take{forks.length - 1 > 1 ? "s" : ""}</div>}
+      {forks.length > 1 && <div className="px-3 py-2 border-t border-slate-200 dark:border-slate-700/60 text-[10px] text-indigo-600 dark:text-indigo-400 text-center">+{forks.length - 1} more counter-take{forks.length - 1 > 1 ? "s" : ""}</div>}
     </div>
   );
 }
@@ -219,7 +219,7 @@ function OwnershipJourneyCard({ reviews, currentUserId, currentUserName, onLike,
       <div className="flex items-center gap-2 px-3 pb-3 flex-wrap">
         {isOwner && onNewEntry && <button type="button" onClick={() => onNewEntry(primary)} className="text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition text-violet-600 dark:text-violet-400 border-violet-300 dark:border-violet-700 hover:bg-violet-50 dark:hover:bg-violet-950/30">+ New Entry</button>}
         {(!isOwner || !onNewEntry) && onFork && <button type="button" onClick={() => onFork(primary)} className="text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900">⑂ Fork</button>}
-        {forks.length > 0 && <button type="button" onClick={() => setShowForks((v) => !v)} className="text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/20">⑂ {forks.length} Counter-take{forks.length !== 1 ? "s" : ""}</button>}
+        {forks.length > 0 && <button type="button" onClick={() => setShowForks((v) => !v)} className="text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-950/20">⑂ {forks.length} Counter-take{forks.length !== 1 ? "s" : ""}</button>}
       </div>
       {showForks && forks.length > 0 && <div className="px-3 pb-3"><CounterTakePanel original={primary} forks={forks} /></div>}
     </div>
@@ -264,8 +264,8 @@ function CommunityTagManager({ product, currentUserEmail, onTagsUpdated }: {
   }
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-amber-200 dark:border-amber-800/50 p-4">
-      <p className="text-[10px] font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-2">⚡ Admin — Community Tags</p>
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-indigo-200 dark:border-indigo-800/50 p-4">
+      <p className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-2">⚡ Admin — Community Tags</p>
       <div className="flex flex-wrap gap-1.5 mb-3">
         <span className="text-[11px] font-semibold bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-2 py-0.5 rounded-full">
           #{product.communitySlug} <span className="opacity-60 font-normal">home</span>
@@ -284,9 +284,9 @@ function CommunityTagManager({ product, currentUserEmail, onTagsUpdated }: {
           onChange={(e) => setNewTag(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && addTag()}
           placeholder="community-slug"
-          className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-[12px] outline-none focus:ring-1 focus:ring-amber-400 dark:text-slate-100 dark:placeholder-slate-500"
+          className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-[12px] outline-none focus:ring-1 focus:ring-indigo-400 dark:text-slate-100 dark:placeholder-slate-500"
         />
-        <button type="button" onClick={addTag} disabled={busy || !newTag.trim()} className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-white text-[12px] font-semibold rounded-lg disabled:opacity-50 transition">
+        <button type="button" onClick={addTag} disabled={busy || !newTag.trim()} className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-[12px] font-semibold rounded-lg disabled:opacity-50 transition">
           + Tag
         </button>
       </div>
@@ -511,7 +511,7 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
           <div className="flex items-start gap-2.5 flex-wrap">
             <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 leading-snug">{product.name}</h1>
             {product.communitySeeded && !reviews.some((r: any) => r.isVerifiedPurchase === true) && (
-              <span className="mt-0.5 shrink-0 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-2 py-1 rounded-full">🌱 Community Seeded</span>
+              <span className="mt-0.5 shrink-0 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-violet-700 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/30 border border-violet-200 dark:border-violet-800 px-2 py-1 rounded-full">🌱 Community Seeded</span>
             )}
             {product.communitySeeded && reviews.some((r: any) => r.isVerifiedPurchase === true) && (
               <span className="mt-0.5 shrink-0 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 px-2 py-1 rounded-full">✅ Verified</span>

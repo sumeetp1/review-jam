@@ -4,9 +4,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --brand: #f59e0b;
-  --brand-dark: #d97706;
-  --brand-hover: #fbbf24;
+  --brand: #6366f1;
+  --brand-dark: #4f46e5;
+  --brand-hover: #818cf8;
 }
 
 @theme inline {
@@ -33,9 +33,9 @@ body {
 
 /* Brand gradient button */
 .btn-brand {
-  background: linear-gradient(135deg, #f59e0b, #f97316);
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.30);
   transition: opacity 0.15s, transform 0.1s;
 }
 .btn-brand:hover { opacity: 0.92; }

@@ -24,6 +24,7 @@ type ProductEntry = {
   communitySeeded?: boolean;
   slug?: string;
   communitySlug?: string;
+  coverImage?: string;
   // Computed
   reviewCount: number;
   avgRating: number;
@@ -229,7 +230,7 @@ function CreateHubModal({
                 </div>
               )}
 
-              <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2.5 text-[11px] text-amber-700 dark:text-amber-400">
+              <div className="bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 rounded-lg px-3 py-2.5 text-[11px] text-indigo-700 dark:text-indigo-400">
                 <span className="font-bold">Community Seeded</span> — this hub will be tagged until a verified owner posts a review.
               </div>
 
@@ -313,6 +314,7 @@ export default function ExplorePage() {
             communitySeeded: prod.communitySeeded === true,
             slug: prod.slug,
             communitySlug: prod.communitySlug,
+            coverImage: prod.coverImage,
             reviewCount,
             avgRating,
             totalLikes,
@@ -422,13 +424,13 @@ export default function ExplorePage() {
                   active
                     ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100"
                     : boosted
-                    ? "bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 border-orange-300 dark:border-orange-700 hover:bg-orange-100 dark:hover:bg-orange-900/30"
+                    ? "bg-violet-50 dark:bg-violet-950/30 text-violet-700 dark:text-violet-400 border-violet-300 dark:border-violet-700 hover:bg-violet-100 dark:hover:bg-violet-900/30"
                     : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50"
                 }`}
               >
                 {boosted && <span aria-label="Boosted category">🔥</span>}
                 {cat}
-                {boosted && <span className="text-[9px] font-bold tracking-wide uppercase text-orange-600 dark:text-orange-400">Boosted</span>}
+                {boosted && <span className="text-[9px] font-bold tracking-wide uppercase text-violet-600 dark:text-violet-400">Boosted</span>}
               </button>
             );
           })}
@@ -465,48 +467,72 @@ export default function ExplorePage() {
               <Link
                 key={p.id}
                 href={p.slug && p.communitySlug ? `/c/${p.communitySlug}/${p.slug}` : `/product/${p.id}`}
-                className="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-2.5 hover:border-slate-400 dark:hover:border-slate-600 hover:shadow-sm transition"
+                className="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md transition"
               >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-[14px] font-semibold text-slate-900 dark:text-slate-100 group-hover:underline leading-snug">
-                      {p.name}
-                    </h3>
-                    <p className="text-[12px] text-slate-500 dark:text-slate-500 mt-0.5">{p.brandName}</p>
-                  </div>
-                  <div className="flex flex-col items-end gap-1 shrink-0">
-                    {isActive(p) && (
-                      <span className="text-[10px] font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded">Live</span>
+                {/* Cover image */}
+                {p.coverImage ? (
+                  <div className="relative w-full h-40 overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
+                    <img
+                      src={p.coverImage}
+                      alt={p.name}
+                      className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                    <div className="absolute bottom-2 left-3 flex items-center gap-1.5">
+                      {isActive(p) && (
+                        <span className="text-[10px] font-semibold text-white bg-emerald-500/90 px-1.5 py-0.5 rounded-full backdrop-blur-sm">Live</span>
+                      )}
+                    </div>
+                    {p.avgRating > 0 && (
+                      <div className="absolute bottom-2 right-3 text-[11px] font-semibold text-white flex items-center gap-0.5">
+                        <span className="text-amber-400">★</span> {p.avgRating.toFixed(1)}
+                      </div>
                     )}
+                  </div>
+                ) : (
+                  <div className="w-full h-40 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center shrink-0">
+                    <span className="text-4xl opacity-30 select-none">📦</span>
+                  </div>
+                )}
+
+                {/* Card body */}
+                <div className="p-4 flex flex-col gap-2 flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-[14px] font-semibold text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 leading-snug transition-colors">
+                        {p.name}
+                      </h3>
+                      <p className="text-[12px] text-slate-500 dark:text-slate-500 mt-0.5">{p.brandName}</p>
+                    </div>
+                    {!p.coverImage && p.avgRating > 0 && (
+                      <span className="text-[11px] text-amber-500 font-semibold shrink-0">★ {p.avgRating.toFixed(1)}</span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-full font-medium">{p.category}</span>
                     {p.communitySeeded && !p.hasVerifiedOwner && (
-                      <span className="text-[9px] font-bold uppercase tracking-wide text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-700 px-1.5 py-0.5 rounded">
+                      <span className="text-[10px] font-medium text-violet-700 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40 px-1.5 py-0.5 rounded-full">
                         🌱 Seeded
                       </span>
                     )}
                   </div>
-                </div>
 
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-md font-medium">{p.category}</span>
-                  {p.avgRating > 0 && (
-                    <span className="text-[11px] text-amber-600 dark:text-amber-400 font-medium">★ {p.avgRating.toFixed(1)}</span>
+                  {p.topQuote && (
+                    <p className="text-[12px] text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 italic">
+                      "{p.topQuote}"
+                    </p>
                   )}
-                </div>
 
-                {p.topQuote && (
-                  <p className="text-[13px] text-slate-600 dark:text-slate-400 italic leading-snug line-clamp-2">
-                    "{p.topQuote}"
-                  </p>
-                )}
-
-                <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-500 mt-auto pt-1 border-t border-slate-100 dark:border-slate-800">
-                  <span>{p.reviewCount} review{p.reviewCount !== 1 ? "s" : ""}</span>
-                  <span>👍 {p.totalLikes} likes</span>
-                  {sortKey === "discovery" && p.discoveryRank > 0 && (
-                    <span className="ml-auto text-amber-600 dark:text-amber-400 font-semibold">
-                      🔥 {p.discoveryRank.toFixed(1)}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-3 text-[11px] text-slate-400 dark:text-slate-500 mt-auto pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <span>{p.reviewCount} review{p.reviewCount !== 1 ? "s" : ""}</span>
+                    <span>👍 {p.totalLikes}</span>
+                    {sortKey === "discovery" && p.discoveryRank > 0 && (
+                      <span className="ml-auto text-indigo-500 dark:text-indigo-400 font-semibold">
+                        🔥 {p.discoveryRank.toFixed(1)}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </Link>
             ))}

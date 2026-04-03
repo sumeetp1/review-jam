@@ -310,7 +310,7 @@ export default function ReviewCard({
                 <HealthScoreBadge score={review.healthScore} breakdown={review.healthScoreBreakdown} />
               )}
               {review.rating != null && (
-                <span className="text-[11px] font-medium text-amber-700 dark:text-amber-400/90 tabular-nums">
+                <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400 tabular-nums">
                   ★ {review.rating}
                 </span>
               )}
@@ -328,11 +328,11 @@ export default function ReviewCard({
           {review.productName && (
             <p className="text-[13px] text-slate-600 dark:text-slate-400 mb-1 flex items-center gap-1.5 flex-wrap">
               {review.productSlug && review.communitySlug ? (
-                <Link href={`/c/${review.communitySlug}/${review.productSlug}`} className="font-medium text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:underline transition-colors">
+                <Link href={`/c/${review.communitySlug}/${review.productSlug}`} className="font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline transition-colors">
                   {review.productName}
                 </Link>
               ) : review.productId && !review.productId.startsWith("organic_") ? (
-                <Link href={`/product/${review.productId}`} className="font-medium text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:underline transition-colors">
+                <Link href={`/product/${review.productId}`} className="font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline transition-colors">
                   {review.productName}
                 </Link>
               ) : (
@@ -459,7 +459,7 @@ export default function ReviewCard({
               disabled={!onLike}
               className={`flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 transition-colors ${
                 hasLiked
-                  ? "text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 font-medium"
+                  ? "text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 font-medium"
                   : "hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/50"
               } disabled:cursor-default`}
             >
@@ -541,7 +541,7 @@ export default function ReviewCard({
             {showPoolLink && review.productId && !review.productId.startsWith("organic_") && (
               <Link
                 href={`/product/${review.productId}`}
-                className="ml-auto font-medium text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:underline shrink-0 py-2 px-2.5 md:py-1 md:px-1.5 transition-colors"
+                className="ml-auto font-medium text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline shrink-0 py-2 px-2.5 md:py-1 md:px-1.5 transition-colors"
               >
                 View hub →
               </Link>
