@@ -173,7 +173,7 @@ export default function LeftSidebar({
         <nav className="px-1">
           <NavRow href="/" icon="🏠" label="Home" active={pathname === "/" && activeCategoryFilter === "All"} onClick={onClearFilter} />
           <NavRow href="/explore" icon="🔍" label="Explore" active={pathname === "/explore"} />
-          <NavRow href="/channels" icon="📡" label="Channels" active={pathname.startsWith("/channels")} />
+          <NavRow href="/c" icon="📡" label="Communities" active={pathname.startsWith("/c")} />
           <NavRow href="/profile" icon="👤" label="Profile" active={pathname === "/profile"} />
           <NavRow href="/brands" icon="🏢" label="For brands" active={pathname === "/brands"} />
           <NavRow href="/admin" icon="⚡" label="Admin" active={pathname === "/admin"} />
@@ -193,8 +193,8 @@ export default function LeftSidebar({
             <p className="px-2 py-1 text-[12px] text-slate-400 dark:text-slate-500">No channels joined yet.</p>
           )}
           {visibleJoined.map((ch) => (
-            <NavRow key={ch.id} href={`/channels/${ch.slug}`} icon={ch.iconEmoji} label={`rj/${ch.slug}`}
-              active={pathname === `/channels/${ch.slug}`}
+            <NavRow key={ch.id} href={`/c/${ch.slug}`} icon={ch.iconEmoji} label={`rj/${ch.slug}`}
+              active={pathname === `/c/${ch.slug}`}
               right={<span className="text-[10px] text-slate-400 tabular-nums">{ch.memberCount.toLocaleString()}</span>}
             />
           ))}
@@ -212,8 +212,8 @@ export default function LeftSidebar({
         <SectionHeader label="Communities" />
         <div className="px-1">
           {visiblePopular.map((ch) => (
-            <NavRow key={ch.id} href={`/channels/${ch.slug}`} icon={ch.iconEmoji} label={`rj/${ch.slug}`}
-              active={pathname === `/channels/${ch.slug}`}
+            <NavRow key={ch.id} href={`/c/${ch.slug}`} icon={ch.iconEmoji} label={`rj/${ch.slug}`}
+              active={pathname === `/c/${ch.slug}`}
               right={
                 <button type="button" onClick={(e) => handleJoin(e, ch)} disabled={joining === ch.id}
                   className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full border border-amber-400 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 disabled:opacity-50 transition">
@@ -229,7 +229,7 @@ export default function LeftSidebar({
             </button>
           )}
           <div className="flex gap-2 px-2 py-1">
-            <Link href="/channels" className="text-[11px] text-amber-600 dark:text-amber-400 hover:underline font-medium">All channels</Link>
+            <Link href="/c" className="text-[11px] text-amber-600 dark:text-amber-400 hover:underline font-medium">All communities</Link>
             {user && (
               <button type="button" onClick={() => setShowCreate(true)} className="text-[11px] text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition">
                 + Create
@@ -267,7 +267,7 @@ export default function LeftSidebar({
           userId={user.uid}
           userName={user.displayName || "Anonymous"}
           onClose={() => setShowCreate(false)}
-          onCreated={(slug) => { window.location.href = `/channels/${slug}`; }}
+          onCreated={(slug) => { window.location.href = `/c/${slug}`; }}
         />
       )}
     </>

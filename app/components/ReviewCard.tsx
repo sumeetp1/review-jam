@@ -64,6 +64,8 @@ export type ReviewData = {
   latestVersionLabel?: string;
   channelSlug?: string;
   channelId?: string;
+  productSlug?: string;
+  communitySlug?: string;
   reviewerId?: string;
   createdAt?: string;
   // SKU / variant
@@ -325,7 +327,11 @@ export default function ReviewCard({
           {/* Product name + context badges */}
           {review.productName && (
             <p className="text-[13px] text-slate-600 dark:text-slate-400 mb-1 flex items-center gap-1.5 flex-wrap">
-              {review.productId && !review.productId.startsWith("organic_") ? (
+              {review.productSlug && review.communitySlug ? (
+                <Link href={`/c/${review.communitySlug}/${review.productSlug}`} className="font-medium text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:underline transition-colors">
+                  {review.productName}
+                </Link>
+              ) : review.productId && !review.productId.startsWith("organic_") ? (
                 <Link href={`/product/${review.productId}`} className="font-medium text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:underline transition-colors">
                   {review.productName}
                 </Link>
@@ -350,7 +356,7 @@ export default function ReviewCard({
                 </span>
               )}
               {review.channelSlug && (
-                <a href={`/channels/${review.channelSlug}`} className="text-[10px] font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded hover:underline">
+                <a href={`/c/${review.channelSlug}`} className="text-[10px] font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded hover:underline">
                   rj/{review.channelSlug}
                 </a>
               )}

@@ -22,6 +22,8 @@ type ProductEntry = {
   campaignId: string;
   endDate: string;
   communitySeeded?: boolean;
+  slug?: string;
+  communitySlug?: string;
   // Computed
   reviewCount: number;
   avgRating: number;
@@ -309,6 +311,8 @@ export default function ExplorePage() {
             campaignId: prod.campaignId,
             endDate: prod.endDate,
             communitySeeded: prod.communitySeeded === true,
+            slug: prod.slug,
+            communitySlug: prod.communitySlug,
             reviewCount,
             avgRating,
             totalLikes,
@@ -356,7 +360,7 @@ export default function ExplorePage() {
           onClose={() => setShowCreateModal(false)}
           onCreated={(productId) => {
             setShowCreateModal(false);
-            router.push(`/product/${productId}`);
+            router.push(`/product/${productId}`); // redirects to /c/... after migration
           }}
         />
       )}
@@ -460,7 +464,7 @@ export default function ExplorePage() {
             {filtered.map((p) => (
               <Link
                 key={p.id}
-                href={`/product/${p.id}`}
+                href={p.slug && p.communitySlug ? `/c/${p.communitySlug}/${p.slug}` : `/product/${p.id}`}
                 className="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-2.5 hover:border-slate-400 dark:hover:border-slate-600 hover:shadow-sm transition"
               >
                 <div className="flex items-start justify-between gap-2">

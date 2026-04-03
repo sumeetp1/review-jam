@@ -1317,6 +1317,54 @@ export default function AdminDashboard() {
     }
   };
 
+  // ── Community + Slug migration ────────────────────────────────────────────
+  const handleMigrateProductSlugs = async () => {
+    const confirmed = window.confirm(
+      "This will add 'slug' and 'communitySlug' fields to ALL products that are missing them.\n\nThis is safe to run multiple times — it skips products that already have slugs. Continue?"
+    );
+    if (!confirmed) return;
+    setIsProcessing(true);
+    setStatusMessage("Migrating product slugs…");
+
+    function slugify(text: string): string {
+      return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+    }
+
+    try {
+      const snap = await getDocs(collection(db, "products"));
+      let updated = 0;
+      let skipped = 0;
+      const slugCounts = new Map<string, number>();
+
+      for (const d of snap.docs) {
+        const data = d.data();
+        if (data.slug && data.communitySlug) { skipped++; continue; }
+
+        const baseSlug = slugify(data.name || "product");
+        const communitySlug = slugify(data.category || "general");
+
+        // Deduplicate: if slug already used, append a counter
+        const count = slugCounts.get(baseSlug) ?? 0;
+        slugCounts.set(baseSlug, count + 1);
+        const slug = count === 0 ? baseSlug : `${baseSlug}-${count}`;
+
+        await updateDoc(doc(db, "products", d.id), {
+          slug,
+          communitySlug,
+          communityTags: data.communityTags ?? [],
+        });
+        updated++;
+      }
+
+      setStatusMessage(`✅ Migration complete! ${updated} products updated, ${skipped} already had slugs.`);
+    } catch (err) {
+      console.error(err);
+      setStatusMessage("❌ Migration failed. Check console.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   // ── Personal Data seeder for sumit.pandey75@gmail.com ────────────────────
   const handleSeedPersonalData = async () => {
     if (!user) { alert("Sign in first."); return; }
@@ -1793,6 +1841,26 @@ export default function AdminDashboard() {
             className="bg-amber-500 hover:bg-amber-400 text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
           >
             {isProcessing ? "Seeding…" : "Seed Widget Demo"}
+          </button>
+        </div>
+
+        {/* --- COMMUNITY SLUG MIGRATION --- */}
+        <div className="bg-gradient-to-r from-emerald-950/60 to-teal-950/40 p-6 rounded-3xl border border-emerald-700/40 mb-8 flex justify-between items-center shadow-lg">
+          <div>
+            <h2 className="text-xl font-bold text-white mb-1">🗂️ Migrate Product Slugs</h2>
+            <p className="text-emerald-200/70 text-sm">
+              Adds <span className="font-mono text-emerald-300">slug</span> and{" "}
+              <span className="font-mono text-emerald-300">communitySlug</span> to all products so they work on{" "}
+              <span className="font-mono text-emerald-300">/c/[community]/[product]</span> URLs.
+              Safe to run multiple times.
+            </p>
+          </div>
+          <button
+            onClick={handleMigrateProductSlugs}
+            disabled={isProcessing}
+            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
+          >
+            {isProcessing ? "Migrating…" : "Run Migration"}
           </button>
         </div>
 
