@@ -205,7 +205,7 @@ export default function AdminDashboard() {
       const day = 24 * 60 * 60 * 1000;
 
       // ── Clear existing data (all collections) ────────────────────────────
-      const [prodSnap, revSnap, chSnap, cmSnap, rcSnap, rfSnap, discSnap] = await Promise.all([
+      const [prodSnap, revSnap, chSnap, cmSnap, rcSnap, rfSnap, discSnap, qaSnap] = await Promise.all([
         getDocs(collection(db, "products")),
         getDocs(collection(db, "reviews")),
         getDocs(collection(db, "channels")),
@@ -213,6 +213,7 @@ export default function AdminDashboard() {
         getDocs(collection(db, "reviewComments")),
         getDocs(collection(db, "reviewForks")),
         getDocs(collection(db, "productDiscussions")),
+        getDocs(collection(db, "productDiscussionAnswers")),
       ]);
       await Promise.all([
         ...prodSnap.docs.map((d) => deleteDoc(d.ref)),
@@ -222,6 +223,7 @@ export default function AdminDashboard() {
         ...rcSnap.docs.map((d) => deleteDoc(d.ref)),
         ...rfSnap.docs.map((d) => deleteDoc(d.ref)),
         ...discSnap.docs.map((d) => deleteDoc(d.ref)),
+        ...qaSnap.docs.map((d) => deleteDoc(d.ref)),
       ]);
 
       setStatusMessage("Inserting campaigns & variants…");
@@ -976,7 +978,120 @@ export default function AdminDashboard() {
         });
       }
 
-      setStatusMessage(`✅ Done! Seeded ${campaigns.length} products, ${reviews.length} reviews (${reviews.filter(r => r.isVerifiedPurchase).length} verified, ${reviews.filter(r => r.biasFlag).length} bias-flagged), ${sampleChannels.length} channels (${sampleChannels.filter(c => c.multiplier > 1).length} boosted), 3 ownership journeys with version updates, 2 forks, threaded comments, and discussion posts across 3 products.`);
+      setStatusMessage("Adding comparison forks for Counter-Take feature…");
+
+      // ── Extra fork: PS5 Pro — Leo's honest 3-star counter-take on Tom's 5-star ─
+      // This is the richest disagreement in the seed set: same product, very different views
+      if (reviewIds[13] && reviewIds[14]) {
+        await updateDoc(doc(db, "reviews", reviewIds[14]), {
+          forkedFromReviewId: reviewIds[13],
+          forkedFromReviewerName: "Tom Harrison",
+        });
+        await updateDoc(doc(db, "reviews", reviewIds[13]), { forkCount: 3 });
+        await addDoc(collection(db, "reviewForks"), {
+          originalReviewId: reviewIds[13], forkReviewId: reviewIds[14],
+          forkerId: "seed_u15", forkerName: "Leo Santos", createdAt: ago(7),
+        });
+      }
+
+      // ── Extra fork: Whoop — James's subscription-sceptic counter-take on Elena's ─
+      if (reviewIds[15] && reviewIds[16]) {
+        await updateDoc(doc(db, "reviews", reviewIds[16]), {
+          forkedFromReviewId: reviewIds[15],
+          forkedFromReviewerName: "Elena Rodriguez",
+        });
+        await updateDoc(doc(db, "reviews", reviewIds[15]), { forkCount: 2 });
+        await addDoc(collection(db, "reviewForks"), {
+          originalReviewId: reviewIds[15], forkReviewId: reviewIds[16],
+          forkerId: "seed_u17", forkerName: "James Okafor", createdAt: ago(14),
+        });
+      }
+
+      setStatusMessage("Adding Q&A answers (Ask an Owner feature)…");
+
+      // ── Q&A Answers (productDiscussionAnswers) ─────────────────────────────
+      // Verified owners reply to questions in their product's Q&A tab.
+      // isVerifiedOwner === true for reviewers who have isVerifiedPurchase: true.
+
+      // Sony — question about hearing aids (Alex Chen is verified owner of Sony)
+      const sonyDiscSnap = await getDocs(
+        query(collection(db, "productDiscussions"), where("productId", "==", campDocs["camp_sony"]))
+      ).catch(() => null);
+      if (sonyDiscSnap) {
+        const hearingQ = sonyDiscSnap.docs.find(d => d.data().type === "question");
+        if (hearingQ) {
+          await addDoc(collection(db, "productDiscussionAnswers"), {
+            questionId: hearingQ.id, productId: campDocs["camp_sony"],
+            authorId: "seed_u1", authorName: "Alex Chen",
+            body: "Great question. I can't speak to hearing aids specifically, but the Ambient Sound / transparency mode on these is genuinely well-tuned — it lets through speech without the digital artefacts you get on most competitors. The ANC also has a 'Voice Priority' setting that preserves conversation frequencies. I'd strongly suggest your dad tests in-store. The Sony store staff in London let me spend 40 minutes testing before I bought.",
+            isVerifiedOwner: true, upvotes: 14, upvotedBy: [], createdAt: ago(4),
+          });
+          await addDoc(collection(db, "productDiscussionAnswers"), {
+            questionId: hearingQ.id, productId: campDocs["camp_sony"],
+            authorId: "seed_u4", authorName: "Sam Williams",
+            body: "I'd echo the above — transparent mode on this is the best I've heard. One thing worth knowing: you can run Transparency and light ANC simultaneously on the XM6, which might be exactly what your dad needs on flights.",
+            isVerifiedOwner: true, upvotes: 6, upvotedBy: [], createdAt: ago(3),
+          });
+          await addDoc(collection(db, "productDiscussionAnswers"), {
+            questionId: hearingQ.id, productId: campDocs["camp_sony"],
+            authorId: "seed_u9", authorName: "Anita Rao",
+            body: "Not an owner but an audiologist once told me that over-ear ANC headphones can actually work well alongside certain hearing aids because they're not blocking the ear canal. Worth getting professional advice either way.",
+            isVerifiedOwner: false, upvotes: 3, upvotedBy: [], createdAt: ago(2),
+          });
+        }
+      }
+
+      // Rivian — question about cargo accessories (Chris Meyers is verified owner)
+      const rivianDiscSnap = await getDocs(
+        query(collection(db, "productDiscussions"), where("productId", "==", campDocs["camp_rivian"]))
+      ).catch(() => null);
+      if (rivianDiscSnap) {
+        const cargoQ = rivianDiscSnap.docs.find(d => d.data().type === "question");
+        if (cargoQ) {
+          await addDoc(collection(db, "productDiscussionAnswers"), {
+            questionId: cargoQ.id, productId: campDocs["camp_rivian"],
+            authorId: "seed_u10", authorName: "Chris Meyers",
+            body: "I've tested three systems over 10,000 miles. The Rock Tamers Gear Tunnel Organizer ($189) is the best value. The Decked system is excellent for serious off-road and van-life use but pricey. Rivian's official accessories are overpriced for what they are. For a bike rack specifically — the Yakima HoldUp EVO hitches directly to the Rivian receiver and handles two e-bikes without any sway issues.",
+            isVerifiedOwner: true, upvotes: 31, upvotedBy: [], createdAt: ago(5),
+          });
+          await addDoc(collection(db, "productDiscussionAnswers"), {
+            questionId: cargoQ.id, productId: campDocs["camp_rivian"],
+            authorId: "seed_u11", authorName: "Olivia Park",
+            body: "Confirming the Yakima recommendation — it's what we use for our kids' bikes and it's solid. The R2's hitch rating is high enough for e-bikes without issue.",
+            isVerifiedOwner: false, upvotes: 9, upvotedBy: [], createdAt: ago(4),
+          });
+        }
+      }
+
+      // Linear — question about stakeholder roadmap (David Kim is verified owner)
+      const linearDiscSnap = await getDocs(
+        query(collection(db, "productDiscussions"), where("productId", "==", campDocs["camp_linear"]))
+      ).catch(() => null);
+      if (linearDiscSnap) {
+        const roadmapQ = linearDiscSnap.docs.find(d => d.data().type === "question");
+        if (roadmapQ) {
+          await addDoc(collection(db, "productDiscussionAnswers"), {
+            questionId: roadmapQ.id, productId: campDocs["camp_linear"],
+            authorId: "seed_u8", authorName: "David Kim",
+            body: "We solved this with a Linear → Notion sync via Make (formerly Integromat). Linear stays as source of truth for engineers; Notion shows a curated roadmap view for PMs and investors that auto-updates whenever we move issues between cycles. The setup took about 2 hours and has saved hours of manual status updates every week. Happy to share the template if anyone wants it.",
+            isVerifiedOwner: true, upvotes: 23, upvotedBy: [], createdAt: ago(4),
+          });
+          await addDoc(collection(db, "productDiscussionAnswers"), {
+            questionId: roadmapQ.id, productId: campDocs["camp_linear"],
+            authorId: "seed_u9", authorName: "Anita Rao",
+            body: "Simpler approach for solo devs: I export the active cycle to a Google Sheet once a week via the Linear API. Three lines of code in a Google Apps Script runs automatically every Monday. PMs get a Gantt-ish view without me lifting a finger.",
+            isVerifiedOwner: false, upvotes: 11, upvotedBy: [], createdAt: ago(3),
+          });
+          await addDoc(collection(db, "productDiscussionAnswers"), {
+            questionId: roadmapQ.id, productId: campDocs["camp_linear"],
+            authorId: "seed_u6", authorName: "Sophie Kim",
+            body: "We just use the Linear roadmap view directly and share a read-only link with stakeholders. It's not a Gantt but PMs have accepted it after we explained the cycle-based planning model. Expectation setting was the actual fix, not a tool change.",
+            isVerifiedOwner: false, upvotes: 7, upvotedBy: [], createdAt: ago(2),
+          });
+        }
+      }
+
+      setStatusMessage(`✅ Done! Seeded ${campaigns.length} products, ${reviews.length} reviews (${reviews.filter(r => r.isVerifiedPurchase).length} verified, ${reviews.filter(r => r.biasFlag).length} bias-flagged), ${sampleChannels.length} channels (${sampleChannels.filter(c => c.multiplier > 1).length} boosted), 3 ownership journeys, 4 forks (Sony, Rivian, PS5, Whoop), threaded comments, discussion posts, and Q&A answers with Verified Owner badges.`);
     } catch (error) {
       console.error(error);
       setStatusMessage("❌ Error seeding data. Check console.");
@@ -1202,6 +1317,266 @@ export default function AdminDashboard() {
     }
   };
 
+  // ── Personal Data seeder for sumit.pandey75@gmail.com ────────────────────
+  const handleSeedPersonalData = async () => {
+    if (!user) { alert("Sign in first."); return; }
+    const confirmed = window.confirm(
+      `This will create/update profile data and reviews attributed to the currently logged-in user (${user.email}).\n\nMake sure you are signed in as sumit.pandey75@gmail.com. Continue?`
+    );
+    if (!confirmed) return;
+
+    setIsProcessing(true);
+    setStatusMessage("Seeding personal data…");
+
+    try {
+      const now = new Date();
+      const ago = (days: number) => new Date(now.getTime() - days * 86400000).toISOString();
+
+      // ── 1. Upsert user document ──────────────────────────────────────────
+      const userDocRef = doc(db, "users", user.uid);
+      await updateDoc(userDocRef, {
+        displayName: user.displayName || "Sumit Pandey",
+        email: user.email,
+        trustScore: 340,
+        badges: ["first_review", "verified_owner", "helpful_reviewer", "early_adopter"],
+        interests: ["Tech", "SaaS", "Automotive", "Fitness"],
+        walletBalance: 47.50,
+        totalEarned: 127.80,
+        reviewCount: 3,
+        updatedAt: now.toISOString(),
+      }).catch(async () => {
+        // Doc may not exist yet — create it
+        await addDoc(collection(db, "users"), {
+          uid: user.uid,
+          displayName: user.displayName || "Sumit Pandey",
+          email: user.email,
+          trustScore: 340,
+          badges: ["first_review", "verified_owner", "helpful_reviewer", "early_adopter"],
+          interests: ["Tech", "SaaS", "Automotive", "Fitness"],
+          walletBalance: 47.50,
+          totalEarned: 127.80,
+          reviewCount: 3,
+          createdAt: now.toISOString(),
+        });
+      });
+
+      // ── 2. Look up product IDs ────────────────────────────────────────────
+      const [sonySnap, linearSnap, whoop5Snap] = await Promise.all([
+        getDocs(query(collection(db, "products"), where("name", "==", "Sony WH-1000XM6"))),
+        getDocs(query(collection(db, "products"), where("name", "==", "Linear"))),
+        getDocs(query(collection(db, "products"), where("name", "==", "Whoop 5.0"))),
+      ]);
+
+      const sonyId   = sonySnap.docs[0]?.id   ?? null;
+      const linearId = linearSnap.docs[0]?.id ?? null;
+      const whoopId  = whoop5Snap.docs[0]?.id ?? null;
+
+      // ── 3. Sony WH-1000XM6 review — with Ownership Journey entries ───────
+      const sonyReview = {
+        productId: sonyId,
+        productName: "Sony WH-1000XM6",
+        category: "Tech",
+        campaignId: "organic",
+        rating: 5,
+        subRatings: { "Sound Quality": 5, "ANC": 5, "Comfort": 4, "Battery": 5 },
+        content:
+          "Coming from Bose QC45, the XM6 is a generational leap. The ANC is genuinely eerie — I tested it on a packed train and the carriage vanished. Multipoint pairing between MacBook and iPhone is seamless; no disconnect dance. Build quality feels intentional — the matte finish resists fingerprints and the hinge clicks with satisfying precision. Wear detection pauses audio the instant you lift an ear cup.",
+        summary: "The ANC benchmark just moved again — and Sony owns it",
+        marketingQuote: "The ANC benchmark just moved again — and Sony owns it",
+        pros: ["Class-leading ANC", "Seamless multipoint pairing", "Wear detection", "Premium matte build"],
+        cons: ["No analog input", "App feels dated"],
+        bestFor: ["Frequent flyers", "Open-plan offices"],
+        mediaUrls: [],
+        reviewerId: user.uid,
+        reviewerName: user.displayName || "Sumit Pandey",
+        likesCount: 47,
+        likedBy: [],
+        helpfulCount: 29,
+        helpfulBy: [],
+        notHelpfulCount: 0,
+        notHelpfulBy: [],
+        commentCount: 3,
+        forkCount: 0,
+        versionCount: 3,
+        latestVersionLabel: "6-Month Update",
+        campaignId2: "organic",
+        isCampaignReview: false,
+        isVerifiedPurchase: true,
+        reviewType: "verified",
+        productSource: "purchased",
+        usageDuration: "6 months",
+        eligibleForPayout: true,
+        biasFlag: false,
+        healthScore: 88,
+        healthScoreBreakdown: {
+          contentLength: 20, hasMedia: 0, hasProsAndCons: 15, hasSummary: 10,
+          engagement: 15, recency: 10, verifiedPurchase: 15, versionUpdates: 3,
+        },
+        createdAt: ago(180),
+      };
+
+      const sonyRef = await addDoc(collection(db, "reviews"), sonyReview);
+
+      // Version 1 — initial purchase (already reflected in the review)
+      // Version 2 — 3-Month Update
+      await addDoc(collection(db, "reviewVersions"), {
+        reviewId: sonyRef.id,
+        productId: sonyId,
+        productName: "Sony WH-1000XM6",
+        reviewerId: user.uid,
+        reviewerName: user.displayName || "Sumit Pandey",
+        versionLabel: "3-Month Update",
+        versionNumber: 2,
+        rating: 5,
+        content:
+          "Three months in: the ear-pad cushions have softened noticeably and long sessions (3+ hours) are genuinely comfortable now. Battery still hits 29–30 hours in real use. ANC firmware update last month improved wind-noise rejection on my commute.",
+        pros: ["Ear pads soften with use", "Great ANC firmware updates"],
+        cons: ["Still no analog input"],
+        createdAt: ago(90),
+      });
+
+      // Version 3 — 6-Month Update
+      await addDoc(collection(db, "reviewVersions"), {
+        reviewId: sonyRef.id,
+        productId: sonyId,
+        productName: "Sony WH-1000XM6",
+        reviewerId: user.uid,
+        reviewerName: user.displayName || "Sumit Pandey",
+        versionLabel: "6-Month Update",
+        versionNumber: 3,
+        rating: 5,
+        content:
+          "Half a year of daily use. The only thing that's changed is my appreciation for multipoint — I now pair to iPad as well. Build is holding up immaculately, no creak or hinge wear. Still the best all-round headphone you can buy at this price. Would purchase again without hesitation.",
+        pros: ["Zero build degradation at 6 months", "Multipoint still works flawlessly"],
+        cons: ["App still hasn't improved"],
+        createdAt: ago(1),
+      });
+
+      // ── 4. Linear review ─────────────────────────────────────────────────
+      const linearReview = {
+        productId: linearId,
+        productName: "Linear",
+        category: "SaaS",
+        campaignId: "organic",
+        rating: 5,
+        subRatings: { "Speed": 5, "UX": 5, "Integrations": 4, "Value": 5 },
+        content:
+          "Linear replaced Jira for our 12-person team eight months ago and the productivity delta is measurable. Issue creation is keyboard-first and takes under 3 seconds. Cycle planning is visual and drag-and-drop without the lag. The GitHub integration means PRs close issues automatically — no manual bookkeeping. The API is clean enough that our eng lead built a custom Slack-to-Linear bridge in an afternoon.",
+        summary: "Jira is a legacy tax. Linear is what project management should feel like.",
+        marketingQuote: "Jira is a legacy tax. Linear is what project management should feel like.",
+        pros: ["Sub-second response times", "Keyboard-first", "Clean API", "GitHub sync"],
+        cons: ["Reporting dashboard is basic", "Guest seats are limited on lower plans"],
+        bestFor: ["Engineering teams", "Startups", "Remote teams"],
+        mediaUrls: [],
+        reviewerId: user.uid,
+        reviewerName: user.displayName || "Sumit Pandey",
+        likesCount: 112,
+        likedBy: [],
+        helpfulCount: 67,
+        helpfulBy: [],
+        notHelpfulCount: 1,
+        notHelpfulBy: [],
+        commentCount: 8,
+        forkCount: 0,
+        versionCount: 1,
+        isCampaignReview: false,
+        isVerifiedPurchase: true,
+        reviewType: "verified",
+        productSource: "purchased",
+        usageDuration: "8 months",
+        eligibleForPayout: true,
+        biasFlag: false,
+        healthScore: 91,
+        healthScoreBreakdown: {
+          contentLength: 20, hasMedia: 0, hasProsAndCons: 15, hasSummary: 10,
+          engagement: 18, recency: 10, verifiedPurchase: 15, versionUpdates: 3,
+        },
+        createdAt: ago(60),
+      };
+
+      await addDoc(collection(db, "reviews"), linearReview);
+
+      // ── 5. Whoop 5.0 review ──────────────────────────────────────────────
+      const whoopReview = {
+        productId: whoopId,
+        productName: "Whoop 5.0",
+        category: "Fitness",
+        campaignId: "organic",
+        rating: 4,
+        subRatings: { "Accuracy": 4, "Battery": 5, "App": 4, "Comfort": 5 },
+        content:
+          "I was sceptical of the subscription model but seven months in, Whoop has genuinely changed my training. Recovery scores kept me honest during a heavy block — I ignored the red day once and tweaked my shoulder. The strain coach is surprisingly accurate; my HRV trend over 6 months shows clear adaptation. The band is comfortable enough to forget entirely, which is the highest praise for a wearable. Battery life has been closer to 5 days for me, not the claimed 7, but I charge during morning calls so it's a non-issue.",
+        summary: "The subscription is worth it if you actually act on the data",
+        marketingQuote: "The subscription is worth it if you actually act on the data",
+        pros: ["HRV tracking is accurate", "Comfortable 24/7 wear", "Strain coach is honest"],
+        cons: ["Subscription on top of hardware cost", "Battery life < claimed"],
+        bestFor: ["Endurance athletes", "Data-driven trainers", "Sleep optimisers"],
+        mediaUrls: [],
+        reviewerId: user.uid,
+        reviewerName: user.displayName || "Sumit Pandey",
+        likesCount: 83,
+        likedBy: [],
+        helpfulCount: 51,
+        helpfulBy: [],
+        notHelpfulCount: 2,
+        notHelpfulBy: [],
+        commentCount: 5,
+        forkCount: 0,
+        versionCount: 1,
+        isCampaignReview: false,
+        isVerifiedPurchase: true,
+        reviewType: "verified",
+        productSource: "purchased",
+        usageDuration: "7 months",
+        eligibleForPayout: true,
+        biasFlag: false,
+        healthScore: 85,
+        healthScoreBreakdown: {
+          contentLength: 20, hasMedia: 0, hasProsAndCons: 15, hasSummary: 10,
+          engagement: 15, recency: 10, verifiedPurchase: 15, versionUpdates: 0,
+        },
+        createdAt: ago(30),
+      };
+
+      await addDoc(collection(db, "reviews"), whoopReview);
+
+      // ── 6. Verified Q&A answer on Sony hearing-aid question ──────────────
+      if (sonyId) {
+        // Find the Sony hearing-aid discussion question
+        const discussionSnap = await getDocs(
+          query(collection(db, "productDiscussions"), where("productId", "==", sonyId))
+        ).catch(() => null);
+
+        const hearingQ = discussionSnap?.docs.find((d) =>
+          (d.data().body as string || "").toLowerCase().includes("hearing")
+        );
+
+        if (hearingQ) {
+          await addDoc(collection(db, "productDiscussionAnswers"), {
+            questionId: hearingQ.id,
+            productId: sonyId,
+            authorId: user.uid,
+            authorName: user.displayName || "Sumit Pandey",
+            body: "Confirmed owner here — the XM6 is NOT a hearing aid and Sony explicitly states it doesn't amplify ambient sound for hearing-impaired users. That said, the Ambient Sound mode (max setting) does boost environmental audio noticeably, which I use at low volume when I need situational awareness. It helped a friend with mild hearing loss follow conversations in quiet rooms, but please consult an audiologist for anything clinical.",
+            isVerifiedOwner: true,
+            upvotes: 18,
+            upvotedBy: [],
+            createdAt: ago(5),
+          });
+        }
+      }
+
+      setStatusMessage(
+        `✅ Personal data seeded for ${user.email}! Profile updated (trust 340, 4 badges), 3 reviews added (Sony with 2 version updates, Linear, Whoop), and a verified Q&A answer posted.`
+      );
+    } catch (err) {
+      console.error(err);
+      setStatusMessage("❌ Error seeding personal data. Check console.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   // ── Expert Seeding handlers ───────────────────────────────────────────────
   async function handleAddInventory(e: React.FormEvent) {
     e.preventDefault();
@@ -1418,6 +1793,25 @@ export default function AdminDashboard() {
             className="bg-amber-500 hover:bg-amber-400 text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
           >
             {isProcessing ? "Seeding…" : "Seed Widget Demo"}
+          </button>
+        </div>
+
+        {/* --- PERSONAL DATA SEEDER --- */}
+        <div className="bg-gradient-to-r from-violet-950/60 to-purple-950/40 p-6 rounded-3xl border border-violet-700/40 mb-8 flex justify-between items-center shadow-lg">
+          <div>
+            <h2 className="text-xl font-bold text-white mb-1">👤 Seed Personal Data</h2>
+            <p className="text-violet-200/70 text-sm">
+              Creates profile + 3 verified reviews (Sony with Ownership Journey, Linear, Whoop 5.0) attributed to{" "}
+              <span className="text-violet-300 font-mono">sumit.pandey75@gmail.com</span>.
+              Sign in as that account first.
+            </p>
+          </div>
+          <button
+            onClick={handleSeedPersonalData}
+            disabled={isProcessing}
+            className="bg-violet-600 hover:bg-violet-500 text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
+          >
+            {isProcessing ? "Seeding…" : "Seed My Data"}
           </button>
         </div>
 

@@ -988,14 +988,16 @@ export default function ProductPage() {
       {/* Version Update Wizard */}
       {updatingReview && user && (
         <VersionUpdateWizard
-          user={user}
-          review={updatingReview}
-          onSaved={(updated: any) => {
+          reviewId={updatingReview.id}
+          existingVersionCount={updatingReview.versionCount ?? 1}
+          productName={updatingReview.productName ?? ""}
+          category={updatingReview.category ?? ""}
+          onSaved={() => {
+            const reviewId = updatingReview.id;
             setReviews((prev) => prev.map((r) =>
-              r.id !== updatingReview.id ? r : {
+              r.id !== reviewId ? r : {
                 ...r,
                 versionCount: (r.versionCount ?? 1) + 1,
-                latestVersionLabel: updated.latestVersionLabel ?? r.latestVersionLabel,
                 createdAt: new Date().toISOString(),
               }
             ));
