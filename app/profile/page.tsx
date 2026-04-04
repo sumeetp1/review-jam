@@ -326,9 +326,6 @@ export default function ProfilePage() {
                           </span>
                         )}
                         <span>{new Date(r.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>
-                        {r.campaignId !== "organic" && (
-                          <span className="text-emerald-600 dark:text-emerald-400 font-medium">Sponsored</span>
-                        )}
                         {(r.versionCount ?? 0) > 1 && (
                           <span className="text-blue-600 dark:text-blue-400 font-medium">{r.versionCount} updates</span>
                         )}

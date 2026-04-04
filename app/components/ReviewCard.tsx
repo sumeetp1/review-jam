@@ -23,7 +23,6 @@ const USAGE_LABELS: Record<string, string> = {
 };
 
 const SOURCE_LABELS: Record<string, string> = {
-  brand_sent: "Sent by brand",
   purchased:  "Purchased",
   gift:       "Gift",
 };
@@ -339,12 +338,6 @@ export default function ReviewCard({
               {review.isVerifiedPurchase && !review.isCampaignReview && (
                 <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/50">
                   ✓ Verified Owner
-                </span>
-              )}
-              {/* Seeded Review — product provided via platform inventory programme */}
-              {review.productSource === "brand_sent" && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-400 px-1.5 py-0.5 rounded border border-violet-200 dark:border-violet-800/50">
-                  📦 Seeded Review
                 </span>
               )}
               {(review.communitySlug || review.channelSlug) && (
