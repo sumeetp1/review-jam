@@ -39,22 +39,14 @@ export type ReviewFormData = {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-export const AVAILABLE_CATEGORIES = [
+export const SUGGESTED_CATEGORIES = [
   "Tech", "Home", "SaaS", "Automotive", "Beauty",
   "Gaming", "Fitness", "Travel", "Finance",
+  "Food & Drink", "Health", "Education", "Infrastructure", "Services",
 ];
 
-export const CATEGORY_SUB_RATINGS: Record<string, string[]> = {
-  Tech:       ["Performance",    "Build Quality",    "Value for Money"],
-  Home:       ["Durability",     "Design",           "Ease of Use"],
-  SaaS:       ["Features",       "Ease of Use",      "Customer Support"],
-  Automotive: ["Performance",    "Comfort",          "Value for Money"],
-  Beauty:     ["Results",        "Ingredients",      "Packaging"],
-  Gaming:     ["Graphics",       "Gameplay",         "Value for Money"],
-  Fitness:    ["Effectiveness",  "Build Quality",    "Value for Money"],
-  Travel:     ["Comfort",        "Amenities",        "Value for Money"],
-  Finance:    ["Ease of Use",    "Features",         "Support"],
-};
+// Legacy alias — some files still import this name
+export const AVAILABLE_CATEGORIES = SUGGESTED_CATEGORIES;
 
 const USAGE_DURATIONS = [
   { value: "less_1_week"   as const, label: "< 1 week" },
@@ -319,7 +311,7 @@ function GenericReviewForm({
         {!productInfo && (
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-              Product name <span className="text-red-400">*</span>
+              What are you reviewing? <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
@@ -334,15 +326,19 @@ function GenericReviewForm({
         {!productInfo && (
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Category</label>
-            <select
+            <input
+              type="text"
+              list="category-suggestions"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
+              placeholder="e.g. Tech, EV Charging, Construction..."
               className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none dark:text-slate-100"
-            >
-              {AVAILABLE_CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
+            />
+            <datalist id="category-suggestions">
+              {SUGGESTED_CATEGORIES.map((cat) => (
+                <option key={cat} value={cat} />
               ))}
-            </select>
+            </datalist>
           </div>
         )}
 
@@ -522,7 +518,9 @@ function FullReviewWizard({
   const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
   const [isHonestOpinion, setIsHonestOpinion] = useState(false);
 
-  const subRatingKeys = CATEGORY_SUB_RATINGS[category] ?? [];
+  // Free-form sub-rating dimensions — reviewer adds their own
+  const [customDimensions, setCustomDimensions] = useState<string[]>(["", "", ""]);
+  const subRatingKeys = customDimensions.filter((d) => d.trim() !== "");
 
   // ── Validation ──
   const finishStepNumber = totalSteps;
@@ -778,7 +776,7 @@ function FullReviewWizard({
             {mode === "organic" ? (
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                  Product name <span className="text-red-400">*</span>
+                  What are you reviewing? <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="text"
@@ -819,15 +817,19 @@ function FullReviewWizard({
             {mode === "organic" && (
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Category</label>
-                <select
+                <input
+                  type="text"
+                  list="category-suggestions-full"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
+                  placeholder="e.g. Tech, EV Charging, Construction..."
                   className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none dark:text-slate-100"
-                >
-                  {AVAILABLE_CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
+                />
+                <datalist id="category-suggestions-full">
+                  {SUGGESTED_CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat} />
                   ))}
-                </select>
+                </datalist>
               </div>
             )}
 
@@ -857,25 +859,41 @@ function FullReviewWizard({
               <StarPicker value={overallRating} onChange={setOverallRating} />
             </div>
 
-            {subRatingKeys.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                Rate specific aspects <span className="font-normal">(optional — add your own dimensions)</span>
+              </label>
               <div className="space-y-2">
-                <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                  Rate specific aspects <span className="font-normal">(optional)</span>
-                </label>
-                <div className="space-y-2">
-                  {subRatingKeys.map((attr) => (
-                    <div key={attr} className="flex items-center justify-between">
-                      <span className="text-xs text-slate-600 dark:text-slate-400 w-36 shrink-0">{attr}</span>
+                {customDimensions.map((dim, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={dim}
+                      onChange={(e) => {
+                        const updated = [...customDimensions];
+                        updated[idx] = e.target.value;
+                        setCustomDimensions(updated);
+                      }}
+                      placeholder={`Dimension ${idx + 1} (e.g. Quality, Value, Design)`}
+                      className="flex-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs outline-none dark:text-slate-100 dark:placeholder-slate-500"
+                    />
+                    {dim.trim() && (
                       <StarPicker
                         size="sm"
-                        value={subRatings[attr] ?? 0}
-                        onChange={(v) => setSubRatings((prev) => ({ ...prev, [attr]: v }))}
+                        value={subRatings[dim.trim()] ?? 0}
+                        onChange={(v) => setSubRatings((prev) => ({ ...prev, [dim.trim()]: v }))}
                       />
-                    </div>
-                  ))}
-                </div>
+                    )}
+                  </div>
+                ))}
+                {customDimensions.length < 5 && (
+                  <button type="button" onClick={() => setCustomDimensions((d) => [...d, ""])}
+                    className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline">
+                    + Add dimension
+                  </button>
+                )}
               </div>
-            )}
+            </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-700 dark:text-slate-300">

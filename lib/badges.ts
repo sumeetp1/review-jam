@@ -8,23 +8,31 @@ export type Badge = {
   description: string;
 };
 
-export const ALL_BADGES: Badge[] = [
+// Base badges — always available
+export const BASE_BADGES: Badge[] = [
   { id: "verified_buyer",     label: "Verified Buyer",      emoji: "✅", description: "Reviewed a product they personally purchased" },
   { id: "prolific_reviewer",  label: "Prolific Reviewer",   emoji: "✍️", description: "Posted 5 or more reviews" },
   { id: "photo_reviewer",     label: "Photo Reviewer",      emoji: "📸", description: "Included photos in at least one review" },
-  { id: "tech_expert",        label: "Tech Expert",         emoji: "💻", description: "3+ reviews in Tech" },
-  { id: "home_expert",        label: "Home Expert",         emoji: "🏠", description: "3+ reviews in Home" },
-  { id: "beauty_expert",      label: "Beauty Expert",       emoji: "💄", description: "3+ reviews in Beauty" },
-  { id: "gaming_expert",      label: "Gaming Expert",       emoji: "🎮", description: "3+ reviews in Gaming" },
-  { id: "fitness_expert",     label: "Fitness Expert",      emoji: "💪", description: "3+ reviews in Fitness" },
-  { id: "saas_expert",        label: "SaaS Expert",         emoji: "☁️", description: "3+ reviews in SaaS" },
-  { id: "automotive_expert",  label: "Auto Expert",         emoji: "🚗", description: "3+ reviews in Automotive" },
-  { id: "travel_expert",      label: "Travel Expert",       emoji: "✈️", description: "3+ reviews in Travel" },
-  { id: "finance_expert",     label: "Finance Expert",      emoji: "💰", description: "3+ reviews in Finance" },
 ];
 
+// Dynamic category expert badges are generated at runtime from review data.
+// Any category with 3+ reviews earns a "[Category] Expert" badge.
+// For backward compatibility, ALL_BADGES includes base badges; getBadgeById
+// also checks for dynamic expert badge IDs.
+
+export const ALL_BADGES = BASE_BADGES;
+
 export function getBadgeById(id: string): Badge | undefined {
-  return ALL_BADGES.find((b) => b.id === id);
+  const base = BASE_BADGES.find((b) => b.id === id);
+  if (base) return base;
+
+  // Dynamic expert badge: id format is "category_expert" (e.g. "tech_expert", "ev_charging_expert")
+  if (id.endsWith("_expert")) {
+    const catPart = id.slice(0, -"_expert".length).replace(/_/g, " ");
+    const label = catPart.split(" ").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    return { id, label: `${label} Expert`, emoji: "🏅", description: `3+ reviews in ${label}` };
+  }
+  return undefined;
 }
 
 export async function updateUserBadges(userId: string): Promise<string[]> {
@@ -44,7 +52,7 @@ export async function updateUserBadges(userId: string): Promise<string[]> {
     earned.push("photo_reviewer");
   }
 
-  // Category expert: 3+ reviews in same category
+  // Dynamic category expert: 3+ reviews in any category
   const categoryCounts: Record<string, number> = {};
   reviews.forEach((r) => {
     if (r.category) {
@@ -53,10 +61,8 @@ export async function updateUserBadges(userId: string): Promise<string[]> {
   });
   for (const [cat, count] of Object.entries(categoryCounts)) {
     if (count >= 3) {
-      const expertId = `${cat.toLowerCase()}_expert`;
-      if (ALL_BADGES.some((b) => b.id === expertId)) {
-        earned.push(expertId);
-      }
+      const expertId = `${cat.toLowerCase().replace(/[^a-z0-9]+/g, "_")}_expert`;
+      earned.push(expertId);
     }
   }
 

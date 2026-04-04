@@ -6,7 +6,6 @@ import {
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../../lib/firebase";
-import { CATEGORY_SUB_RATINGS } from "./ReviewWizard";
 
 const VERSION_LABELS = [
   "1 Month Update",
@@ -47,7 +46,9 @@ export default function VersionUpdateWizard({
   const [submitting, setSubmitting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const subRatingKeys = CATEGORY_SUB_RATINGS[category] ?? [];
+  // Free-form sub-rating dimensions for version updates
+  const [customDimensions, setCustomDimensions] = useState<string[]>(["", "", ""]);
+  const subRatingKeys = customDimensions.filter((d) => d.trim() !== "");
   const finalLabel = versionLabel === "Custom" ? customLabel : versionLabel;
 
   const handleSubmit = async () => {
@@ -154,24 +155,32 @@ export default function VersionUpdateWizard({
             </div>
           </div>
 
-          {/* Sub-ratings */}
-          {subRatingKeys.length > 0 && (
-            <div className="space-y-2">
-              <label className="block text-[12px] font-medium text-slate-700 dark:text-slate-300">Sub-ratings</label>
-              {subRatingKeys.map((attr) => (
-                <div key={attr} className="flex items-center justify-between">
-                  <span className="text-[12px] text-slate-600 dark:text-slate-400">{attr}</span>
+          {/* Sub-ratings — free-form dimensions */}
+          <div className="space-y-2">
+            <label className="block text-[12px] font-medium text-slate-700 dark:text-slate-300">Rate specific aspects <span className="font-normal text-slate-400">(optional)</span></label>
+            {customDimensions.map((dim, idx) => (
+              <div key={idx} className="flex items-center gap-2">
+                <input
+                  type="text" value={dim}
+                  onChange={(e) => { const u = [...customDimensions]; u[idx] = e.target.value; setCustomDimensions(u); }}
+                  placeholder={`Dimension ${idx + 1}`}
+                  className="flex-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs outline-none dark:text-slate-100"
+                />
+                {dim.trim() && (
                   <div className="flex gap-0.5">
                     {[1, 2, 3, 4, 5].map((star) => (
-                      <button key={star} type="button" onClick={() => setSubRatings((p) => ({ ...p, [attr]: star }))} className="text-base transition-transform hover:scale-110 leading-none">
-                        <span className={(subRatings[attr] ?? 0) >= star ? "text-amber-400" : "text-slate-200 dark:text-slate-700"}>★</span>
+                      <button key={star} type="button" onClick={() => setSubRatings((p) => ({ ...p, [dim.trim()]: star }))} className="text-base transition-transform hover:scale-110 leading-none">
+                        <span className={(subRatings[dim.trim()] ?? 0) >= star ? "text-amber-400" : "text-slate-200 dark:text-slate-700"}>★</span>
                       </button>
                     ))}
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                )}
+              </div>
+            ))}
+            {customDimensions.length < 5 && (
+              <button type="button" onClick={() => setCustomDimensions((d) => [...d, ""])} className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline">+ Add dimension</button>
+            )}
+          </div>
 
           {/* Content */}
           <div>

@@ -22,10 +22,6 @@ function getTierStyle(score: number): { bg: string; text: string; emoji: string 
   return { bg: "bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700", text: "text-slate-600 dark:text-slate-400", emoji: "🌱" };
 }
 
-const AVAILABLE_CATEGORIES = [
-  "Tech", "Home", "SaaS", "Automotive", "Beauty",
-  "Gaming", "Fitness", "Travel", "Finance",
-];
 
 type LedgerEntry = {
   id: string;
@@ -70,6 +66,7 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [anchorInvites, setAnchorInvites] = useState<any[]>([]);
   const [updatingInviteId, setUpdatingInviteId] = useState<string | null>(null);
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -80,6 +77,7 @@ export default function ProfilePage() {
           fetchLedger(currentUser.uid),
           fetchMyReviews(currentUser.uid),
           fetchAnchorInvites(currentUser.uid),
+          fetchCategories(),
         ]);
       }
       setIsLoading(false);
@@ -127,6 +125,15 @@ export default function ProfilePage() {
     } catch {
       // Index may not exist yet; silently skip
     }
+  }
+
+  async function fetchCategories() {
+    try {
+      const snap = await getDocs(collection(db, "channels"));
+      const cats = new Set<string>();
+      snap.docs.forEach((d) => { const cat = d.data().category; if (cat) cats.add(cat as string); });
+      setAvailableCategories([...cats].sort());
+    } catch {}
   }
 
   async function fetchAnchorInvites(uid: string) {
@@ -496,7 +503,7 @@ export default function ProfilePage() {
               <div className="space-y-4">
                 <p className="text-sm text-slate-500 dark:text-slate-500">Used to personalize your default feed.</p>
                 <div className="flex flex-wrap gap-2">
-                  {AVAILABLE_CATEGORIES.map((cat) => (
+                  {availableCategories.map((cat) => (
                     <button
                       key={cat}
                       type="button"

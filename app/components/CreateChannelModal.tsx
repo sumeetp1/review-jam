@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { collection, query, where, getDocs, addDoc, doc, setDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
-import { AVAILABLE_CATEGORIES } from "./ReviewWizard";
+import { SUGGESTED_CATEGORIES } from "./ReviewWizard";
 
 type Props = {
   userId: string;
@@ -24,7 +24,7 @@ export default function CreateChannelModal({ userId, userName, onClose, onCreate
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState(AVAILABLE_CATEGORIES[0]);
+  const [category, setCategory] = useState("");
   const [iconEmoji, setIconEmoji] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -130,15 +130,19 @@ export default function CreateChannelModal({ userId, userName, onClose, onCreate
 
           <div>
             <label className="block text-[12px] font-medium text-slate-700 dark:text-slate-300 mb-1.5">Category</label>
-            <select
+            <input
+              type="text"
+              list="channel-category-suggestions"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
+              placeholder="e.g. Tech, EV Charging, Street Food..."
               className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none dark:text-slate-100"
-            >
-              {AVAILABLE_CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
+            />
+            <datalist id="channel-category-suggestions">
+              {SUGGESTED_CATEGORIES.map((cat) => (
+                <option key={cat} value={cat} />
               ))}
-            </select>
+            </datalist>
           </div>
 
           <div>

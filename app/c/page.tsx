@@ -7,7 +7,6 @@ import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { db, auth } from "../../lib/firebase";
 import CreateChannelModal from "../components/CreateChannelModal";
-import { AVAILABLE_CATEGORIES } from "../components/ReviewWizard";
 
 type Community = {
   id: string;
@@ -101,7 +100,7 @@ export default function CommunitiesPage() {
             className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm outline-none dark:text-slate-100 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-300 dark:focus:border-indigo-600 transition"
           >
             <option value="All">All categories</option>
-            {AVAILABLE_CATEGORIES.map((cat) => (
+            {[...new Set(communities.map((c) => c.category).filter(Boolean))].sort().map((cat) => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>

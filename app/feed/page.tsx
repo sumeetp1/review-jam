@@ -11,7 +11,7 @@ import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage
 import { signInWithPopup, signOut, onAuthStateChanged, User } from "firebase/auth";
 import { db, auth, googleProvider, storage } from "../../lib/firebase";
 import { updateUserBadges } from "../../lib/badges";
-import ReviewWizard, { ReviewFormData, AVAILABLE_CATEGORIES } from "../components/ReviewWizard";
+import ReviewWizard, { ReviewFormData } from "../components/ReviewWizard";
 import { calculateDiscoveryRank } from "../../lib/discoveryRank";
 import { incrementTrustScore } from "../../lib/trustScore";
 import ReviewCard, { type ReviewData } from "../components/ReviewCard";
@@ -43,6 +43,7 @@ export default function FeedPage() {
   const [currentTime, setCurrentTime] = useState(Date.now());
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [boostedCategories, setBoostedCategories] = useState<Set<string>>(new Set());
+  const [dynamicCategories, setDynamicCategories] = useState<string[]>([]);
 
   const categoriesRef = useRef<HTMLDivElement>(null);
 
@@ -119,6 +120,11 @@ export default function FeedPage() {
         if (hasActiveBounty && ch.category) boosted.add(ch.category as string);
       });
       setBoostedCategories(boosted);
+
+      // Build dynamic categories from channels
+      const allCats = new Set<string>();
+      channelSnap.forEach((d) => { const cat = d.data().category; if (cat) allCats.add(cat as string); });
+      setDynamicCategories([...allCats].sort());
 
       const fetchedProducts: any[] = [];
       prodSnap.forEach((d) => fetchedProducts.push({ id: d.id, ...d.data() }));
@@ -371,7 +377,7 @@ export default function FeedPage() {
             <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 mb-1">What are you into?</h2>
             <p className="text-sm text-slate-500 dark:text-slate-500 mb-4">Personalise your feed.</p>
             <div className="flex flex-wrap gap-2 mb-5">
-              {AVAILABLE_CATEGORIES.map((cat) => (
+              {dynamicCategories.map((cat) => (
                 <button
                   key={cat}
                   type="button"
@@ -552,7 +558,7 @@ export default function FeedPage() {
                   <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${activeCategoryFilter === "All" ? "bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-500/20" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-indigo-300 hover:text-indigo-600 dark:hover:border-indigo-700 dark:hover:text-indigo-400"}`}>
                     All
                   </button>
-                  {AVAILABLE_CATEGORIES.map((cat) => {
+                  {dynamicCategories.map((cat) => {
                     const isActive  = activeCategoryFilter === cat;
                     const isBoosted = boostedCategories.has(cat);
                     return (
@@ -586,7 +592,7 @@ export default function FeedPage() {
                 <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3.5 py-2 rounded-full text-[13px] font-medium border transition shrink-0 ${activeCategoryFilter === "All" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"}`}>
                   All
                 </button>
-                {AVAILABLE_CATEGORIES.map((cat) => {
+                {dynamicCategories.map((cat) => {
                   const isActive  = activeCategoryFilter === cat;
                   const isBoosted = boostedCategories.has(cat);
                   return (

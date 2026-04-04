@@ -14,12 +14,8 @@ const MODEL_CANDIDATES = [
   "gemini-2.0-flash",
 ].filter(Boolean) as string[];
 
-const VALID_CATEGORIES = [
-  "Tech", "Home", "SaaS", "Automotive", "Beauty",
-  "Gaming", "Fitness", "Travel", "Finance",
-] as const;
-
-type Category = (typeof VALID_CATEGORIES)[number];
+// Categories are open — any non-empty string is valid
+type Category = string;
 
 type SeedResult = {
   brandName: string;
@@ -52,10 +48,10 @@ function str(v: unknown): string {
 }
 
 function validateAndNormalize(raw: Record<string, unknown>): SeedResult | null {
-  const category = VALID_CATEGORIES.find(
-    (c) => c.toLowerCase() === str(raw.category).toLowerCase()
-  );
-  if (!category) return null;
+  const rawCat = str(raw.category).trim();
+  if (!rawCat) return null;
+  // Title-case normalize the category
+  const category = rawCat.split(" ").map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
 
   const specs = Array.isArray(raw.specs)
     ? raw.specs

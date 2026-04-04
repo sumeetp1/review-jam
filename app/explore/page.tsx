@@ -38,7 +38,7 @@ type ProductEntry = {
   bountyStatus: string;
 };
 
-const CATEGORIES = ["All", "Tech", "Home", "SaaS", "Automotive", "Beauty", "Gaming", "Fitness", "Travel", "Finance"];
+// Categories are built dynamically from channel data — no hardcoded list
 
 type SortKey = "discovery" | "reviews" | "rating" | "likes" | "newest";
 
@@ -314,6 +314,7 @@ function ExplorePage() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") ?? "");
   const [boostedCategories, setBoostedCategories] = useState<Set<string>>(new Set());
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [dynamicCategories, setDynamicCategories] = useState<string[]>([]);
 
   useEffect(() => {
     async function load() {
@@ -331,6 +332,11 @@ function ExplorePage() {
           if (isBoosted(ch) && ch.category) boosted.add(ch.category as string);
         });
         setBoostedCategories(boosted);
+
+        // Build dynamic category list from channels
+        const allCats = new Set<string>();
+        channelSnap.docs.forEach((d) => { const cat = d.data().category; if (cat) allCats.add(cat as string); });
+        setDynamicCategories([...allCats].sort());
 
         const reviews = revSnap.docs.map((d) => d.data());
 
@@ -473,7 +479,7 @@ function ExplorePage() {
 
         {/* Category filter */}
         <div className="flex gap-1.5 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden">
-          {CATEGORIES.map((cat) => {
+          {["All", ...dynamicCategories].map((cat) => {
             const active  = categoryFilter === cat;
             const boosted = cat !== "All" && boostedCategories.has(cat);
             return (
