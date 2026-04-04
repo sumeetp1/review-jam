@@ -109,7 +109,7 @@ export default function CommunitiesPage() {
       </header>
 
       {/* Hero banner */}
-      <div className="max-w-6xl mx-auto px-4 md:px-8 pt-6 pb-2">
+      <div className="max-w-3xl mx-auto px-4 md:px-6 pt-6 pb-2">
         <div className="rounded-xl bg-gradient-to-r from-indigo-500/10 via-violet-500/10 to-purple-500/10 dark:from-indigo-900/20 dark:via-violet-900/20 dark:to-purple-900/20 border border-indigo-100 dark:border-indigo-900/40 px-6 py-5 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">Communities</h2>
@@ -121,8 +121,8 @@ export default function CommunitiesPage() {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-6xl mx-auto px-4 md:px-8 py-4">
+      {/* Content — Reddit-style full-width rows */}
+      <div className="max-w-3xl mx-auto px-4 md:px-6 py-4">
         {loading ? (
           <p className="text-center text-sm text-slate-400 py-12 animate-pulse">Loading communities...</p>
         ) : filtered.length === 0 ? (
@@ -137,38 +137,54 @@ export default function CommunitiesPage() {
           </div>
         ) : (
           Array.from(grouped.entries()).map(([category, coms]) => (
-            <div key={category} className="mb-8">
-              <h2 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <div key={category} className="mb-6">
+              <h2 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2 px-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
                 {category}
                 <span className="text-[10px] font-normal text-slate-400 dark:text-slate-600">({coms.length})</span>
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {coms.map((c) => (
+              <div className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/60 overflow-hidden divide-y divide-slate-100 dark:divide-slate-800/80">
+                {coms.map((c, idx) => (
                   <Link
                     key={c.id}
                     href={`/c/${c.slug}`}
-                    className="block p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900 hover:border-indigo-200 dark:hover:border-indigo-800 hover:shadow-sm transition-all"
+                    className="flex items-center gap-4 px-4 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-800/60 flex items-center justify-center text-2xl shrink-0">
-                        {c.iconEmoji}
+                    {/* Rank number */}
+                    <span className="text-[13px] font-semibold text-slate-400 dark:text-slate-500 w-5 text-right shrink-0 tabular-nums">{idx + 1}</span>
+
+                    {/* Icon */}
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center text-xl shrink-0">
+                      {c.iconEmoji}
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 leading-tight">rj/{c.slug}</p>
+                      <p className="text-[12px] text-slate-500 dark:text-slate-400 truncate mt-0.5">{c.description}</p>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="hidden sm:flex items-center gap-4 shrink-0">
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 tabular-nums">{c.memberCount.toLocaleString()}</p>
+                        <p className="text-[10px] text-slate-400 dark:text-slate-500">members</p>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 mb-0.5">rj/{c.slug}</p>
-                        <p className="text-[12px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed mb-2">{c.description}</p>
-                        <div className="flex items-center gap-3">
-                          <span className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                            {c.memberCount}
-                          </span>
-                          <span className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-                            {c.reviewCount}
-                          </span>
-                        </div>
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 tabular-nums">{c.reviewCount.toLocaleString()}</p>
+                        <p className="text-[10px] text-slate-400 dark:text-slate-500">reviews</p>
                       </div>
                     </div>
+
+                    {/* Mobile stats */}
+                    <div className="flex sm:hidden items-center gap-2 shrink-0 text-[11px] text-slate-400 dark:text-slate-500">
+                      <span>{c.memberCount} members</span>
+                    </div>
+
+                    {/* Chevron */}
+                    <svg className="w-4 h-4 text-slate-300 dark:text-slate-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 18l6-6-6-6" />
+                    </svg>
                   </Link>
                 ))}
               </div>
