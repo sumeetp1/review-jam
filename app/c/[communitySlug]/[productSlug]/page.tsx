@@ -267,7 +267,7 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
   const [isLoading, setIsLoading] = useState(true);
 
   const [feedTab, setFeedTab] = useState<FeedTab>("logs");
-  const [reviewMode, setReviewMode] = useState<"verified" | "generic" | null>(null);
+  const [reviewMode, setReviewMode] = useState<"verified" | null>(null);
   const [hasAlreadyReviewed, setHasAlreadyReviewed] = useState(false);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [selectedVariantId, setSelectedVariantId] = useState("all");
@@ -569,13 +569,12 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
 
             {/* Write review CTA */}
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600 mb-3">Own this product?</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600 mb-3">Write a review</p>
               {!user ? <p className="text-sm text-slate-500 dark:text-slate-500 text-center py-1">Sign in to post a review.</p>
               : hasAlreadyReviewed ? <p className="text-[12px] text-slate-500 dark:text-slate-500 text-center py-1">✓ You&apos;ve reviewed this. Use &quot;+ New Entry&quot; on your review to add updates.</p>
               : <div className="space-y-2">
-                  <button type="button" onClick={() => setReviewMode("verified")} className="w-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-[12px] font-semibold py-2.5 rounded-lg hover:opacity-90 transition">I own this</button>
-                  <button type="button" onClick={() => setReviewMode("generic")} className="w-full border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-[12px] py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition">Quick review (no payout)</button>
-                  <p className="text-[10px] text-slate-400 text-center">Verified reviews earn from the reward pool.</p>
+                  <button type="button" onClick={() => setReviewMode("verified")} className="w-full btn-brand text-[13px] font-semibold py-3 rounded-lg transition">Post a Review</button>
+                  <p className="text-[10px] text-slate-400 text-center">Share your honest experience with this product.</p>
                 </div>
               }
             </div>
