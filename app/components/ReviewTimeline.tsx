@@ -30,6 +30,7 @@ type Props = {
 export default function ReviewTimeline({ reviewId, originalReview }: Props) {
   const [versions, setVersions] = useState<VersionEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedIdx, setSelectedIdx] = useState(-1); // -1 = none selected (pills only)
 
   useEffect(() => {
     (async () => {
@@ -49,12 +50,14 @@ export default function ReviewTimeline({ reviewId, originalReview }: Props) {
   }, [reviewId]);
 
   if (loading) {
-    return <p className="text-[12px] text-slate-400 py-2">Loading timeline...</p>;
+    return <p className="text-[12px] text-slate-400 py-1 animate-pulse">Loading journey...</p>;
   }
+
+  if (versions.length === 0) return null;
 
   const allEntries = [
     {
-      label: "Original Review",
+      label: "Original",
       content: originalReview.content,
       rating: originalReview.rating,
       pros: originalReview.pros,
@@ -71,67 +74,71 @@ export default function ReviewTimeline({ reviewId, originalReview }: Props) {
     })),
   ];
 
+  const selected = selectedIdx >= 0 ? allEntries[selectedIdx] : null;
+
   return (
-    <div className="mt-3 border-t border-slate-100 dark:border-slate-800 pt-3">
-      <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
-        Review Timeline
-      </p>
-      <div className="relative pl-4">
-        {/* Vertical line */}
-        <div className="absolute left-[5px] top-1 bottom-1 w-px bg-slate-200 dark:bg-slate-700" />
-
+    <div>
+      {/* Journey pills */}
+      <div className="flex gap-1.5 flex-wrap">
         {allEntries.map((entry, i) => (
-          <div key={i} className="relative pb-4 last:pb-0">
-            {/* Dot */}
-            <div className={`absolute -left-4 top-1 w-2.5 h-2.5 rounded-full border-2 ${
-              i === allEntries.length - 1
-                ? "bg-slate-800 dark:bg-slate-200 border-slate-800 dark:border-slate-200"
-                : "bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600"
-            }`} />
-
-            <div className="ml-2">
-              <div className="flex items-center gap-2 mb-0.5">
-                <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                  {entry.label}
-                </span>
-                {entry.rating != null && (
-                  <span className="text-[10px] text-amber-600 dark:text-amber-400 tabular-nums">
-                    ★ {entry.rating}
-                  </span>
-                )}
-              </div>
-              {entry.date && (
-                <p className="text-[10px] text-slate-400 dark:text-slate-500 mb-1">
-                  {new Date(entry.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                </p>
-              )}
-              {entry.content && (
-                <p className="text-[12px] text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3">
-                  {entry.content}
-                </p>
-              )}
-              {entry.pros && entry.pros.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {entry.pros.map((p, j) => (
-                    <span key={j} className="text-[10px] bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded">
-                      + {p}
-                    </span>
-                  ))}
-                </div>
-              )}
-              {entry.cons && entry.cons.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {entry.cons.map((c, j) => (
-                    <span key={j} className="text-[10px] bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded">
-                      - {c}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+          <button
+            key={i}
+            type="button"
+            onClick={() => setSelectedIdx(selectedIdx === i ? -1 : i)}
+            className={`text-[11px] font-medium px-2.5 py-1 rounded-full border transition-all ${
+              selectedIdx === i
+                ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 hover:text-indigo-600 dark:hover:text-indigo-400"
+            }`}
+          >
+            {i === 0 ? "Original" : entry.label}
+            {entry.rating != null && (
+              <span className={`ml-1 ${selectedIdx === i ? "text-amber-200" : "text-amber-500 dark:text-amber-400"}`}>
+                {"★"} {entry.rating}
+              </span>
+            )}
+          </button>
         ))}
       </div>
+
+      {/* Selected entry detail */}
+      {selected && (
+        <div className="mt-2 p-3 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200">
+              {selectedIdx === 0 ? "Original Review" : selected.label}
+            </span>
+            {selected.date && (
+              <span className="text-[10px] text-slate-400 dark:text-slate-500">
+                {new Date(selected.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              </span>
+            )}
+          </div>
+          {selected.content && (
+            <p className="text-[13px] text-slate-700 dark:text-slate-300 leading-relaxed mb-2">
+              {selected.content}
+            </p>
+          )}
+          {selected.pros && selected.pros.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-1">
+              {selected.pros.map((p, j) => (
+                <span key={j} className="text-[10px] bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded">
+                  + {p}
+                </span>
+              ))}
+            </div>
+          )}
+          {selected.cons && selected.cons.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {selected.cons.map((c, j) => (
+                <span key={j} className="text-[10px] bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded">
+                  - {c}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

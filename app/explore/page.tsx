@@ -28,6 +28,7 @@ type ProductEntry = {
   // Computed
   reviewCount: number;
   avgRating: number;
+  avgHealthScore: number;
   topQuote: string;
   totalLikes: number;
   discoveryRank: number;
@@ -306,6 +307,10 @@ function ExplorePage() {
           const avgRating = reviewCount
             ? prodReviews.reduce((s, r) => s + (r.rating || 0), 0) / reviewCount
             : 0;
+          const reviewsWithHealth = prodReviews.filter((r) => r.healthScore != null);
+          const avgHealthScore = reviewsWithHealth.length
+            ? Math.round(reviewsWithHealth.reduce((s, r) => s + r.healthScore, 0) / reviewsWithHealth.length)
+            : 0;
           const totalLikes = prodReviews.reduce((s, r) => s + (r.likesCount || 0), 0);
           const topReview = [...prodReviews].sort((a, b) => (b.likesCount || 0) - (a.likesCount || 0))[0];
           const topQuote = topReview?.summary || topReview?.marketingQuote || "";
@@ -330,6 +335,7 @@ function ExplorePage() {
             coverImage: prod.coverImage,
             reviewCount,
             avgRating,
+            avgHealthScore,
             totalLikes,
             topQuote,
             discoveryRank,
@@ -500,11 +506,22 @@ function ExplorePage() {
                         <span className="text-[10px] font-semibold text-white bg-emerald-500/90 px-1.5 py-0.5 rounded-full backdrop-blur-sm">Live</span>
                       )}
                     </div>
-                    {p.avgRating > 0 && (
-                      <div className="absolute bottom-2 right-3 text-[11px] font-semibold text-white flex items-center gap-0.5">
-                        <span className="text-amber-400">★</span> {p.avgRating.toFixed(1)}
-                      </div>
-                    )}
+                    <div className="absolute bottom-2 right-3 flex items-center gap-1.5">
+                      {p.avgHealthScore > 0 && (
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full backdrop-blur-sm ${
+                          p.avgHealthScore >= 70 ? "bg-emerald-500/90 text-white" :
+                          p.avgHealthScore >= 40 ? "bg-amber-500/90 text-white" :
+                          "bg-red-500/90 text-white"
+                        }`}>
+                          {p.avgHealthScore}
+                        </span>
+                      )}
+                      {p.avgRating > 0 && (
+                        <span className="text-[11px] font-semibold text-white flex items-center gap-0.5">
+                          <span className="text-amber-400">★</span> {p.avgRating.toFixed(1)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div className="w-full h-40 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center shrink-0">
@@ -521,8 +538,21 @@ function ExplorePage() {
                       </h3>
                       <p className="text-[12px] text-slate-500 dark:text-slate-500 mt-0.5">{p.brandName}</p>
                     </div>
-                    {!p.coverImage && p.avgRating > 0 && (
-                      <span className="text-[11px] text-amber-500 font-semibold shrink-0">★ {p.avgRating.toFixed(1)}</span>
+                    {!p.coverImage && (
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {p.avgHealthScore > 0 && (
+                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                            p.avgHealthScore >= 70 ? "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400" :
+                            p.avgHealthScore >= 40 ? "bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400" :
+                            "bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-400"
+                          }`}>
+                            {p.avgHealthScore}
+                          </span>
+                        )}
+                        {p.avgRating > 0 && (
+                          <span className="text-[11px] text-amber-500 font-semibold">★ {p.avgRating.toFixed(1)}</span>
+                        )}
+                      </div>
                     )}
                   </div>
 

@@ -256,6 +256,8 @@ export default function ReviewCard({
 }: Props) {
   const [showComments, setShowComments] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const hasLiked       = !!(currentUserId && review.likedBy?.includes(currentUserId));
   const hasHelpful     = !!(currentUserId && review.helpfulBy?.includes(currentUserId));
@@ -356,88 +358,119 @@ export default function ReviewCard({
                 </span>
               )}
               {(review.versionCount ?? 0) > 1 && (
-                <button type="button" onClick={() => setShowTimeline((v) => !v)}
-                  className="text-[10px] font-medium bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded hover:bg-blue-100 dark:hover:bg-blue-900/40 transition">
+                <span className="text-[10px] font-medium bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded">
                   {review.versionCount} updates
-                </button>
+                </span>
               )}
             </p>
           )}
 
           {/* Summary headline */}
           {headline && (
-            <p className="text-[15px] font-semibold text-slate-900 dark:text-slate-100 leading-snug mb-1.5">
+            <p className="text-[15px] font-semibold text-slate-900 dark:text-slate-100 leading-snug mb-1">
               {headline}
             </p>
           )}
 
-          {/* Sub-ratings */}
-          {hasSubRatings && (
-            <div className="flex gap-3 flex-wrap mb-2">
-              {Object.entries(review.subRatings!).map(([attr, val]) => (
-                <span key={attr} className="text-[11px] text-slate-500 dark:text-slate-500">
-                  {attr}:{" "}
-                  <span className="text-amber-500 dark:text-amber-400">{"★".repeat(val)}</span>
-                </span>
-              ))}
+          {/* Ownership Journey pills — always visible when versions exist */}
+          {(review.versionCount ?? 0) > 1 && (
+            <div className="mb-2">
+              <ReviewTimeline
+                reviewId={review.id}
+                originalReview={{
+                  content: review.content,
+                  rating: review.rating,
+                  pros: review.pros,
+                  cons: review.cons,
+                  createdAt: review.createdAt,
+                }}
+              />
             </div>
           )}
 
-          {/* Pros */}
-          {hasPros && (
-            <div className="flex flex-wrap gap-1 mb-1.5">
-              {review.pros!.map((pro, i) => (
-                <span key={i} className="inline-flex items-center gap-0.5 text-[11px] font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md">
-                  ✓ {pro}
-                </span>
-              ))}
-            </div>
+          {/* Read more / Show less toggle */}
+          {(review.content || hasPros || hasCons || hasSubRatings || hasMedia || hasBestFor) && (
+            <button
+              type="button"
+              onClick={() => setExpanded((v) => !v)}
+              className="text-[12px] font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 mb-1.5 transition-colors"
+            >
+              {expanded ? "Show less" : "Read more"}
+            </button>
           )}
 
-          {/* Cons */}
-          {hasCons && (
-            <div className="flex flex-wrap gap-1 mb-1.5">
-              {review.cons!.map((con, i) => (
-                <span key={i} className="inline-flex items-center gap-0.5 text-[11px] font-medium bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-md">
-                  – {con}
-                </span>
-              ))}
-            </div>
-          )}
+          {/* Expandable details */}
+          {expanded && (
+            <>
+              {/* Sub-ratings */}
+              {hasSubRatings && (
+                <div className="flex gap-3 flex-wrap mb-2">
+                  {Object.entries(review.subRatings!).map(([attr, val]) => (
+                    <span key={attr} className="text-[11px] text-slate-500 dark:text-slate-500">
+                      {attr}:{" "}
+                      <span className="text-amber-500 dark:text-amber-400">{"★".repeat(val)}</span>
+                    </span>
+                  ))}
+                </div>
+              )}
 
-          {/* Review body */}
-          {review.content && (
-            <p className="text-[15px] text-slate-800 dark:text-slate-200 leading-relaxed font-normal mb-2 whitespace-pre-wrap">
-              {review.content}
-            </p>
-          )}
+              {/* Pros */}
+              {hasPros && (
+                <div className="flex flex-wrap gap-1 mb-1.5">
+                  {review.pros!.map((pro, i) => (
+                    <span key={i} className="inline-flex items-center gap-0.5 text-[11px] font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md">
+                      ✓ {pro}
+                    </span>
+                  ))}
+                </div>
+              )}
 
-          {/* Media thumbnails */}
-          {hasMedia && (
-            <div className="flex gap-2 mb-2 flex-wrap">
-              {review.mediaUrls!.map((url, i) => (
-                <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={url}
-                    alt=""
-                    className="w-24 h-24 md:w-20 md:h-20 object-cover rounded-lg border border-slate-200 dark:border-slate-700 hover:opacity-90 transition"
-                  />
-                </a>
-              ))}
-            </div>
-          )}
+              {/* Cons */}
+              {hasCons && (
+                <div className="flex flex-wrap gap-1 mb-1.5">
+                  {review.cons!.map((con, i) => (
+                    <span key={i} className="inline-flex items-center gap-0.5 text-[11px] font-medium bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-md">
+                      – {con}
+                    </span>
+                  ))}
+                </div>
+              )}
 
-          {/* Best for */}
-          {hasBestFor && (
-            <div className="flex flex-wrap gap-1 mb-2">
-              <span className="text-[11px] text-slate-400 dark:text-slate-500 mr-0.5">Best for:</span>
-              {review.bestFor!.map((tag, i) => (
-                <span key={i} className="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-md">
-                  {tag}
-                </span>
-              ))}
-            </div>
+              {/* Review body */}
+              {review.content && (
+                <p className="text-[15px] text-slate-800 dark:text-slate-200 leading-relaxed font-normal mb-2 whitespace-pre-wrap">
+                  {review.content}
+                </p>
+              )}
+
+              {/* Media thumbnails */}
+              {hasMedia && (
+                <div className="flex gap-2 mb-2 flex-wrap">
+                  {review.mediaUrls!.map((url, i) => (
+                    <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={url}
+                        alt=""
+                        className="w-24 h-24 md:w-20 md:h-20 object-cover rounded-lg border border-slate-200 dark:border-slate-700 hover:opacity-90 transition"
+                      />
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              {/* Best for */}
+              {hasBestFor && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500 mr-0.5">Best for:</span>
+                  {review.bestFor!.map((tag, i) => (
+                    <span key={i} className="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-md">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </>
           )}
 
           {/* Action bar */}
@@ -497,6 +530,30 @@ export default function ReviewCard({
               <span className="tabular-nums">{commentCount}</span>
             </button>
 
+            {/* Copy link (reference) */}
+            <button
+              type="button"
+              onClick={() => {
+                const path = review.communitySlug && review.productSlug
+                  ? `/c/${review.communitySlug}/${review.productSlug}?review=${review.id}`
+                  : `/product/${review.productId}?review=${review.id}`;
+                const url = `${window.location.origin}${path}`;
+                navigator.clipboard?.writeText(url).then(() => {
+                  setLinkCopied(true);
+                  setTimeout(() => setLinkCopied(false), 2000);
+                });
+              }}
+              className={`flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 transition-colors ${
+                linkCopied
+                  ? "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30"
+                  : "hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/50"
+              }`}
+              title="Copy review link"
+            >
+              <span aria-hidden>{linkCopied ? "✓" : "🔗"}</span>
+              {linkCopied && <span className="text-[11px]">Copied</span>}
+            </button>
+
             {/* Share */}
             <button
               type="button"
@@ -525,19 +582,7 @@ export default function ReviewCard({
             )}
           </div>
 
-          {/* Version timeline */}
-          {showTimeline && (
-            <ReviewTimeline
-              reviewId={review.id}
-              originalReview={{
-                content: review.content,
-                rating: review.rating,
-                pros: review.pros,
-                cons: review.cons,
-                createdAt: review.createdAt,
-              }}
-            />
-          )}
+          {/* Version timeline (shown inline above for versionCount > 1) */}
 
           {/* Comments thread */}
           {showComments && (
