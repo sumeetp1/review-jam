@@ -2,22 +2,10 @@
 //
 // DR = (weightedAvgHealthScore × reviewCount) / log(daysSinceLastReview + 2)
 //
-// Weight per review is the product of two multipliers:
-//
-//   Origin multiplier — rewards unsolicited feedback:
-//     organic (isCampaignReview === false) → 1.2×
-//     campaign                             → 1.0×
-//
-//   Bias multiplier — penalises over-positive / marketing-speak reviews
-//   flagged by the AI agent:
+// Weight per review uses a bias multiplier — penalises over-positive /
+// marketing-speak reviews flagged by the AI agent:
 //     biasFlag === true  → 0.8×
 //     biasFlag === false → 1.0×
-//
-// Combined examples:
-//   Honest organic review  (not biased): 1.2 × 1.0 = 1.20 ← rises to top
-//   Biased organic review:               1.2 × 0.8 = 0.96
-//   Honest campaign review:              1.0 × 1.0 = 1.00
-//   Biased campaign review:              1.0 × 0.8 = 0.80
 //
 // The log denominator keeps stale products from permanently dominating the
 // feed — a product reviewed yesterday ranks higher than one with the same
@@ -25,7 +13,7 @@
 
 export type DRReviewInput = {
   healthScore?: number;       // 0–100; defaults to 0 if missing
-  isCampaignReview?: boolean; // false = organic (1.2×), true = campaign (1.0×)
+  isCampaignReview?: boolean; // kept for data compatibility, no longer affects ranking
   biasFlag?: boolean;         // true = over-positive/marketing-speak (0.8× penalty)
   createdAt?: string;         // ISO date string; used to find most-recent review
 };
@@ -44,10 +32,9 @@ export function calculateDiscoveryRank(reviews: DRReviewInput[]): number {
   let weightedScoreSum = 0;
 
   for (const r of reviews) {
-    const score          = typeof r.healthScore === "number" ? r.healthScore : 0;
-    const originMult     = r.isCampaignReview === false ? 1.2 : 1.0;
-    const biasMult       = r.biasFlag === true ? 0.8 : 1.0;
-    const weight         = originMult * biasMult;
+    const score    = typeof r.healthScore === "number" ? r.healthScore : 0;
+    const biasMult = r.biasFlag === true ? 0.8 : 1.0;
+    const weight   = biasMult;
     weightedScoreSum += score * weight;
     totalWeight += weight;
   }

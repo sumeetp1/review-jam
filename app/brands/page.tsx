@@ -61,7 +61,7 @@ export default function BrandsPage() {
           <ul className="space-y-3 text-[15px] text-slate-300 font-normal">
             <li className="flex items-start gap-2"><span className="text-emerald-500 shrink-0">✓</span> Automated quality checks reduce spam</li>
             <li className="flex items-start gap-2"><span className="text-emerald-500 shrink-0">✓</span> Reward engagement that resonates</li>
-            <li className="flex items-start gap-2"><span className="text-emerald-500 shrink-0">✓</span> Shareable campaign links</li>
+            <li className="flex items-start gap-2"><span className="text-emerald-500 shrink-0">✓</span> Shareable product review links</li>
           </ul>
         </div>
 
@@ -205,12 +205,12 @@ export default function BrandsPage() {
               </thead>
               <tbody className="divide-y divide-slate-800/60">
                 {[
-                  ["Campaign creation",     true,  true,  true ],
+                  ["Product listing",       true,  true,  true ],
                   ["AI moderation",         true,  true,  true ],
                   ["Brand dashboard",       true,  true,  true ],
                   ["Marketing quote export",true,  true,  true ],
                   ["🧩 Trust Widget embed",  true,  true,  true ],
-                  ["Custom campaign duration", false, true, true],
+                  ["Custom listing duration", false, true, true],
                   ["Priority placement",    false, false, true ],
                   ["Dedicated account manager", false, false, true],
                 ].map(([label, s, g, sc]) => (

@@ -20,7 +20,7 @@ export type ReviewFormData = {
   bestFor: string[];
   mediaFiles: File[];
   isCampaignReview: boolean;
-  reviewType: "campaign" | "verified" | "generic";
+  reviewType: "organic" | "verified" | "generic";
   productCode?: string;
   channelId?: string;
   channelSlug?: string;
@@ -418,28 +418,24 @@ function GenericReviewForm({
   );
 }
 
-// ─── Main Wizard (Campaign / Verified / Organic) ──────────────────────────────
+// ─── Main Wizard (Verified / Organic / Generic) ─────────────────────────────
 
 export type ProductVariant = { id: string; name: string };
 
 type Props = {
   user: User;
-  mode: "organic" | "campaign" | "verified" | "generic";
+  mode: "organic" | "verified" | "generic";
   productInfo?: { name: string; category: string; variants?: ProductVariant[] };
-  isCampaignReview?: boolean;
   channelId?: string;
   channelSlug?: string;
   onSubmit: (data: ReviewFormData) => Promise<void>;
   onClose: () => void;
 };
 
-// Step labels are computed per-instance based on mode (see FullReviewWizard)
-
 export default function ReviewWizard({
   user: _user,
   mode,
   productInfo,
-  isCampaignReview = false,
   channelId,
   channelSlug,
   onSubmit,
@@ -467,14 +463,13 @@ export default function ReviewWizard({
     <FullReviewWizard
       mode={mode}
       productInfo={productInfo}
-      isCampaignReview={isCampaignReview}
       onSubmit={wrappedSubmit}
       onClose={onClose}
     />
   );
 }
 
-// ─── Full Wizard (Campaign / Verified / Organic) ──────────────────────────────
+// ─── Full Wizard (Verified / Organic) ────────────────────────────────────────
 
 type ReceiptVerification = {
   status: "idle" | "checking" | "verified" | "failed";
@@ -487,14 +482,10 @@ type ReceiptVerification = {
 function FullReviewWizard({
   mode,
   productInfo,
-  isCampaignReview,
   onSubmit,
   onClose,
 }: Omit<Props, "user">) {
-  // Campaign reviews: 3 steps. Organic/verified: 4 steps (adds Proof of Purchase)
-  const STEP_LABELS = isCampaignReview
-    ? ["Context", "Your Review", "Finish"]
-    : ["Context", "Your Review", "Proof of Purchase", "Finish"];
+  const STEP_LABELS = ["Context", "Your Review", "Proof of Purchase", "Finish"];
   const totalSteps = STEP_LABELS.length;
 
   const [step, setStep] = useState(1);
@@ -534,7 +525,7 @@ function FullReviewWizard({
   const subRatingKeys = CATEGORY_SUB_RATINGS[category] ?? [];
 
   // ── Validation ──
-  const finishStepNumber = totalSteps; // 3 for campaign, 4 for non-campaign
+  const finishStepNumber = totalSteps;
 
   const validateStep = (s: number): boolean => {
     if (s === 1) {
@@ -573,7 +564,7 @@ function FullReviewWizard({
         return false;
       }
     }
-    // Step 3 non-campaign = Proof of Purchase — no required fields, skip freely
+    // Step 3 = Proof of Purchase — no required fields, skip freely
     // Finish step — always requires honest opinion checkbox
     if (s === finishStepNumber) {
       if (!isHonestOpinion) {
@@ -674,9 +665,9 @@ function FullReviewWizard({
     setIsSubmitting(true);
     try {
       await onSubmit({
-        productName: mode === "campaign" ? (productInfo?.name ?? "") : productName,
-        category: mode === "campaign" ? (productInfo?.category ?? category) : category,
-        productSource: isCampaignReview ? "brand_sent" : "purchased",
+        productName: productInfo?.name ?? productName,
+        category: productInfo?.category ?? category,
+        productSource: "purchased",
         usageDuration,
         purchaseChannel,
         overallRating,
@@ -687,8 +678,8 @@ function FullReviewWizard({
         summary,
         bestFor,
         mediaFiles,
-        isCampaignReview: isCampaignReview ?? false,
-        reviewType: mode === "campaign" ? "campaign" : mode === "verified" ? "verified" : "campaign",
+        isCampaignReview: false,
+        reviewType: mode === "verified" ? "verified" : "organic",
         productCode: mode === "verified" ? productCode : undefined,
         variantId: variantId || undefined,
         variantName: variantName || undefined,
@@ -712,12 +703,10 @@ function FullReviewWizard({
 
   const headerLabel =
     mode === "verified" ? "Verified purchase review" :
-    mode === "campaign" ? "Sponsored review" :
     "Write a review";
 
   const headerSub =
     mode === "verified" ? "Earns based on engagement · Verify with your product code" :
-    mode === "campaign" ? "Earns based on engagement · Disclosed as sponsored review" :
     null;
 
   return (
@@ -905,7 +894,7 @@ function FullReviewWizard({
               </div>
             </div>
 
-            {mode !== "campaign" && (
+            {(
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
                   Where did you buy it?
@@ -998,8 +987,8 @@ function FullReviewWizard({
           </div>
         )}
 
-        {/* ════ STEP 3 (non-campaign): Proof of Purchase ════ */}
-        {step === 3 && !isCampaignReview && (
+        {/* ════ STEP 3: Proof of Purchase ════ */}
+        {step === 3 && (
           <div className="space-y-4 py-2">
             <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 rounded-lg px-3 py-2.5">
               <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300 mb-0.5">
@@ -1174,14 +1163,6 @@ function FullReviewWizard({
             </div>
 
             <div className="space-y-2.5 pt-1 border-t border-slate-100 dark:border-slate-800">
-              {isCampaignReview && (
-                <label className="flex items-start gap-2.5">
-                  <input type="checkbox" checked readOnly className="mt-0.5 accent-slate-900 shrink-0" />
-                  <span className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                    I received this product as part of a brand review program.
-                  </span>
-                </label>
-              )}
               {mode === "verified" && (
                 <label className="flex items-start gap-2.5">
                   <input type="checkbox" checked readOnly className="mt-0.5 accent-slate-900 shrink-0" />

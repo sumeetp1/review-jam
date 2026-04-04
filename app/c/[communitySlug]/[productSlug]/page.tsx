@@ -267,7 +267,7 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
   const [isLoading, setIsLoading] = useState(true);
 
   const [feedTab, setFeedTab] = useState<FeedTab>("logs");
-  const [reviewMode, setReviewMode] = useState<"campaign" | "verified" | "generic" | null>(null);
+  const [reviewMode, setReviewMode] = useState<"verified" | "generic" | null>(null);
   const [hasAlreadyReviewed, setHasAlreadyReviewed] = useState(false);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [selectedVariantId, setSelectedVariantId] = useState("all");
@@ -363,7 +363,7 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
       reviewerId: user.uid, reviewerName: user.displayName,
       productId: product.id, productName: product.name, category: product.category,
       productSlug, communitySlug,
-      campaignId: product.campaignId || "default",
+      campaignId: "organic",
       likesCount: 0, likedBy: [], helpfulCount: 0, helpfulBy: [],
       notHelpfulCount: 0, notHelpfulBy: [], commentCount: 0,
       marketingQuote, pros: data.pros, cons: data.cons, summary: data.summary,
@@ -371,7 +371,7 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
       purchaseChannel: data.purchaseChannel, subRatings: data.subRatings,
       bestFor: data.bestFor, mediaUrls, reviewType: data.reviewType,
       productCode: data.productCode ?? null,
-      isCampaignReview: data.reviewType === "campaign",
+      isCampaignReview: false,
       eligibleForPayout: data.reviewType !== "generic",
       isVerifiedPurchase: data.isVerifiedPurchase ?? false,
       variantId: data.variantId ?? null, variantName: data.variantName ?? null,
@@ -431,7 +431,7 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
     <main className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200">
       {/* Review Wizard */}
       {reviewMode && user && (
-        <ReviewWizard user={user} mode={reviewMode} productInfo={{ name: product.name, category: product.category, variants }} isCampaignReview={reviewMode === "campaign"} onSubmit={handleReviewSubmit} onClose={() => setReviewMode(null)} />
+        <ReviewWizard user={user} mode={reviewMode} productInfo={{ name: product.name, category: product.category, variants }} onSubmit={handleReviewSubmit} onClose={() => setReviewMode(null)} />
       )}
 
       {/* Version Update Wizard */}

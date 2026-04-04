@@ -10,7 +10,6 @@ export type Badge = {
 
 export const ALL_BADGES: Badge[] = [
   { id: "verified_buyer",     label: "Verified Buyer",      emoji: "✅", description: "Reviewed a product they personally purchased" },
-  { id: "campaign_reviewer",  label: "Campaign Reviewer",   emoji: "🎯", description: "Participated in a brand review campaign" },
   { id: "prolific_reviewer",  label: "Prolific Reviewer",   emoji: "✍️", description: "Posted 5 or more reviews" },
   { id: "photo_reviewer",     label: "Photo Reviewer",      emoji: "📸", description: "Included photos in at least one review" },
   { id: "tech_expert",        label: "Tech Expert",         emoji: "💻", description: "3+ reviews in Tech" },
@@ -37,9 +36,6 @@ export async function updateUserBadges(userId: string): Promise<string[]> {
 
   if (reviews.some((r) => r.productSource === "purchased")) {
     earned.push("verified_buyer");
-  }
-  if (reviews.some((r) => r.isCampaignReview === true)) {
-    earned.push("campaign_reviewer");
   }
   if (reviews.length >= 5) {
     earned.push("prolific_reviewer");

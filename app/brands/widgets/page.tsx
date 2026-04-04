@@ -163,7 +163,7 @@ export default function BrandWidgetsPage() {
           Sign in with Google
         </button>
         <Link href="/brands" className="text-sm text-slate-500 hover:text-slate-300 transition">
-          Don&apos;t have a campaign yet? →
+          Don&apos;t have a product listed? →
         </Link>
       </main>
     );
@@ -172,14 +172,14 @@ export default function BrandWidgetsPage() {
   if (!isAuthorized) {
     return (
       <main className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-4 p-8 text-center">
-        <h2 className="text-lg font-semibold text-white">No campaigns found</h2>
+        <h2 className="text-lg font-semibold text-white">No products found</h2>
         <p className="text-slate-400 text-sm max-w-sm">
-          We couldn&apos;t find any campaigns for <strong className="text-white">{user.email}</strong>.
+          We couldn&apos;t find any products for <strong className="text-white">{user.email}</strong>.
           Widgets are available on the $500+ tier.
         </p>
         <div className="flex gap-3 mt-1">
           <Link href="/brands" className="text-sm font-medium bg-white text-slate-950 px-4 py-2 rounded-lg hover:bg-slate-100 transition">
-            Request a campaign
+            List a product
           </Link>
           <button type="button" onClick={() => auth.signOut()} className="text-sm text-slate-400 hover:text-white transition">
             Sign out
