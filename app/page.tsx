@@ -4,9 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { collection, getCountFromServer } from "firebase/firestore";
 import { onAuthStateChanged, signInWithPopup, User } from "firebase/auth";
-import { db, auth, googleProvider } from "../lib/firebase";
+import { auth, googleProvider } from "../lib/firebase";
 import Avatar from "./components/Avatar";
 
 export default function LandingPage() {
@@ -14,7 +13,6 @@ export default function LandingPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [stats, setStats] = useState({ reviews: 0, products: 0 });
 
   useEffect(() => {
     if (
@@ -33,17 +31,6 @@ export default function LandingPage() {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const [revSnap, prodSnap] = await Promise.all([
-          getCountFromServer(collection(db, "reviews")),
-          getCountFromServer(collection(db, "products")),
-        ]);
-        setStats({ reviews: revSnap.data().count, products: prodSnap.data().count });
-      } catch {}
-    })();
-  }, []);
 
   const toggleDarkMode = () => {
     if (isDarkMode) {
@@ -118,18 +105,15 @@ export default function LandingPage() {
       {/* Hero — centered */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 pb-16 relative z-10">
 
-        {/* Logo mark */}
-        <div className="mb-4">
-          <Image src="/logo.svg" alt="Review Jam" width={220} height={52} className="dark:hidden" />
-          <Image src="/logo-dark.svg" alt="Review Jam" width={220} height={52} className="hidden dark:block" />
+        {/* Logo mark — centered on all screens */}
+        <div className="mb-4 flex justify-center w-full">
+          <Image src="/logo.svg" alt="Review Jam" width={220} height={52} className="dark:hidden mx-auto" />
+          <Image src="/logo-dark.svg" alt="Review Jam" width={220} height={52} className="hidden dark:block mx-auto" />
         </div>
 
         {/* Tagline */}
-        <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 text-center mb-2 max-w-lg font-medium">
+        <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 text-center mb-8 max-w-lg font-medium">
           Discover trusted reviews. Share your experience.
-        </p>
-        <p className="text-sm md:text-base text-slate-400 dark:text-slate-500 text-center mb-8 max-w-md">
-          Join a community-driven marketplace where honest opinions are valued and rewarded.
         </p>
 
         {/* Search bar */}
@@ -178,21 +162,14 @@ export default function LandingPage() {
           </Link>
         </div>
 
-        {/* Stats */}
-        {(stats.reviews > 0 || stats.products > 0) && (
-          <div className="flex items-center gap-6 text-sm">
-            <div className="text-center">
-              <p className="text-lg font-bold text-slate-900 dark:text-slate-100">{stats.reviews.toLocaleString()}</p>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500">Reviews</p>
-            </div>
-            <div className="w-px h-8 bg-slate-200 dark:bg-slate-700" />
-            <div className="text-center">
-              <p className="text-lg font-bold text-slate-900 dark:text-slate-100">{stats.products.toLocaleString()}</p>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500">Products</p>
-            </div>
-          </div>
-        )}
       </main>
+
+      {/* Footer subtitle */}
+      <footer className="text-center px-4 pb-6 relative z-10">
+        <p className="text-sm text-slate-400 dark:text-slate-500 max-w-md mx-auto">
+          A community-driven marketplace where honest opinions are valued and rewarded.
+        </p>
+      </footer>
     </div>
   );
 }
