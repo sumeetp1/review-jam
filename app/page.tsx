@@ -692,7 +692,8 @@ export default function Home() {
       <button
         type="button"
         onClick={() => { if (!user) handleLogin(); else setReviewMode("verified"); }}
-        className="md:hidden fixed bottom-[76px] right-4 z-40 w-14 h-14 rounded-full btn-brand flex items-center justify-center active:scale-95 transition"
+        className="md:hidden fixed right-4 z-40 w-14 h-14 rounded-full btn-brand flex items-center justify-center active:scale-95 transition"
+        style={{ bottom: "calc(56px + env(safe-area-inset-bottom, 0px) + 16px)" }}
         aria-label="Post a review"
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

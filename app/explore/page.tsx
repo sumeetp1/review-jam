@@ -64,13 +64,15 @@ function CreateHubModal({
 }: {
   initialName: string;
   onClose: () => void;
-  onCreated: (productId: string) => void;
+  onCreated: (productId: string, slug: string, communitySlug: string) => void;
 }) {
   const [name, setName]         = useState(initialName);
   const [step, setStep]         = useState<"input" | "preview" | "done">("input");
   const [isLoading, setIsLoading] = useState(false);
   const [preview, setPreview]   = useState<AiPreview | null>(null);
   const [productId, setProductId] = useState("");
+  const [productSlug, setProductSlug] = useState("");
+  const [productCommunitySlug, setProductCommunitySlug] = useState("");
   const [error, setError]       = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -93,6 +95,8 @@ function CreateHubModal({
       }
       setPreview(data.data);
       setProductId(data.productId);
+      setProductSlug(data.slug ?? "");
+      setProductCommunitySlug(data.communitySlug ?? "");
       setStep("preview");
     } catch {
       setError("Network error. Please try again.");
@@ -237,7 +241,7 @@ function CreateHubModal({
               {error && <p className="text-[12px] text-red-600 dark:text-red-400">{error}</p>}
 
               <div className="flex gap-2 pt-1">
-                <button type="button" onClick={() => onCreated(productId)}
+                <button type="button" onClick={() => onCreated(productId, productSlug, productCommunitySlug)}
                   className="flex-1 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold py-2.5 rounded-xl transition">
                   🚀 Launch Product Hub
                 </button>
@@ -360,9 +364,13 @@ export default function ExplorePage() {
         <CreateHubModal
           initialName={searchQuery.trim()}
           onClose={() => setShowCreateModal(false)}
-          onCreated={(productId) => {
+          onCreated={(productId, slug, communitySlug) => {
             setShowCreateModal(false);
-            router.push(`/product/${productId}`); // redirects to /c/... after migration
+            if (slug && communitySlug) {
+              router.push(`/c/${communitySlug}/${slug}`);
+            } else {
+              router.push(`/product/${productId}`);
+            }
           }}
         />
       )}

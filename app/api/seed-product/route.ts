@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { collection, addDoc, doc, writeBatch } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
+import { slugify, categoryToSlug } from "../../../lib/slugify";
 
 // ─── Gemini setup (same pattern as /api/agent) ────────────────────────────────
 
@@ -146,9 +147,15 @@ export async function POST(request: Request) {
 
   // ── Step 2: Build product doc (with or without AI data) ──────────────────
   const now = new Date().toISOString();
+  const resolvedCategory = aiData?.category ?? ("Tech" as Category);
+  const productSlug      = slugify(productName);
+  const communitySlug    = categoryToSlug(resolvedCategory);
+
   const productDoc = aiData
     ? {
         name: productName,
+        slug: productSlug,
+        communitySlug,
         brandName: aiData.brandName,
         category: aiData.category,
         description: aiData.description,
@@ -163,6 +170,8 @@ export async function POST(request: Request) {
       }
     : {
         name: productName,
+        slug: productSlug,
+        communitySlug,
         brandName: "",
         category: "Tech" as Category,
         description: "",
@@ -193,6 +202,8 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       productId: productRef.id,
+      slug: productSlug,
+      communitySlug,
       data: aiData
         ? { ...aiData }
         : { brandName: "", category: "Tech", description: "", specs: [], variants: [], verifiedSkus: [] },

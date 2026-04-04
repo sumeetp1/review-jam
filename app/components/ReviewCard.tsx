@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
-  collection, query, where, getDocs, addDoc, orderBy,
+  collection, query, where, getDocs, addDoc,
   doc, updateDoc, increment, arrayUnion, arrayRemove,
 } from "firebase/firestore";
 import { db } from "../../lib/firebase";
@@ -116,19 +116,27 @@ function CommentThread({
   const [replyingTo, setReplyingTo] = useState<{ id: string; userName: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  // Auto-load comments when thread mounts
+  useEffect(() => {
+    loadComments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const loadComments = async () => {
     if (loaded) return;
     setLoading(true);
     try {
       const q = query(
         collection(db, "reviewComments"),
-        where("reviewId", "==", reviewId),
-        orderBy("createdAt", "asc")
+        where("reviewId", "==", reviewId)
       );
       const snap = await getDocs(q);
-      setComments(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Comment)));
+      const sorted = snap.docs
+        .map((d) => ({ id: d.id, ...d.data() } as Comment))
+        .sort((a, b) => (a.createdAt ?? "").localeCompare(b.createdAt ?? ""));
+      setComments(sorted);
     } catch {
-      // Firestore index may not exist yet; fail silently
+      // Firestore query failed; show empty state
     } finally {
       setLoaded(true);
       setLoading(false);
@@ -196,14 +204,8 @@ function CommentThread({
 
   return (
     <div className="mt-2 border-t border-slate-100 dark:border-slate-800 pt-2">
-      {!loaded ? (
-        <button
-          type="button"
-          onClick={loadComments}
-          className="text-[12px] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
-        >
-          {loading ? "Loading…" : "Load comments"}
-        </button>
+      {loading ? (
+        <p className="text-[12px] text-slate-400 dark:text-slate-500">Loading comments…</p>
       ) : (
         <div className="space-y-2">
           {comments.length === 0 && (
