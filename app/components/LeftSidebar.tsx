@@ -171,7 +171,7 @@ export default function LeftSidebar({
         {/* ── Navigation ─────────────────────────────── */}
         <SectionHeader label="Navigate" />
         <nav className="px-1">
-          <NavRow href="/" icon="🏠" label="Home" active={pathname === "/" && activeCategoryFilter === "All"} onClick={onClearFilter} />
+          <NavRow href="/feed" icon="🏠" label="Feed" active={pathname === "/feed" && activeCategoryFilter === "All"} onClick={onClearFilter} />
           <NavRow href="/explore" icon="🔍" label="Explore" active={pathname === "/explore"} />
           <NavRow href="/c" icon="📡" label="Communities" active={pathname.startsWith("/c")} />
           <NavRow href="/profile" icon="👤" label="Profile" active={pathname === "/profile"} />

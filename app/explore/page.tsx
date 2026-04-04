@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { calculateDiscoveryRank } from "../../lib/discoveryRank";
@@ -260,13 +260,22 @@ function CreateHubModal({
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
-export default function ExplorePage() {
+export default function ExplorePageWrapper() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white dark:bg-slate-950 flex items-center justify-center text-slate-400 text-sm animate-pulse">Loading...</div>}>
+      <ExplorePage />
+    </Suspense>
+  );
+}
+
+function ExplorePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<ProductEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [sortKey, setSortKey] = useState<SortKey>("discovery");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") ?? "");
   const [boostedCategories, setBoostedCategories] = useState<Set<string>>(new Set());
   const [showCreateModal, setShowCreateModal] = useState(false);
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
-  { href: "/",         label: "Home",     icon: HomeIcon },
+  { href: "/feed",     label: "Home",     icon: HomeIcon },
   { href: "/explore",  label: "Explore",  icon: ExploreIcon },
   { href: "/c", label: "Communities", icon: ChannelsIcon },
   { href: "/profile",  label: "Profile",  icon: ProfileIcon },
@@ -17,7 +17,7 @@ export default function BottomNav() {
     <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 safe-area-pb">
       <div className="flex items-stretch h-[56px]">
         {NAV_ITEMS.map((item) => {
-          const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+          const isActive = pathname === item.href || (item.href !== "/feed" && pathname.startsWith(item.href));
           const Icon = item.icon;
           return (
             <Link
