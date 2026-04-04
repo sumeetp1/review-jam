@@ -1,14 +1,16 @@
 <svg width="512" height="128" viewBox="0 0 512 128" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="rjGradient" x1="8" y1="8" x2="120" y2="120" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#4F46E5"/>
-      <stop offset="1" stop-color="#7C3AED"/>
+    <linearGradient id="rjShield" x1="16" y1="8" x2="112" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6366F1"/>
+      <stop offset="0.5" stop-color="#8B5CF6"/>
+      <stop offset="1" stop-color="#A78BFA"/>
     </linearGradient>
   </defs>
-  <!-- Icon mark -->
-  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#rjGradient)"/>
-  <path d="M35 64L53 81L89 45" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M78 78H93C98.5 78 103 82.5 103 88C103 93.5 98.5 98 93 98H71C65.5 98 61 93.5 61 88C61 84.1 63.2 80.7 66.4 79" fill="white" fill-opacity="0.18"/>
-  <!-- Wordmark -->
-  <text x="148" y="64" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="42" font-weight="700" fill="#0F172A" dominant-baseline="middle" letter-spacing="-0.5">Review Jam</text>
+  <!-- Shield icon -->
+  <path d="M64 8L16 26V62C16 90 36 112 64 120C92 112 112 90 112 62V26L64 8Z" fill="url(#rjShield)"/>
+  <!-- Star inside shield -->
+  <path d="M64 36L70 52.5H87.5L73.5 63L79 79.5L64 69L49 79.5L54.5 63L40.5 52.5H58L64 36Z" fill="white" fill-opacity="0.95"/>
+  <!-- Wordmark: stacked -->
+  <text x="132" y="56" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, sans-serif" font-size="50" font-weight="800" fill="#1E293B" dominant-baseline="middle" letter-spacing="-1.5">Review</text>
+  <text x="134" y="96" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, sans-serif" font-size="30" font-weight="700" fill="#6366F1" dominant-baseline="middle" letter-spacing="4">JAM</text>
 </svg>

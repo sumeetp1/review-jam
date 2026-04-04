@@ -69,10 +69,17 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col transition-colors duration-200 bg-gradient-to-br from-white via-indigo-50/40 to-violet-50/30 dark:bg-none dark:bg-slate-950">
+    <div className="min-h-screen flex flex-col transition-colors duration-200 bg-gradient-to-br from-white via-indigo-50/40 to-violet-50/30 dark:bg-none dark:bg-slate-950 relative overflow-hidden">
+
+      {/* Trust background image */}
+      <div
+        className="absolute inset-0 opacity-[0.04] dark:opacity-[0.03] pointer-events-none bg-center bg-cover"
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1920&q=80&fit=crop')" }}
+        aria-hidden="true"
+      />
 
       {/* Top bar */}
-      <header className="flex items-center justify-between px-4 md:px-8 h-14 shrink-0">
+      <header className="flex items-center justify-between px-4 md:px-8 h-14 shrink-0 relative z-10">
         <Link href="/" className="flex items-center">
           <Image src="/logo.svg" alt="Review Jam" width={110} height={26} priority className="dark:hidden" />
           <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} priority className="hidden dark:block" />
@@ -109,7 +116,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero — centered */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 pb-16">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 pb-16 relative z-10">
 
         {/* Logo mark */}
         <div className="mb-4">
