@@ -460,6 +460,11 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
             {product.communitySeeded && reviews.some((r: any) => r.isVerifiedPurchase === true) && (
               <span className="mt-0.5 shrink-0 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 px-2 py-1 rounded-full">✅ Verified</span>
             )}
+            {product.bountyStatus === "active" && (product.bountyPoolRemaining ?? 0) > 0 && (
+              <span className="mt-0.5 shrink-0 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-2 py-1 rounded-full">
+                💰 ${(product.bountyPoolRemaining ?? 0).toFixed(0)} Bounty Pool
+              </span>
+            )}
           </div>
           <p className="text-sm text-slate-500 dark:text-slate-500">{product.brandName}</p>
 

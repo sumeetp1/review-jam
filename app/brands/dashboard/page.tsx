@@ -45,10 +45,14 @@ export default function BrandDashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<string>("all");
-  const [bountyCategory, setBountyCategory] = useState("");
-  const [bountyTier, setBountyTier] = useState<1.5 | 2.0>(1.5);
+  const [bountyProductId, setBountyProductId] = useState("");
+  const [bountyAmount, setBountyAmount] = useState("500");
+  const [bountyMaxPerReview, setBountyMaxPerReview] = useState("25");
+  const [bountyMinScore, setBountyMinScore] = useState("60");
+  const [bountyDuration, setBountyDuration] = useState("30");
   const [isBountyLoading, setIsBountyLoading] = useState(false);
   const [bountyMessage, setBountyMessage] = useState("");
+  const [isDistributing, setIsDistributing] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
@@ -93,34 +97,48 @@ export default function BrandDashboardPage() {
     try { await signInWithPopup(auth, googleProvider); } catch {}
   };
 
-  const uniqueCategories = [...new Set(campaigns.map((c) => c.category).filter(Boolean))];
-
-  async function handleSponsorCategory() {
-    if (!bountyCategory) return;
+  async function handleFundBounty() {
+    if (!bountyProductId) return;
     setIsBountyLoading(true);
     setBountyMessage("");
     try {
-      const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-      const channelSnap = await getDocs(
-        query(collection(db, "channels"), where("category", "==", bountyCategory)),
-      );
-      if (channelSnap.empty) {
-        setBountyMessage(`No channels found for "${bountyCategory}". The multiplier will apply when channels in this category are created.`);
-        setIsBountyLoading(false);
-        return;
-      }
-      for (const ch of channelSnap.docs) {
-        await updateDoc(doc(db, "channels", ch.id), {
-          multiplier: bountyTier,
-          multiplierExpiresAt: expiresAt,
-          multiplierSponsoredBy: user?.email ?? "brand",
-        });
-      }
-      setBountyMessage(`✅ ${channelSnap.size} "${bountyCategory}" channel${channelSnap.size !== 1 ? "s" : ""} boosted to ${bountyTier}× for 30 days.`);
+      const res = await fetch("/api/bounty", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "fund",
+          productId: bountyProductId,
+          amount: Number(bountyAmount),
+          maxPerReview: Number(bountyMaxPerReview),
+          minHealthScore: Number(bountyMinScore),
+          durationDays: Number(bountyDuration),
+        }),
+      });
+      const data = await res.json();
+      setBountyMessage(data.success ? `✅ ${data.message}` : `❌ ${data.error}`);
+      if (data.success && user?.email) loadBrandData(user.email);
     } catch {
-      setBountyMessage("❌ Failed to apply bounty. Please try again.");
+      setBountyMessage("❌ Failed to fund bounty. Please try again.");
     } finally {
       setIsBountyLoading(false);
+    }
+  }
+
+  async function handleDistribute(productId: string) {
+    setIsDistributing(productId);
+    try {
+      const res = await fetch("/api/bounty", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "distribute", productId }),
+      });
+      const data = await res.json();
+      alert(data.success ? data.message : data.error);
+      if (data.success && user?.email) loadBrandData(user.email);
+    } catch {
+      alert("Failed to distribute bounty.");
+    } finally {
+      setIsDistributing(null);
     }
   }
 
@@ -272,6 +290,116 @@ export default function BrandDashboardPage() {
               <p className="text-xs text-slate-400 uppercase tracking-wide mt-0.5">{s.label}</p>
             </div>
           ))}
+        </div>
+
+        {/* ── Fund a Review Bounty ── */}
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-white flex items-center gap-2 mb-1">
+            💰 Fund a Review Bounty
+          </h3>
+          <p className="text-xs text-slate-400 leading-relaxed mb-4">
+            Incentivize honest reviews by funding a bounty pool. Payouts are based on review quality (health score), not sentiment — negative reviews earn the same as positive ones.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+            <div>
+              <label className="block text-[11px] text-slate-500 uppercase tracking-wide mb-1 font-semibold">Product</label>
+              <select
+                value={bountyProductId}
+                onChange={(e) => setBountyProductId(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-sm outline-none focus:border-indigo-500 transition"
+              >
+                <option value="">Select a product</option>
+                {campaigns.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-[11px] text-slate-500 uppercase tracking-wide mb-1 font-semibold">Pool Amount ($)</label>
+              <input
+                type="number"
+                value={bountyAmount}
+                onChange={(e) => setBountyAmount(e.target.value)}
+                min="50"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-sm outline-none focus:border-indigo-500 transition"
+              />
+            </div>
+            <div>
+              <label className="block text-[11px] text-slate-500 uppercase tracking-wide mb-1 font-semibold">Max per review ($)</label>
+              <input
+                type="number"
+                value={bountyMaxPerReview}
+                onChange={(e) => setBountyMaxPerReview(e.target.value)}
+                min="5"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-sm outline-none focus:border-indigo-500 transition"
+              />
+            </div>
+            <div>
+              <label className="block text-[11px] text-slate-500 uppercase tracking-wide mb-1 font-semibold">Min health score (0-100)</label>
+              <input
+                type="number"
+                value={bountyMinScore}
+                onChange={(e) => setBountyMinScore(e.target.value)}
+                min="0" max="100"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-sm outline-none focus:border-indigo-500 transition"
+              />
+            </div>
+            <div>
+              <label className="block text-[11px] text-slate-500 uppercase tracking-wide mb-1 font-semibold">Duration (days)</label>
+              <input
+                type="number"
+                value={bountyDuration}
+                onChange={(e) => setBountyDuration(e.target.value)}
+                min="7" max="90"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-sm outline-none focus:border-indigo-500 transition"
+              />
+            </div>
+            <div className="flex items-end">
+              <button
+                type="button"
+                onClick={handleFundBounty}
+                disabled={isBountyLoading || !bountyProductId || !bountyAmount}
+                className="w-full px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 text-white font-bold rounded-lg text-sm transition"
+              >
+                {isBountyLoading ? "Funding..." : "Fund Bounty"}
+              </button>
+            </div>
+          </div>
+
+          {bountyMessage && (
+            <p className={`text-xs font-semibold ${bountyMessage.startsWith("✅") ? "text-green-400" : "text-red-400"}`}>
+              {bountyMessage}
+            </p>
+          )}
+
+          {/* Active bounties */}
+          {campaigns.filter((c: any) => c.bountyStatus === "active" && (c.bountyPoolRemaining ?? 0) > 0).length > 0 && (
+            <div className="mt-4 border-t border-slate-700 pt-4">
+              <p className="text-[11px] text-slate-500 uppercase tracking-wide font-semibold mb-2">Active Bounties</p>
+              <div className="space-y-2">
+                {campaigns.filter((c: any) => c.bountyStatus === "active").map((c: any) => (
+                  <div key={c.id} className="flex items-center justify-between bg-slate-900 rounded-lg px-3 py-2.5">
+                    <div>
+                      <p className="text-sm font-medium text-white">{c.name}</p>
+                      <p className="text-[11px] text-slate-400">
+                        ${(c.bountyPoolRemaining ?? 0).toFixed(0)} remaining of ${(c.bountyPool ?? 0).toFixed(0)}
+                        {c.bountyExpiresAt && <span> · Expires {new Date(c.bountyExpiresAt).toLocaleDateString()}</span>}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDistribute(c.id)}
+                      disabled={isDistributing === c.id}
+                      className="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 text-white transition"
+                    >
+                      {isDistributing === c.id ? "..." : "Distribute"}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Top marketing quotes */}

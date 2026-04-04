@@ -33,6 +33,9 @@ type ProductEntry = {
   totalLikes: number;
   discoveryRank: number;
   hasVerifiedOwner: boolean;
+  bountyPool: number;
+  bountyPoolRemaining: number;
+  bountyStatus: string;
 };
 
 const CATEGORIES = ["All", "Tech", "Home", "SaaS", "Automotive", "Beauty", "Gaming", "Fitness", "Travel", "Finance"];
@@ -369,6 +372,9 @@ function ExplorePage() {
             avgRating,
             avgHealthScore,
             totalLikes,
+            bountyPool: prod.bountyPool ?? 0,
+            bountyPoolRemaining: prod.bountyPoolRemaining ?? 0,
+            bountyStatus: prod.bountyStatus ?? "",
             topQuote,
             discoveryRank,
             hasVerifiedOwner: prodReviews.some((r) => r.isVerifiedPurchase === true),
@@ -537,6 +543,11 @@ function ExplorePage() {
                       <div className="absolute bottom-2 left-3 flex items-center gap-1.5">
                         {isActive(p) && (
                           <span className="text-[10px] font-semibold text-white bg-emerald-500/90 px-1.5 py-0.5 rounded-full backdrop-blur-sm">Live</span>
+                        )}
+                        {p.bountyStatus === "active" && p.bountyPoolRemaining > 0 && (
+                          <span className="text-[10px] font-semibold text-white bg-amber-500/90 px-1.5 py-0.5 rounded-full backdrop-blur-sm">
+                            💰 ${p.bountyPoolRemaining.toFixed(0)} bounty
+                          </span>
                         )}
                         {p.avgRating > 0 && (
                           <span className="text-[11px] font-semibold text-white flex items-center gap-0.5">
