@@ -6,7 +6,6 @@ import Image from "next/image";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { db, auth } from "../../lib/firebase";
-import BottomNav from "../components/BottomNav";
 import CreateChannelModal from "../components/CreateChannelModal";
 import { AVAILABLE_CATEGORIES } from "../components/ReviewWizard";
 
@@ -62,20 +61,20 @@ export default function CommunitiesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 pb-24">
+    <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950 pb-20">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto px-4 md:px-8 py-3 flex items-center justify-between gap-4">
           <Link href="/" className="shrink-0">
             <Image src="/logo.svg" alt="Review Jam" width={110} height={26} className="dark:hidden" />
             <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} className="hidden dark:block" />
           </Link>
-          <h1 className="text-base font-bold text-slate-900 dark:text-slate-100">Communities</h1>
+          <h1 className="text-base font-bold text-slate-900 dark:text-slate-100 hidden sm:block">Communities</h1>
           {user ? (
             <button
               type="button"
               onClick={() => setShowCreate(true)}
-              className="px-3 py-1.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg text-sm font-medium hover:opacity-90 transition shrink-0"
+              className="px-3.5 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg text-sm font-medium hover:opacity-90 transition shrink-0"
             >
               + Create
             </button>
@@ -83,20 +82,25 @@ export default function CommunitiesPage() {
         </div>
 
         {/* Search + filter */}
-        <div className="max-w-5xl mx-auto px-4 pb-3 flex gap-2">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search communities…"
-            className="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-slate-100 dark:placeholder-slate-500"
-          />
+        <div className="max-w-6xl mx-auto px-4 md:px-8 pb-3 flex gap-2">
+          <div className="relative flex-1">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
+            </svg>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search communities..."
+              className="w-full pl-9 pr-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-300 dark:focus:border-indigo-600 dark:text-slate-100 dark:placeholder-slate-500 transition"
+            />
+          </div>
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none dark:text-slate-100"
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm outline-none dark:text-slate-100 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-300 dark:focus:border-indigo-600 transition"
           >
-            <option value="All">All</option>
+            <option value="All">All categories</option>
             {AVAILABLE_CATEGORIES.map((cat) => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
@@ -104,39 +108,65 @@ export default function CommunitiesPage() {
         </div>
       </header>
 
+      {/* Hero banner */}
+      <div className="max-w-6xl mx-auto px-4 md:px-8 pt-6 pb-2">
+        <div className="rounded-xl bg-gradient-to-r from-indigo-500/10 via-violet-500/10 to-purple-500/10 dark:from-indigo-900/20 dark:via-violet-900/20 dark:to-purple-900/20 border border-indigo-100 dark:border-indigo-900/40 px-6 py-5 flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">Communities</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-lg">
+              Join review communities around the products and categories you care about. Share reviews, discover recommendations, and connect with other reviewers.
+            </p>
+          </div>
+          <span className="text-4xl hidden sm:block">🌐</span>
+        </div>
+      </div>
+
       {/* Content */}
-      <div className="max-w-5xl mx-auto px-4 py-4">
+      <div className="max-w-6xl mx-auto px-4 md:px-8 py-4">
         {loading ? (
-          <p className="text-center text-sm text-slate-400 py-12">Loading communities...</p>
+          <p className="text-center text-sm text-slate-400 py-12 animate-pulse">Loading communities...</p>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-slate-400 dark:text-slate-500 text-sm mb-2">No communities found</p>
+          <div className="text-center py-20">
+            <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-xl mx-auto mb-3">🔍</div>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">No communities found</p>
             {user && (
-              <button type="button" onClick={() => setShowCreate(true)} className="text-sm text-slate-600 dark:text-slate-300 underline">
+              <button type="button" onClick={() => setShowCreate(true)} className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
                 Create the first one
               </button>
             )}
           </div>
         ) : (
           Array.from(grouped.entries()).map(([category, coms]) => (
-            <div key={category} className="mb-6">
-              <h2 className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">{category}</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            <div key={category} className="mb-8">
+              <h2 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                {category}
+                <span className="text-[10px] font-normal text-slate-400 dark:text-slate-600">({coms.length})</span>
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {coms.map((c) => (
                   <Link
                     key={c.id}
                     href={`/c/${c.slug}`}
-                    className="block p-3 rounded-lg border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition"
+                    className="block p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900 hover:border-indigo-200 dark:hover:border-indigo-800 hover:shadow-sm transition-all"
                   >
                     <div className="flex items-start gap-3">
-                      <span className="text-2xl leading-none">{c.iconEmoji}</span>
+                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-800/60 flex items-center justify-center text-2xl shrink-0">
+                        {c.iconEmoji}
+                      </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-sm text-slate-900 dark:text-slate-100">rj/{c.slug}</span>
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500">{c.memberCount} members</span>
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500">{c.reviewCount} reviews</span>
+                        <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 mb-0.5">rj/{c.slug}</p>
+                        <p className="text-[12px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed mb-2">{c.description}</p>
+                        <div className="flex items-center gap-3">
+                          <span className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                            {c.memberCount}
+                          </span>
+                          <span className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                            {c.reviewCount}
+                          </span>
                         </div>
-                        <p className="text-[12px] text-slate-600 dark:text-slate-400 mt-0.5 line-clamp-2">{c.description}</p>
                       </div>
                     </div>
                   </Link>
@@ -158,8 +188,6 @@ export default function CommunitiesPage() {
           }}
         />
       )}
-
-      <BottomNav />
     </div>
   );
 }

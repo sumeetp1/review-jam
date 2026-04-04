@@ -7,6 +7,18 @@ import Image from "next/image";
 import { collection, getCountFromServer } from "firebase/firestore";
 import { onAuthStateChanged, signInWithPopup, User } from "firebase/auth";
 import { db, auth, googleProvider } from "../lib/firebase";
+import Avatar from "./components/Avatar";
+
+const CATEGORIES = [
+  { name: "Tech",       icon: "💻", color: "from-blue-500/10 to-indigo-500/10 border-blue-200 dark:border-blue-800 hover:border-blue-400 dark:hover:border-blue-600",       text: "text-blue-700 dark:text-blue-400" },
+  { name: "SaaS",       icon: "☁️", color: "from-violet-500/10 to-purple-500/10 border-violet-200 dark:border-violet-800 hover:border-violet-400 dark:hover:border-violet-600", text: "text-violet-700 dark:text-violet-400" },
+  { name: "Gaming",     icon: "🎮", color: "from-emerald-500/10 to-teal-500/10 border-emerald-200 dark:border-emerald-800 hover:border-emerald-400 dark:hover:border-emerald-600", text: "text-emerald-700 dark:text-emerald-400" },
+  { name: "Beauty",     icon: "✨", color: "from-pink-500/10 to-rose-500/10 border-pink-200 dark:border-pink-800 hover:border-pink-400 dark:hover:border-pink-600",           text: "text-pink-700 dark:text-pink-400" },
+  { name: "Home",       icon: "🏠", color: "from-amber-500/10 to-orange-500/10 border-amber-200 dark:border-amber-800 hover:border-amber-400 dark:hover:border-amber-600",     text: "text-amber-700 dark:text-amber-400" },
+  { name: "Fitness",    icon: "💪", color: "from-red-500/10 to-rose-500/10 border-red-200 dark:border-red-800 hover:border-red-400 dark:hover:border-red-600",                 text: "text-red-700 dark:text-red-400" },
+  { name: "Automotive", icon: "🚗", color: "from-slate-500/10 to-zinc-500/10 border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600",       text: "text-slate-700 dark:text-slate-400" },
+  { name: "Finance",    icon: "💰", color: "from-green-500/10 to-emerald-500/10 border-green-200 dark:border-green-800 hover:border-green-400 dark:hover:border-green-600",     text: "text-green-700 dark:text-green-400" },
+];
 
 export default function LandingPage() {
   const router = useRouter();
@@ -68,7 +80,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-300 transition-colors duration-200 flex flex-col">
+    <div className="min-h-screen flex flex-col transition-colors duration-200 bg-gradient-to-br from-white via-indigo-50/40 to-violet-50/30 dark:from-slate-950 dark:via-slate-950 dark:to-indigo-950/20">
 
       {/* Top bar */}
       <header className="flex items-center justify-between px-4 md:px-8 h-14 shrink-0">
@@ -80,15 +92,21 @@ export default function LandingPage() {
           <button
             type="button"
             onClick={toggleDarkMode}
-            className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition text-slate-500 dark:text-slate-400 text-sm"
+            className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/60 dark:hover:bg-slate-800 transition text-slate-500 dark:text-slate-400 text-sm"
             aria-label="Toggle dark mode"
           >
             {isDarkMode ? "\u2600\uFE0F" : "\uD83C\uDF19"}
           </button>
           {user ? (
-            <Link href="/feed" className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
-              My Feed
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link href="/feed" className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition px-3 py-1.5 rounded-lg hover:bg-white/60 dark:hover:bg-slate-800">
+                My Feed
+              </Link>
+              <Link href="/profile" className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-white/60 dark:hover:bg-slate-800 transition">
+                <Avatar name={user.displayName} src={user.photoURL} size="sm" className="w-8 h-8" />
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300 hidden md:inline max-w-[120px] truncate">{user.displayName}</span>
+              </Link>
+            </div>
           ) : (
             <button
               type="button"
@@ -102,17 +120,20 @@ export default function LandingPage() {
       </header>
 
       {/* Hero — centered */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 pb-20">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 pb-16">
 
         {/* Logo mark */}
-        <div className="mb-6">
-          <Image src="/logo.svg" alt="Review Jam" width={200} height={48} className="dark:hidden" />
-          <Image src="/logo-dark.svg" alt="Review Jam" width={200} height={48} className="hidden dark:block" />
+        <div className="mb-4">
+          <Image src="/logo.svg" alt="Review Jam" width={220} height={52} className="dark:hidden" />
+          <Image src="/logo-dark.svg" alt="Review Jam" width={220} height={52} className="hidden dark:block" />
         </div>
 
         {/* Tagline */}
-        <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 text-center mb-8 max-w-md">
-          Real reviews from real people.
+        <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 text-center mb-2 max-w-lg font-medium">
+          Discover trusted reviews. Share your experience.
+        </p>
+        <p className="text-sm md:text-base text-slate-400 dark:text-slate-500 text-center mb-8 max-w-md">
+          Join a community-driven marketplace where honest opinions are valued and rewarded.
         </p>
 
         {/* Search bar */}
@@ -130,7 +151,7 @@ export default function LandingPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search for a product, brand, or category..."
-              className="w-full pl-12 pr-4 py-3.5 md:py-4 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-base outline-none shadow-sm hover:shadow-md focus:shadow-md focus:border-indigo-300 dark:focus:border-indigo-600 transition-all dark:text-slate-100 dark:placeholder-slate-500"
+              className="w-full pl-12 pr-4 py-3.5 md:py-4 rounded-full border border-slate-200/80 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm text-base outline-none shadow-sm hover:shadow-md focus:shadow-lg focus:border-indigo-400 dark:focus:border-indigo-500 transition-all dark:text-slate-100 dark:placeholder-slate-500"
               autoComplete="off"
             />
           </div>
@@ -140,32 +161,57 @@ export default function LandingPage() {
         <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
           <Link
             href="/feed"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:text-indigo-600 dark:hover:border-indigo-600 dark:hover:text-indigo-400 transition bg-white dark:bg-slate-900"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-indigo-200 dark:border-indigo-800 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
             Write a Review
           </Link>
           <Link
             href="/explore"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:text-indigo-600 dark:hover:border-indigo-600 dark:hover:text-indigo-400 transition bg-white dark:bg-slate-900"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:text-indigo-600 dark:hover:border-indigo-600 dark:hover:text-indigo-400 transition bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
             Explore Products
           </Link>
           <Link
             href="/c"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:text-indigo-600 dark:hover:border-indigo-600 dark:hover:text-indigo-400 transition bg-white dark:bg-slate-900"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:text-indigo-600 dark:hover:border-indigo-600 dark:hover:text-indigo-400 transition bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87" /><path d="M16 3.13a4 4 0 010 7.75" /></svg>
             Browse Communities
           </Link>
         </div>
 
+        {/* Category cards */}
+        <div className="w-full max-w-[700px] mb-8">
+          <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center mb-3">Browse by category</p>
+          <div className="grid grid-cols-4 md:grid-cols-4 gap-2">
+            {CATEGORIES.map((cat) => (
+              <Link
+                key={cat.name}
+                href={`/explore?q=${encodeURIComponent(cat.name)}`}
+                className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border bg-gradient-to-br ${cat.color} transition-all hover:shadow-sm hover:scale-[1.03] active:scale-[0.98]`}
+              >
+                <span className="text-2xl md:text-3xl">{cat.icon}</span>
+                <span className={`text-[11px] md:text-xs font-semibold ${cat.text}`}>{cat.name}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+
         {/* Stats */}
         {(stats.reviews > 0 || stats.products > 0) && (
-          <p className="text-sm text-slate-400 dark:text-slate-500">
-            {stats.reviews.toLocaleString()} reviews across {stats.products.toLocaleString()} products
-          </p>
+          <div className="flex items-center gap-6 text-sm">
+            <div className="text-center">
+              <p className="text-lg font-bold text-slate-900 dark:text-slate-100">{stats.reviews.toLocaleString()}</p>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500">Reviews</p>
+            </div>
+            <div className="w-px h-8 bg-slate-200 dark:bg-slate-700" />
+            <div className="text-center">
+              <p className="text-lg font-bold text-slate-900 dark:text-slate-100">{stats.products.toLocaleString()}</p>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500">Products</p>
+            </div>
+          </div>
         )}
       </main>
     </div>
