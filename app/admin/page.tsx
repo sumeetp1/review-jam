@@ -205,7 +205,7 @@ export default function AdminDashboard() {
       const day = 24 * 60 * 60 * 1000;
 
       // ── Clear existing data (all collections) ────────────────────────────
-      const [prodSnap, revSnap, chSnap, cmSnap, rcSnap, discSnap, qaSnap] = await Promise.all([
+      const [prodSnap, revSnap, chSnap, cmSnap, rcSnap, discSnap, qaSnap, modSnap, paySnap, notifSnap] = await Promise.all([
         getDocs(collection(db, "products")),
         getDocs(collection(db, "reviews")),
         getDocs(collection(db, "channels")),
@@ -213,6 +213,9 @@ export default function AdminDashboard() {
         getDocs(collection(db, "reviewComments")),
         getDocs(collection(db, "productDiscussions")),
         getDocs(collection(db, "productDiscussionAnswers")),
+        getDocs(collection(db, "moderationEvents")),
+        getDocs(collection(db, "payoutLedger")),
+        getDocs(collection(db, "notifications")),
       ]);
       await Promise.all([
         ...prodSnap.docs.map((d) => deleteDoc(d.ref)),
@@ -222,6 +225,9 @@ export default function AdminDashboard() {
         ...rcSnap.docs.map((d) => deleteDoc(d.ref)),
         ...discSnap.docs.map((d) => deleteDoc(d.ref)),
         ...qaSnap.docs.map((d) => deleteDoc(d.ref)),
+        ...modSnap.docs.map((d) => deleteDoc(d.ref)),
+        ...paySnap.docs.map((d) => deleteDoc(d.ref)),
+        ...notifSnap.docs.map((d) => deleteDoc(d.ref)),
       ]);
 
       setStatusMessage("Inserting campaigns & variants…");
@@ -426,6 +432,12 @@ export default function AdminDashboard() {
       //   cons: []                  → Critical Balance penalty (-15 quality)
       //   isCampaignReview: false   → organic weight boost (1.2×) in Discovery Rank
       //   high likesCount           → engagement score, payout weighting
+      //   bestFor: [...]            → "Best for" tags (health score +5)
+      //   subRatings: {...}         → Attribute-level ratings (health score +1-5)
+      //   purchaseChannel: "..."    → Where purchased (amazon, brand_website, retail, other)
+      //   productCode: "..."        → SKU for verified purchase verification
+      //   reviewType: "generic"     → Quick review (no payout eligibility)
+      //   channelId: "..."          → Linked to community channel
       const reviews: any[] = [
 
         // ── TECH · Sony WH-1000XM6 ───────────────────────────────────────────
@@ -439,6 +451,9 @@ export default function AdminDashboard() {
           content: "Bought these the week they launched after years on the Bose QC35. The noise cancellation is in a completely different league — it removes the low-frequency London Underground rumble entirely, not just attenuates it. Battery genuinely lasts me three full work days. Multipoint pairing between my MacBook and iPhone is seamless.",
           pros: ["Class-leading ANC", "40hr battery", "Multipoint seamless", "Comfortable all-day"],
           cons: ["Clamping force tight on large heads", "App is bloated"],
+          bestFor: ["Commuters", "Frequent flyers", "Remote workers"],
+          subRatings: { "Performance": 5, "Build Quality": 4, "Value for Money": 5 },
+          purchaseChannel: "amazon", productCode: "WH1000XM6/B",
           likesCount: 341, helpfulCount: 112, commentCount: 3,
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "3_plus_months",
@@ -506,6 +521,9 @@ export default function AdminDashboard() {
           content: "The built-in OLED timer is the killer feature nobody mentions. Set a 25-minute focus block, stand for the second half — it is now completely automatic. Assembly took 40 minutes solo. Every cable routes through the integrated tray. Wobble at full height is minimal even with three monitors.",
           pros: ["OLED timer genius", "Cable management excellent", "Stable at max height", "App integration works"],
           cons: ["Assembly instructions could be clearer", "App occasionally disconnects"],
+          bestFor: ["Developers", "Standing desk converts", "Triple-monitor setups"],
+          subRatings: { "Durability": 5, "Design": 5, "Ease of Use": 4 },
+          purchaseChannel: "brand_website", productCode: "LMN-60W",
           likesCount: 267, helpfulCount: 89, commentCount: 4,
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "3_plus_months",
@@ -557,6 +575,9 @@ export default function AdminDashboard() {
           content: "Our 18-person engineering team migrated from Jira in a single afternoon. Creating an issue is three keystrokes. Cycles give our sprints actual structure. GitHub sync means no manual status updates. Six months in, nobody has asked to go back. The keyboard shortcut system alone saves me 45 minutes a week.",
           pros: ["Instant issue creation (3 keystrokes)", "Cycles track velocity naturally", "GitHub sync is flawless", "Fast as a native app"],
           cons: ["No Gantt chart for stakeholders", "Free tier member limit too low"],
+          bestFor: ["Engineering teams", "Keyboard-first users", "Jira refugees"],
+          subRatings: { "Features": 5, "Ease of Use": 5, "Customer Support": 4 },
+          purchaseChannel: "brand_website",
           likesCount: 312, helpfulCount: 134, commentCount: 6,
           isVerifiedPurchase: true, isCampaignReview: true,
           productSource: "purchased", usageDuration: "3_plus_months",
@@ -589,6 +610,9 @@ export default function AdminDashboard() {
           content: "Took it through Zion, Arches, and a 3,000-mile cross-country trip. The gear tunnel has replaced my entire rooftop cargo setup. Highway Assist is hands-free on any divided highway and actually trustworthy. Software updates have fixed every single issue I logged in the first month. Charging network smaller than Tesla but Electrify America works without app drama.",
           pros: ["Off-road capability genuine", "Gear tunnel genius", "OTA updates actually fix things", "Interior space class-leading"],
           cons: ["Charging network smaller than Tesla", "Service centres too few", "Camp Mode limited vs Tesla"],
+          bestFor: ["Adventure families", "Road trippers", "EV enthusiasts"],
+          subRatings: { "Performance": 5, "Comfort": 5, "Value for Money": 4 },
+          purchaseChannel: "brand_website", productCode: "R2-MAX-QM-2025",
           likesCount: 456, helpfulCount: 198, commentCount: 8,
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "3_plus_months",
@@ -625,6 +649,9 @@ export default function AdminDashboard() {
           content: "I was deeply sceptical. Lip glosses do not plump lips — that is marketing speak. Two months of daily use later and the vertical lip lines I have had since my 30s are measurably reduced. The glaze finish photographs beautifully without that sticky latex feel other glosses have. Repurchased twice.",
           pros: ["Real plumping over time", "Non-sticky glaze finish", "Hydration lasts 4–5 hours", "Photographs well"],
           cons: ["Small tube for the price", "Glazed Donut scent divisive"],
+          bestFor: ["Lip care enthusiasts", "Photography subjects", "Dry lip sufferers"],
+          subRatings: { "Results": 5, "Ingredients": 5, "Packaging": 3 },
+          purchaseChannel: "brand_website", productCode: "RH-LIP-GD",
           likesCount: 378, helpfulCount: 145, commentCount: 5,
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "3_plus_months",
@@ -657,6 +684,9 @@ export default function AdminDashboard() {
           content: "Spider-Man 2 at 60fps with full ray tracing is genuinely stunning — this would require a $2,000 PC to achieve natively. PSSR upscaling is not perfect on every title but the best implementations are indistinguishable from native 4K. DualSense haptics remain the most underrated innovation in gaming. The extra storage alone justifies the upgrade from base PS5 if you own more than 15 games.",
           pros: ["PSSR enables 60fps RT in flagship titles", "2TB SSD essential", "DualSense haptics still best-in-class", "Backward compat perfect"],
           cons: ["PSSR inconsistent across games", "Premium price", "No 8K games exist yet"],
+          bestFor: ["First-party gamers", "4K display owners", "Storage hoarders"],
+          subRatings: { "Graphics": 5, "Gameplay": 5, "Value for Money": 3 },
+          purchaseChannel: "retail",
           likesCount: 534, helpfulCount: 234, commentCount: 9,
           isVerifiedPurchase: true, isCampaignReview: true,
           productSource: "brand_sent", usageDuration: "1_3_months",
@@ -693,6 +723,9 @@ export default function AdminDashboard() {
           content: "Six months in and I have completely restructured my training blocks around recovery scores. The most useful moment was when my HRV dropped 18% below baseline for no obvious reason — I rested that day instead of training hard, and 48 hours later got a cold. The device literally predicted my illness. Skin temperature tracking is the sleeper feature — it explains the bad sleep nights I couldn't otherwise account for.",
           pros: ["HRV genuinely predictive", "Sleep staging accurate", "Skin temp catches illness early", "Comfortable to sleep in"],
           cons: ["Subscription model expensive long-term", "No screen means phone dependency", "Community features underdeveloped"],
+          bestFor: ["Endurance athletes", "Sleep optimisers", "Biohackers"],
+          subRatings: { "Effectiveness": 5, "Build Quality": 4, "Value for Money": 3 },
+          purchaseChannel: "brand_website",
           likesCount: 289, helpfulCount: 134, commentCount: 5,
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "3_plus_months",
@@ -780,6 +813,21 @@ export default function AdminDashboard() {
           productSource: "brand_sent", usageDuration: "1_3_months",
           eligibleForPayout: true, reviewType: "campaign",
           createdAt: ago(9) },
+
+        // [21] GENERIC review — tests the "quick review" flow (no payout, no AI validation)
+        { productName: "Sony WH-1000XM6", category: "Tech", campaignId: "organic",
+          productId: campDocs["camp_sony"], productSlug: "sony-wh-1000xm6", communitySlug: "tech",
+          variantName: "Midnight Black", variantId: vid("camp_sony","Midnight Black"),
+          reviewerName: "Quick Reviewer", reviewerId: "seed_u22", rating: 4,
+          summary: "Solid headphones, recommend them",
+          content: "Got these as a gift. Sound quality is excellent and the noise cancellation works well on the train. Battery lasts ages. Would recommend.",
+          pros: ["Great sound", "Good ANC"],
+          cons: ["A bit pricey"],
+          likesCount: 5, helpfulCount: 2, commentCount: 0,
+          isVerifiedPurchase: false, isCampaignReview: false,
+          productSource: "gift", usageDuration: "1_4_weeks",
+          eligibleForPayout: false, reviewType: "generic",
+          createdAt: ago(2) },
       ];
 
       // Write reviews with computed health scores
@@ -1101,7 +1149,82 @@ export default function AdminDashboard() {
         }
       }
 
-      setStatusMessage(`✅ Done! Seeded ${campaigns.length} products (with slug + communitySlug), ${reviews.length} reviews (${reviews.filter(r => r.isVerifiedPurchase).length} verified, ${reviews.filter(r => r.biasFlag).length} bias-flagged), ${sampleChannels.length} communities (${sampleChannels.filter(c => c.multiplier > 1).length} boosted), 3 ownership journeys, threaded comments, discussion posts, and Q&A answers. All product links now route via /c/[community]/[slug].`);
+      setStatusMessage("Adding channel memberships…");
+
+      // ── Channel memberships — link seed reviewers to relevant communities ───
+      const memberships = [
+        { channelId: channelIds["tech"], userId: "seed_u1", userName: "Alex Chen" },
+        { channelId: channelIds["tech"], userId: "seed_u2", userName: "Priya Singh" },
+        { channelId: channelIds["tech"], userId: "seed_u4", userName: "Sam Williams" },
+        { channelId: channelIds["home"], userId: "seed_u5", userName: "Marcus Thompson" },
+        { channelId: channelIds["home"], userId: "seed_u7", userName: "Derek Liu" },
+        { channelId: channelIds["saas"], userId: "seed_u8", userName: "David Kim" },
+        { channelId: channelIds["saas"], userId: "seed_u9", userName: "Anita Rao" },
+        { channelId: channelIds["automotive"], userId: "seed_u10", userName: "Chris Meyers" },
+        { channelId: channelIds["beauty"], userId: "seed_u12", userName: "Aisha Patel" },
+        { channelId: channelIds["gaming"], userId: "seed_u14", userName: "Tom Harrison" },
+        { channelId: channelIds["fitness"], userId: "seed_u16", userName: "Elena Rodriguez" },
+        { channelId: channelIds["travel"], userId: "seed_u18", userName: "Priya Nair" },
+        { channelId: channelIds["finance"], userId: "seed_u20", userName: "Nate Diaz" },
+      ];
+      for (const m of memberships) {
+        await addDoc(collection(db, "channelMembers"), {
+          ...m, joinedAt: ago(Math.floor(Math.random() * 60) + 7),
+        });
+      }
+
+      setStatusMessage("Adding moderation events…");
+
+      // ── Moderation events — audit log for AI/deterministic bias detection ────
+      await addDoc(collection(db, "moderationEvents"), {
+        reviewId: reviewIds[2], reviewerName: "BrandPartner99",
+        reviewPreview: "This is the most incredible product I have ever used. The sound is perfect...",
+        isGenuine: false,
+        reason: "Review contains zero cons, uses superlative language ('perfect', 'flawless') without specifics, and was submitted after less than 1 week of use with a brand_sent product source. Pattern consistent with promotional content.",
+        marketingQuote: "Absolutely perfect in every way — 10/10 no notes",
+        source: "ai" as const,
+        createdAt: ago(5),
+      });
+      await addDoc(collection(db, "moderationEvents"), {
+        reviewId: reviewIds[2], reviewerName: "BrandPartner99",
+        reviewPreview: "This is the most incredible product I have ever used...",
+        isGenuine: false,
+        reason: "Critical Balance check failed: 0 cons listed. Reviews without any negative feedback are automatically flagged for bias.",
+        source: "deterministic" as const,
+        createdAt: ago(5),
+      });
+
+      setStatusMessage("Adding payout ledger entries…");
+
+      // ── Payout ledger — financial transaction log for campaign reviewers ─────
+      const payouts = [
+        { userId: "seed_u2", reviewId: reviewIds[1], productId: campDocs["camp_sony"], productName: "Sony WH-1000XM6", amount: 45.00, healthScore: 68, weightedScore: 68, categoryMultiplier: 1, rawLikes: 178, hasPhoto: false, status: "paid", paidAt: ago(20) },
+        { userId: "seed_u6", reviewId: reviewIds[5], productId: campDocs["camp_lumina"], productName: "Lumina Smart Standing Desk", amount: 32.50, healthScore: 62, weightedScore: 62, categoryMultiplier: 1, rawLikes: 134, hasPhoto: false, status: "paid", paidAt: ago(7) },
+        { userId: "seed_u8", reviewId: reviewIds[7], productId: campDocs["camp_linear"], productName: "Linear — Project Management", amount: 78.00, healthScore: 82, weightedScore: 123, categoryMultiplier: 1.5, rawLikes: 312, hasPhoto: false, status: "paid", paidAt: ago(15) },
+        { userId: "seed_u14", reviewId: reviewIds[13], productId: campDocs["camp_ps5pro"], productName: "PlayStation 5 Pro", amount: 95.00, healthScore: 85, weightedScore: 85, categoryMultiplier: 1, rawLikes: 534, hasPhoto: true, status: "paid", paidAt: ago(5) },
+        { userId: "seed_u13", reviewId: reviewIds[12], productId: campDocs["camp_rhode"], productName: "Rhode Peptide Lip Treatment", amount: 55.00, healthScore: 65, weightedScore: 130, categoryMultiplier: 2.0, rawLikes: 134, hasPhoto: false, status: "pending", paidAt: null },
+      ];
+      for (const p of payouts) {
+        await addDoc(collection(db, "payoutLedger"), { ...p, createdAt: p.paidAt || now.toISOString() });
+      }
+
+      setStatusMessage("Adding notifications…");
+
+      // ── Notifications — sample notification feed ────────────────────────────
+      const notifications = [
+        { userId: "seed_u1", type: "like", message: "Marcus Thompson liked your review of Sony WH-1000XM6", reviewId: reviewIds[0], read: false, createdAt: ago(1) },
+        { userId: "seed_u1", type: "comment", message: "Anita Rao commented on your review: \"How do these compare to the Bose QC Ultra?\"", reviewId: reviewIds[0], read: true, createdAt: ago(8) },
+        { userId: "seed_u1", type: "helpful", message: "Your review of Sony WH-1000XM6 was marked as helpful by 5 people", reviewId: reviewIds[0], read: false, createdAt: ago(3) },
+        { userId: "seed_u10", type: "like", message: "Olivia Park liked your review of Rivian R2 SUV", reviewId: reviewIds[9], read: false, createdAt: ago(2) },
+        { userId: "seed_u8", type: "payout", message: "You received a $78.00 payout for your Linear review!", reviewId: reviewIds[7], read: true, createdAt: ago(15) },
+        { userId: "seed_u14", type: "payout", message: "You received a $95.00 payout for your PlayStation 5 Pro review!", reviewId: reviewIds[13], read: false, createdAt: ago(5) },
+        { userId: "seed_u12", type: "like", message: "Zoe Taylor liked your review of Rhode Peptide Lip Treatment", reviewId: reviewIds[11], read: false, createdAt: ago(4) },
+      ];
+      for (const n of notifications) {
+        await addDoc(collection(db, "notifications"), n);
+      }
+
+      setStatusMessage(`✅ Done! Seeded ${campaigns.length} products, ${reviews.length} reviews (${reviews.filter(r => r.isVerifiedPurchase).length} verified, ${reviews.filter(r => r.biasFlag).length} bias-flagged, ${reviews.filter(r => r.reviewType === "generic").length} generic), ${sampleChannels.length} communities (${sampleChannels.filter(c => c.multiplier > 1).length} boosted), 3 ownership journeys, ${memberships.length} channel memberships, 2 moderation events, ${payouts.length} payouts, ${notifications.length} notifications, threaded comments, discussion posts, and Q&A answers.`);
     } catch (error) {
       console.error(error);
       setStatusMessage("❌ Error seeding data. Check console.");
