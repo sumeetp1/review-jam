@@ -372,22 +372,6 @@ export default function ReviewCard({
             </p>
           )}
 
-          {/* Ownership Journey pills — always visible when versions exist */}
-          {(review.versionCount ?? 0) > 1 && (
-            <div className="mb-2">
-              <ReviewTimeline
-                reviewId={review.id}
-                originalReview={{
-                  content: review.content,
-                  rating: review.rating,
-                  pros: review.pros,
-                  cons: review.cons,
-                  createdAt: review.createdAt,
-                }}
-              />
-            </div>
-          )}
-
           {/* Read more / Show less toggle */}
           {(review.content || hasPros || hasCons || hasSubRatings || hasMedia || hasBestFor) && (
             <button
@@ -469,6 +453,11 @@ export default function ReviewCard({
                     </span>
                   ))}
                 </div>
+              )}
+
+              {/* Ownership journey — nested thread under original review */}
+              {(review.versionCount ?? 0) > 1 && (
+                <ReviewTimeline reviewId={review.id} />
               )}
             </>
           )}
