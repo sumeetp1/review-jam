@@ -64,47 +64,6 @@ function HealthRing({ score }: { score: number }) {
   );
 }
 
-function CounterTakePanel({ original, forks }: { original: any; forks: any[] }) {
-  const fork = forks[0]; if (!fork) return null;
-  const origPros = (original.pros ?? []) as string[]; const origCons = (original.cons ?? []) as string[];
-  const forkPros = (fork.pros ?? []) as string[]; const forkCons = (fork.cons ?? []) as string[];
-  const disagreements = [
-    ...origPros.filter((p) => !forkPros.includes(p)),
-    ...origCons.filter((c) => !forkCons.includes(c)),
-    ...forkPros.filter((p) => !origPros.includes(p)),
-    ...forkCons.filter((c) => !origCons.includes(c)),
-  ];
-  return (
-    <div className="mt-3 rounded-xl border border-slate-200 dark:border-slate-700/60 overflow-hidden text-[12px]">
-      <div className="grid grid-cols-1 sm:grid-cols-2">
-        <div className="p-3 space-y-2 border-b sm:border-b-0 sm:border-r border-slate-200 dark:border-slate-700/60">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Original</p>
-          <p className="font-semibold text-slate-800 dark:text-slate-200">{original.reviewerName ?? "Anonymous"}</p>
-          <div className="flex gap-0.5">{[1,2,3,4,5].map((n) => <span key={n} className={n <= (original.rating || 0) ? "text-amber-400" : "text-slate-200 dark:text-slate-700"}>★</span>)}</div>
-          {origPros.length > 0 && <div className="flex flex-wrap gap-1">{origPros.slice(0,4).map((p,i) => <span key={i} className="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full text-[10px]">{p}</span>)}</div>}
-          {origCons.length > 0 && <div className="flex flex-wrap gap-1">{origCons.slice(0,4).map((c,i) => <span key={i} className="bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 px-2 py-0.5 rounded-full text-[10px]">{c}</span>)}</div>}
-          {original.content && <p className="text-slate-600 dark:text-slate-400 line-clamp-3">{original.content}</p>}
-        </div>
-        <div className="p-3 space-y-2 bg-indigo-50/40 dark:bg-indigo-950/10">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">⑂ Counter-take</p>
-          <p className="font-semibold text-slate-800 dark:text-slate-200">{fork.reviewerName ?? "Anonymous"}</p>
-          <div className="flex gap-0.5">{[1,2,3,4,5].map((n) => <span key={n} className={n <= (fork.rating || 0) ? "text-amber-400" : "text-slate-200 dark:text-slate-700"}>★</span>)}</div>
-          {forkPros.length > 0 && <div className="flex flex-wrap gap-1">{forkPros.slice(0,4).map((p,i) => <span key={i} className="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full text-[10px]">{p}</span>)}</div>}
-          {forkCons.length > 0 && <div className="flex flex-wrap gap-1">{forkCons.slice(0,4).map((c,i) => <span key={i} className="bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 px-2 py-0.5 rounded-full text-[10px]">{c}</span>)}</div>}
-          {fork.content && <p className="text-slate-600 dark:text-slate-400 line-clamp-3">{fork.content}</p>}
-        </div>
-      </div>
-      {disagreements.length > 0 && (
-        <div className="px-3 py-2 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-200 dark:border-slate-700/60">
-          <p className="text-[10px] font-bold text-slate-600 dark:text-slate-400 mb-1">Disagrees on</p>
-          <div className="flex flex-wrap gap-1">{disagreements.slice(0,8).map((d,i) => <span key={i} className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-full text-[10px]">{d}</span>)}</div>
-        </div>
-      )}
-      {forks.length > 1 && <div className="px-3 py-2 border-t border-slate-200 dark:border-slate-700/60 text-[10px] text-indigo-600 dark:text-indigo-400 text-center">+{forks.length - 1} more counter-take{forks.length - 1 > 1 ? "s" : ""}</div>}
-    </div>
-  );
-}
-
 const POST_TYPES = [
   { key: "question", icon: "❓", label: "Question" },
   { key: "tip", icon: "💡", label: "Tip" },
@@ -201,27 +160,24 @@ function QAFeed({ productId, questions, qaAnswers, currentUserId, currentUserNam
   );
 }
 
-function OwnershipJourneyCard({ reviews, currentUserId, currentUserName, onLike, onHelpful, onNotHelpful, onNewEntry, onFork, forkMap }: {
+function OwnershipJourneyCard({ reviews, currentUserId, currentUserName, onLike, onHelpful, onNotHelpful, onNewEntry }: {
   reviews: any[]; currentUserId?: string; currentUserName?: string;
   onLike: (id: string, likedBy: string[]) => void; onHelpful: (id: string, helpfulBy: string[]) => void;
   onNotHelpful: (id: string, notHelpfulBy: string[]) => void;
-  onNewEntry?: (review: any) => void; onFork?: (review: any) => void; forkMap: Map<string, any[]>;
+  onNewEntry?: (review: any) => void;
 }) {
   const primary = [...reviews].sort((a, b) => (b.likesCount || 0) - (a.likesCount || 0))[0];
   const isJourney = (primary.versionCount ?? 1) > 1;
   const isOwner = currentUserId && currentUserId === primary.reviewerId;
-  const forks = forkMap.get(primary.id) ?? [];
-  const [showForks, setShowForks] = useState(false);
   return (
     <div className={isJourney ? "border border-violet-200 dark:border-violet-800/50 rounded-xl overflow-hidden" : ""}>
       {isJourney && <div className="flex items-center gap-2 px-4 py-2 bg-violet-50 dark:bg-violet-950/30 border-b border-violet-200 dark:border-violet-800/50"><span className="text-[10px] font-bold uppercase tracking-widest text-violet-600 dark:text-violet-400">📋 Ownership Journey</span><span className="text-[10px] text-violet-500 dark:text-violet-500 ml-auto">{primary.versionCount} updates · {primary.latestVersionLabel ?? ""}</span></div>}
       <ReviewCard review={primary} currentUserId={currentUserId} currentUserName={currentUserName} onLike={onLike} onHelpful={onHelpful} onNotHelpful={onNotHelpful} showPoolLink={false} />
-      <div className="flex items-center gap-2 px-3 pb-3 flex-wrap">
-        {isOwner && onNewEntry && <button type="button" onClick={() => onNewEntry(primary)} className="text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition text-violet-600 dark:text-violet-400 border-violet-300 dark:border-violet-700 hover:bg-violet-50 dark:hover:bg-violet-950/30">+ New Entry</button>}
-        {(!isOwner || !onNewEntry) && onFork && <button type="button" onClick={() => onFork(primary)} className="text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900">⑂ Fork</button>}
-        {forks.length > 0 && <button type="button" onClick={() => setShowForks((v) => !v)} className="text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-950/20">⑂ {forks.length} Counter-take{forks.length !== 1 ? "s" : ""}</button>}
-      </div>
-      {showForks && forks.length > 0 && <div className="px-3 pb-3"><CounterTakePanel original={primary} forks={forks} /></div>}
+      {isOwner && onNewEntry && (
+        <div className="flex items-center gap-2 px-3 pb-3">
+          <button type="button" onClick={() => onNewEntry(primary)} className="text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition text-violet-600 dark:text-violet-400 border-violet-300 dark:border-violet-700 hover:bg-violet-50 dark:hover:bg-violet-950/30">+ New Entry</button>
+        </div>
+      )}
     </div>
   );
 }
@@ -315,7 +271,6 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
   const [hasAlreadyReviewed, setHasAlreadyReviewed] = useState(false);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [selectedVariantId, setSelectedVariantId] = useState("all");
-  const [forkSource, setForkSource] = useState<{ reviewId: string; reviewerName: string; productName: string; category: string; productId?: string } | null>(null);
   const [updatingReview, setUpdatingReview] = useState<any | null>(null);
 
   useEffect(() => {
@@ -384,22 +339,13 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
   for (const r of displayedReviews) { const key = r.reviewerId ?? r.id; if (!journeyMap.has(key)) journeyMap.set(key, []); journeyMap.get(key)!.push(r); }
   const journeys = Array.from(journeyMap.values()).sort((a, b) => (b[0].likesCount || 0) - (a[0].likesCount || 0));
 
-  const forkMap = new Map<string, any[]>();
-  for (const r of displayedReviews) { if (r.forkedFromReviewId) { const arr = forkMap.get(r.forkedFromReviewId) ?? []; arr.push(r); forkMap.set(r.forkedFromReviewId, arr); } }
-
   const verifiedOwnerIds = new Set<string>(reviews.filter((r) => r.isVerifiedPurchase === true && r.reviewerId).map((r) => r.reviewerId as string));
   const qaQuestions = discussions.filter((d) => d.type === "question");
   const generalDiscussions = discussions.filter((d) => d.type !== "question");
 
-  const handleFork = (review: any) => {
-    if (!user || !product) return;
-    setForkSource({ reviewId: review.id, reviewerName: review.reviewerName || "Anonymous", productName: product.name, category: product.category, productId: product.id });
-    setReviewMode("verified");
-  };
-
   const handleReviewSubmit = async (data: ReviewFormData) => {
     if (!user || !product) throw new Error("Missing user or product.");
-    if (!forkSource && hasAlreadyReviewed) throw new Error("You have already submitted a review for this product.");
+    if (hasAlreadyReviewed) throw new Error("You have already submitted a review for this product.");
     const mediaUrls: string[] = [];
     if (data.mediaFiles.length > 0) {
       try { for (const file of data.mediaFiles) { const fileRef = storageRef(storage, `reviews/${user.uid}/${Date.now()}_${file.name}`); await uploadBytes(fileRef, file); mediaUrls.push(await getDownloadURL(fileRef)); } } catch { /* best-effort */ }
@@ -431,12 +377,10 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
       variantId: data.variantId ?? null, variantName: data.variantName ?? null,
       createdAt: new Date().toISOString(),
     };
-    if (forkSource) { newReview.forkedFromReviewId = forkSource.reviewId; newReview.forkedFromReviewerName = forkSource.reviewerName; await updateDoc(doc(db, "reviews", forkSource.reviewId), { forkCount: increment(1) }); }
     const docRef = await addDoc(collection(db, "reviews"), newReview);
     setReviews((prev) => [{ id: docRef.id, ...newReview }, ...prev]);
-    if (!forkSource) setHasAlreadyReviewed(true);
+    setHasAlreadyReviewed(true);
     if (data.reviewType !== "generic") updateUserBadges(user.uid).catch(() => {});
-    setForkSource(null);
   };
 
   const makeUpdater = (field: string, field2: string) => async (reviewId: string, byArr: string[] = []) => {
@@ -487,7 +431,7 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
     <main className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200">
       {/* Review Wizard */}
       {reviewMode && user && (
-        <ReviewWizard user={user} mode={reviewMode} productInfo={{ name: product.name, category: product.category, variants }} isCampaignReview={reviewMode === "campaign"} forkSource={forkSource ?? undefined} onSubmit={handleReviewSubmit} onClose={() => { setReviewMode(null); setForkSource(null); }} />
+        <ReviewWizard user={user} mode={reviewMode} productInfo={{ name: product.name, category: product.category, variants }} isCampaignReview={reviewMode === "campaign"} onSubmit={handleReviewSubmit} onClose={() => setReviewMode(null)} />
       )}
 
       {/* Version Update Wizard */}
@@ -607,7 +551,7 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
               ))}
             </div>
 
-            {feedTab === "logs" && <div className="space-y-4">{journeys.length === 0 ? <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 py-14 text-center"><p className="text-2xl mb-2">📋</p><p className="text-sm text-slate-500 dark:text-slate-500">No owner logs yet.</p>{user && !hasAlreadyReviewed && <button type="button" onClick={() => setReviewMode("verified")} className="mt-3 text-[12px] font-semibold text-violet-600 dark:text-violet-400 hover:underline">Start your ownership log →</button>}</div> : journeys.map((group, i) => <OwnershipJourneyCard key={group[0].id ?? i} reviews={group} currentUserId={currentUserId} currentUserName={currentUserName} onLike={handleLike} onHelpful={handleHelpful} onNotHelpful={handleNotHelpful} onNewEntry={(review) => setUpdatingReview(review)} onFork={handleFork} forkMap={forkMap} />)}</div>}
+            {feedTab === "logs" && <div className="space-y-4">{journeys.length === 0 ? <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 py-14 text-center"><p className="text-2xl mb-2">📋</p><p className="text-sm text-slate-500 dark:text-slate-500">No owner logs yet.</p>{user && !hasAlreadyReviewed && <button type="button" onClick={() => setReviewMode("verified")} className="mt-3 text-[12px] font-semibold text-violet-600 dark:text-violet-400 hover:underline">Start your ownership log →</button>}</div> : journeys.map((group, i) => <OwnershipJourneyCard key={group[0].id ?? i} reviews={group} currentUserId={currentUserId} currentUserName={currentUserName} onLike={handleLike} onHelpful={handleHelpful} onNotHelpful={handleNotHelpful} onNewEntry={(review) => setUpdatingReview(review)} />)}</div>}
 
             {feedTab === "qa" && <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4"><QAFeed productId={product.id} questions={qaQuestions} qaAnswers={qaAnswers} currentUserId={currentUserId} currentUserName={currentUserName} verifiedOwnerIds={verifiedOwnerIds} onNewQuestion={(post) => setDiscussions((prev) => [post, ...prev])} onUpvoteQuestion={handleUpvotePost} onSubmitAnswer={handleSubmitAnswer} onUpvoteAnswer={handleUpvoteAnswer} /></div>}
 

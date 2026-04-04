@@ -38,7 +38,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   const [reviewMode, setReviewMode] = useState<"organic" | "verified" | "generic" | null>(null);
-  const [forkSource, setForkSource] = useState<{ reviewId: string; reviewerName: string; productName: string; category: string; productId?: string } | null>(null);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [currentTime, setCurrentTime] = useState(Date.now());
@@ -233,7 +232,6 @@ export default function Home() {
       notHelpfulCount: 0,
       notHelpfulBy: [],
       commentCount: 0,
-      forkCount: 0,
       versionCount: 1,
       marketingQuote,
       pros: data.pros,
@@ -254,40 +252,15 @@ export default function Home() {
       createdAt: new Date().toISOString(),
     };
 
-    // Fork metadata
-    if (data.forkedFromReviewId) {
-      newReview.forkedFromReviewId = data.forkedFromReviewId;
-      newReview.forkedFromReviewerName = data.forkedFromReviewerName;
-      // Increment fork count on original
-      await updateDoc(doc(db, "reviews", data.forkedFromReviewId), { forkCount: increment(1) });
-      setAllReviews((cur) => cur.map((r) => r.id === data.forkedFromReviewId ? { ...r, forkCount: (r.forkCount || 0) + 1 } : r));
-      await addDoc(collection(db, "reviewForks"), {
-        originalReviewId: data.forkedFromReviewId,
-        forkReviewId: "", // will update after
-        forkerId: user.uid,
-        forkerName: user.displayName,
-        createdAt: new Date().toISOString(),
-      });
-    }
-
     // Channel metadata
     if (data.channelId) { newReview.channelId = data.channelId; }
     if (data.channelSlug) { newReview.channelSlug = data.channelSlug; }
 
     const docRef = await addDoc(collection(db, "reviews"), newReview);
     setAllReviews((prev) => [{ id: docRef.id, ...newReview } as ReviewData, ...prev]);
-    setForkSource(null);
 
-    if (data.forkedFromReviewId) {
-      // Give trust score to the original reviewer whose content inspired the fork
-      const originalReview = allReviews.find((r) => r.id === data.forkedFromReviewId);
-      if (originalReview?.reviewerId) {
-        incrementTrustScore(originalReview.reviewerId, "fork", 10).catch(() => {});
-      }
-    } else {
-      // Organic review — reward the submitter
-      incrementTrustScore(user.uid, "organic_review", 5).catch(() => {});
-    }
+    // Reward the submitter
+    incrementTrustScore(user.uid, "organic_review", 5).catch(() => {});
 
     if (data.reviewType !== "generic") updateUserBadges(user.uid).catch(() => {});
   };
@@ -335,18 +308,6 @@ export default function Home() {
       notHelpfulCount: increment(has ? -1 : 1),
       notHelpfulBy: has ? arrayRemove(user.uid) : arrayUnion(user.uid),
     });
-  };
-
-  const handleFork = (review: ReviewData) => {
-    if (!user) { handleLogin(); return; }
-    setForkSource({
-      reviewId: review.id,
-      reviewerName: review.reviewerName || "Anonymous",
-      productName: review.productName || "",
-      category: review.category || "Tech",
-      productId: review.productId,
-    });
-    setReviewMode("verified");
   };
 
   // ── Feed tab logic ────────────────────────────────────────────────────────
@@ -399,9 +360,8 @@ export default function Home() {
         <ReviewWizard
           user={user}
           mode={reviewMode}
-          forkSource={forkSource ?? undefined}
           onSubmit={handleReviewSubmit}
-          onClose={() => { setReviewMode(null); setForkSource(null); }}
+          onClose={() => setReviewMode(null)}
         />
       )}
 
@@ -676,7 +636,6 @@ export default function Home() {
                   onLike={handleLike}
                   onHelpful={handleHelpful}
                   onNotHelpful={handleNotHelpful}
-                  onFork={handleFork}
                   showPoolLink
                 />
               ))

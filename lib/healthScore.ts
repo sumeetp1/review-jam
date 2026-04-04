@@ -24,7 +24,6 @@ type ReviewInput = {
   likesCount?: number;
   helpfulCount?: number;
   commentCount?: number;
-  forkCount?: number;
   productSource?: string;
   isVerifiedPurchase?: boolean;
   versionCount?: number;
@@ -54,8 +53,7 @@ export function computeHealthScore(
   const likesPts   = Math.min(Math.log2((review.likesCount ?? 0) + 1) * 2, 8);
   const helpPts    = Math.min(Math.log2((review.helpfulCount ?? 0) + 1) * 2, 7);
   const commentPts = Math.min((review.commentCount ?? 0), 5);
-  const forkPts    = Math.min((review.forkCount ?? 0) * 2.5, 5);
-  const engagement = likesPts + helpPts + commentPts + forkPts;
+  const engagement = likesPts + helpPts + commentPts;
 
   // ── Credibility (max 35 pts) ──────────────────────────────────────────────
   const badgePts      = Math.min(reviewerBadgeCount * 2, 10);

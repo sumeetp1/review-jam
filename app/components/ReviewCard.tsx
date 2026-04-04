@@ -57,9 +57,6 @@ export type ReviewData = {
   badges?: string[];
   healthScore?: number;
   healthScoreBreakdown?: HealthBreakdown;
-  forkedFromReviewId?: string;
-  forkedFromReviewerName?: string;
-  forkCount?: number;
   versionCount?: number;
   latestVersionLabel?: string;
   channelSlug?: string;
@@ -92,7 +89,6 @@ type Props = {
   onLike?: (reviewId: string, likedBy: string[]) => void;
   onHelpful?: (reviewId: string, helpfulBy: string[]) => void;
   onNotHelpful?: (reviewId: string, notHelpfulBy: string[]) => void;
-  onFork?: (review: ReviewData) => void;
   showPoolLink?: boolean;
 };
 
@@ -256,7 +252,6 @@ export default function ReviewCard({
   onLike,
   onHelpful,
   onNotHelpful,
-  onFork,
   showPoolLink = true,
 }: Props) {
   const [showComments, setShowComments] = useState(false);
@@ -318,13 +313,6 @@ export default function ReviewCard({
               )}
             </div>
           </div>
-
-          {/* Forked-from banner */}
-          {review.forkedFromReviewId && (
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1">
-              <span>⑂</span> Forked from {review.forkedFromReviewerName || "another review"}
-            </p>
-          )}
 
           {/* Product name + context badges */}
           {review.productName && (
@@ -508,19 +496,6 @@ export default function ReviewCard({
               <span aria-hidden>💬</span>
               <span className="tabular-nums">{commentCount}</span>
             </button>
-
-            {/* Fork */}
-            {onFork && (
-              <button
-                type="button"
-                onClick={() => onFork(review)}
-                className="flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/50 transition-colors"
-                title="Fork — write your take on this review"
-              >
-                <span aria-hidden>⑂</span>
-                {(review.forkCount ?? 0) > 0 && <span className="tabular-nums">{review.forkCount}</span>}
-              </button>
-            )}
 
             {/* Share */}
             <button

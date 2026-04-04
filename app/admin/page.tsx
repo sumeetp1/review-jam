@@ -205,13 +205,12 @@ export default function AdminDashboard() {
       const day = 24 * 60 * 60 * 1000;
 
       // ── Clear existing data (all collections) ────────────────────────────
-      const [prodSnap, revSnap, chSnap, cmSnap, rcSnap, rfSnap, discSnap, qaSnap] = await Promise.all([
+      const [prodSnap, revSnap, chSnap, cmSnap, rcSnap, discSnap, qaSnap] = await Promise.all([
         getDocs(collection(db, "products")),
         getDocs(collection(db, "reviews")),
         getDocs(collection(db, "channels")),
         getDocs(collection(db, "channelMembers")),
         getDocs(collection(db, "reviewComments")),
-        getDocs(collection(db, "reviewForks")),
         getDocs(collection(db, "productDiscussions")),
         getDocs(collection(db, "productDiscussionAnswers")),
       ]);
@@ -221,7 +220,6 @@ export default function AdminDashboard() {
         ...chSnap.docs.map((d) => deleteDoc(d.ref)),
         ...cmSnap.docs.map((d) => deleteDoc(d.ref)),
         ...rcSnap.docs.map((d) => deleteDoc(d.ref)),
-        ...rfSnap.docs.map((d) => deleteDoc(d.ref)),
         ...discSnap.docs.map((d) => deleteDoc(d.ref)),
         ...qaSnap.docs.map((d) => deleteDoc(d.ref)),
       ]);
@@ -427,7 +425,6 @@ export default function AdminDashboard() {
       //   versionCount > 1          → Ownership Journey card in the Hub
       //   cons: []                  → Critical Balance penalty (-15 quality)
       //   isCampaignReview: false   → organic weight boost (1.2×) in Discovery Rank
-      //   forkCount > 0             → Fork UI on ReviewCard
       //   high likesCount           → engagement score, payout weighting
       const reviews: any[] = [
 
@@ -442,7 +439,7 @@ export default function AdminDashboard() {
           content: "Bought these the week they launched after years on the Bose QC35. The noise cancellation is in a completely different league — it removes the low-frequency London Underground rumble entirely, not just attenuates it. Battery genuinely lasts me three full work days. Multipoint pairing between my MacBook and iPhone is seamless.",
           pros: ["Class-leading ANC", "40hr battery", "Multipoint seamless", "Comfortable all-day"],
           cons: ["Clamping force tight on large heads", "App is bloated"],
-          likesCount: 341, helpfulCount: 112, forkCount: 2, commentCount: 3,
+          likesCount: 341, helpfulCount: 112, commentCount: 3,
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "3_plus_months",
           eligibleForPayout: false, reviewType: "verified",
@@ -461,7 +458,7 @@ export default function AdminDashboard() {
           content: "Switching between my MacBook and iPhone is instant. No Bluetooth menu diving. The LDAC support means music from Tidal sounds genuinely hi-res. Clamping force slightly tight but loosens after a week. Not quite Bose on comfort but wins on everything else.",
           pros: ["Multipoint pairing", "LDAC Hi-Res", "Sound quality"],
           cons: ["Tight clamp initially", "ANC not quite Bose-level on wind noise"],
-          likesCount: 178, helpfulCount: 67, forkCount: 1, commentCount: 2,
+          likesCount: 178, helpfulCount: 67, commentCount: 2,
           isVerifiedPurchase: false, isCampaignReview: true,
           productSource: "brand_sent", usageDuration: "1_3_months",
           eligibleForPayout: true, reviewType: "campaign",
@@ -476,7 +473,7 @@ export default function AdminDashboard() {
           content: "This is the most incredible product I have ever used. The sound is perfect. The ANC is perfect. The battery is perfect. The design is perfect. I cannot find a single thing wrong with it. Everyone should buy these immediately they are simply flawless.",
           pros: ["Perfect sound", "Perfect ANC", "Perfect battery"],
           cons: [],  // <-- triggers Critical Balance penalty
-          likesCount: 12, helpfulCount: 3, forkCount: 0, commentCount: 0,
+          likesCount: 12, helpfulCount: 3, commentCount: 0,
           isVerifiedPurchase: false, isCampaignReview: true,
           biasFlag: true,  // <-- seeded as flagged for AI moderation log
           productSource: "brand_sent", usageDuration: "less_1_week",
@@ -492,7 +489,7 @@ export default function AdminDashboard() {
           content: "Sounds identical to the black but the colour attracts compliments constantly. Matte finish resists fingerprints unlike the glossy silver. Sound-wise this sits noticeably above my old Bose QC45 — bass is deeper and treble is less fatiguing over long sessions.",
           pros: ["Stunning matte finish", "Deep bass", "Non-fatiguing treble"],
           cons: ["Wish more colour options existed", "App still needs work"],
-          likesCount: 89, helpfulCount: 34, forkCount: 0, commentCount: 1,
+          likesCount: 89, helpfulCount: 34, commentCount: 1,
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "1_3_months",
           eligibleForPayout: false, reviewType: "verified",
@@ -509,7 +506,7 @@ export default function AdminDashboard() {
           content: "The built-in OLED timer is the killer feature nobody mentions. Set a 25-minute focus block, stand for the second half — it is now completely automatic. Assembly took 40 minutes solo. Every cable routes through the integrated tray. Wobble at full height is minimal even with three monitors.",
           pros: ["OLED timer genius", "Cable management excellent", "Stable at max height", "App integration works"],
           cons: ["Assembly instructions could be clearer", "App occasionally disconnects"],
-          likesCount: 267, helpfulCount: 89, forkCount: 1, commentCount: 4,
+          likesCount: 267, helpfulCount: 89, commentCount: 4,
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "3_plus_months",
           eligibleForPayout: false, reviewType: "verified",
@@ -528,7 +525,7 @@ export default function AdminDashboard() {
           content: "Compared seven desks before choosing this. For a single monitor the 48-inch is perfect. The walnut veneer looks genuinely premium — not cheap laminate. App reminders to stand actually work because the desk itself buzzes. Wish the surface was slightly deeper front-to-back.",
           pros: ["Premium walnut finish", "App reminders", "Solid motor"],
           cons: ["Shallow depth for dual monitor arms", "No USB-C hub built in"],
-          likesCount: 134, helpfulCount: 45, forkCount: 0, commentCount: 2,
+          likesCount: 134, helpfulCount: 45, commentCount: 2,
           isVerifiedPurchase: false, isCampaignReview: true,
           productSource: "brand_sent", usageDuration: "1_3_months",
           eligibleForPayout: true, reviewType: "campaign",
@@ -543,7 +540,7 @@ export default function AdminDashboard() {
           content: "Three 27-inch monitors plus a laptop stand and the 72-inch has room to spare. Motor is whisper-quiet — nobody in my open office notices when I raise it. Black top hides cable management perfectly. Two people needed for assembly given the weight but that is expected.",
           pros: ["Enormous surface", "Whisper-quiet motor", "Zero wobble at max height"],
           cons: ["Heavy — needs two people to assemble", "Premium price"],
-          likesCount: 198, helpfulCount: 72, forkCount: 0, commentCount: 2,
+          likesCount: 198, helpfulCount: 72, commentCount: 2,
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "3_plus_months",
           eligibleForPayout: false, reviewType: "verified",
@@ -560,7 +557,7 @@ export default function AdminDashboard() {
           content: "Our 18-person engineering team migrated from Jira in a single afternoon. Creating an issue is three keystrokes. Cycles give our sprints actual structure. GitHub sync means no manual status updates. Six months in, nobody has asked to go back. The keyboard shortcut system alone saves me 45 minutes a week.",
           pros: ["Instant issue creation (3 keystrokes)", "Cycles track velocity naturally", "GitHub sync is flawless", "Fast as a native app"],
           cons: ["No Gantt chart for stakeholders", "Free tier member limit too low"],
-          likesCount: 312, helpfulCount: 134, forkCount: 3, commentCount: 6,
+          likesCount: 312, helpfulCount: 134, commentCount: 6,
           isVerifiedPurchase: true, isCampaignReview: true,
           productSource: "purchased", usageDuration: "3_plus_months",
           eligibleForPayout: true, reviewType: "campaign",
@@ -575,7 +572,7 @@ export default function AdminDashboard() {
           content: "I run a one-person dev shop and the free tier covers everything I need. Keyboard shortcuts feel native rather than learned. Issue creation is so fast I actually log things I would normally ignore. Upgrade limits are frustrating if you add contractors.",
           pros: ["Free tier generous for solo", "Keyboard-first design", "Views are flexible"],
           cons: ["Free tier member limit", "No time tracking built in"],
-          likesCount: 89, helpfulCount: 34, forkCount: 0, commentCount: 1,
+          likesCount: 89, helpfulCount: 34, commentCount: 1,
           isVerifiedPurchase: false, isCampaignReview: true,
           productSource: "brand_sent", usageDuration: "1_3_months",
           eligibleForPayout: true, reviewType: "campaign",
@@ -592,7 +589,7 @@ export default function AdminDashboard() {
           content: "Took it through Zion, Arches, and a 3,000-mile cross-country trip. The gear tunnel has replaced my entire rooftop cargo setup. Highway Assist is hands-free on any divided highway and actually trustworthy. Software updates have fixed every single issue I logged in the first month. Charging network smaller than Tesla but Electrify America works without app drama.",
           pros: ["Off-road capability genuine", "Gear tunnel genius", "OTA updates actually fix things", "Interior space class-leading"],
           cons: ["Charging network smaller than Tesla", "Service centres too few", "Camp Mode limited vs Tesla"],
-          likesCount: 456, helpfulCount: 198, forkCount: 2, commentCount: 8,
+          likesCount: 456, helpfulCount: 198, commentCount: 8,
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "3_plus_months",
           eligibleForPayout: false, reviewType: "verified",
@@ -611,7 +608,7 @@ export default function AdminDashboard() {
           content: "Three car seats fit without anyone losing a hip — the flat floor is the trick. 290 miles of EPA range means we charge once per week at home for our 60-mile daily routine. Software updates arrive OTA and have been genuinely improving the product monthly. Service centre access remains the weak point.",
           pros: ["Family interior space", "290mi range sufficient", "OTA updates frequent", "Frunk storage useful"],
           cons: ["Service centre scarcity", "App still has rough edges"],
-          likesCount: 213, helpfulCount: 78, forkCount: 1, commentCount: 3,
+          likesCount: 213, helpfulCount: 78, commentCount: 3,
           isVerifiedPurchase: false, isCampaignReview: true,
           productSource: "brand_sent", usageDuration: "1_3_months",
           eligibleForPayout: true, reviewType: "campaign",
@@ -628,7 +625,7 @@ export default function AdminDashboard() {
           content: "I was deeply sceptical. Lip glosses do not plump lips — that is marketing speak. Two months of daily use later and the vertical lip lines I have had since my 30s are measurably reduced. The glaze finish photographs beautifully without that sticky latex feel other glosses have. Repurchased twice.",
           pros: ["Real plumping over time", "Non-sticky glaze finish", "Hydration lasts 4–5 hours", "Photographs well"],
           cons: ["Small tube for the price", "Glazed Donut scent divisive"],
-          likesCount: 378, helpfulCount: 145, forkCount: 1, commentCount: 5,
+          likesCount: 378, helpfulCount: 145, commentCount: 5,
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "3_plus_months",
           eligibleForPayout: false, reviewType: "verified",
@@ -643,7 +640,7 @@ export default function AdminDashboard() {
           content: "The scent is genuinely watermelon rather than generic fruit candy. Light pink tint flatters every skin tone in my friend group (we tested across four people, four very different undertones). Applies clean, lasts about 3 hours before you need to reapply. Packaging could be more sustainable.",
           pros: ["Authentic scent", "Universal tint", "Clean application", "Non-sticky"],
           cons: ["3-hour wear before reapplication", "Plastic packaging not great"],
-          likesCount: 134, helpfulCount: 56, forkCount: 0, commentCount: 2,
+          likesCount: 134, helpfulCount: 56, commentCount: 2,
           isVerifiedPurchase: false, isCampaignReview: true,
           productSource: "brand_sent", usageDuration: "1_3_months",
           eligibleForPayout: true, reviewType: "campaign",
@@ -660,7 +657,7 @@ export default function AdminDashboard() {
           content: "Spider-Man 2 at 60fps with full ray tracing is genuinely stunning — this would require a $2,000 PC to achieve natively. PSSR upscaling is not perfect on every title but the best implementations are indistinguishable from native 4K. DualSense haptics remain the most underrated innovation in gaming. The extra storage alone justifies the upgrade from base PS5 if you own more than 15 games.",
           pros: ["PSSR enables 60fps RT in flagship titles", "2TB SSD essential", "DualSense haptics still best-in-class", "Backward compat perfect"],
           cons: ["PSSR inconsistent across games", "Premium price", "No 8K games exist yet"],
-          likesCount: 534, helpfulCount: 234, forkCount: 3, commentCount: 9,
+          likesCount: 534, helpfulCount: 234, commentCount: 9,
           isVerifiedPurchase: true, isCampaignReview: true,
           productSource: "brand_sent", usageDuration: "1_3_months",
           eligibleForPayout: true, reviewType: "campaign",
@@ -679,7 +676,7 @@ export default function AdminDashboard() {
           content: "The hardware is excellent. But if you predominantly play multiplatform games or indie titles the PSSR uplift is marginal. I own 40 games and maybe 8 have meaningful Pro enhancements. If your library is Spider-Man, Horizon, GT7, and first-party exclusives this is a no-brainer. If it's COD, FIFA, and Minecraft — save the $200.",
           pros: ["Performance uplift real in supported titles", "2TB welcome", "DualSense unchanged from PS5"],
           cons: ["PSSR support patchy", "Price premium hard to justify for multiplatform gamers", "No 4K Blu-ray on Digital"],
-          likesCount: 234, helpfulCount: 123, forkCount: 0, commentCount: 4,
+          likesCount: 234, helpfulCount: 123, commentCount: 4,
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "1_3_months",
           eligibleForPayout: false, reviewType: "verified",
@@ -696,7 +693,7 @@ export default function AdminDashboard() {
           content: "Six months in and I have completely restructured my training blocks around recovery scores. The most useful moment was when my HRV dropped 18% below baseline for no obvious reason — I rested that day instead of training hard, and 48 hours later got a cold. The device literally predicted my illness. Skin temperature tracking is the sleeper feature — it explains the bad sleep nights I couldn't otherwise account for.",
           pros: ["HRV genuinely predictive", "Sleep staging accurate", "Skin temp catches illness early", "Comfortable to sleep in"],
           cons: ["Subscription model expensive long-term", "No screen means phone dependency", "Community features underdeveloped"],
-          likesCount: 289, helpfulCount: 134, forkCount: 1, commentCount: 5,
+          likesCount: 289, helpfulCount: 134, commentCount: 5,
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "3_plus_months",
           eligibleForPayout: false, reviewType: "verified",
@@ -714,7 +711,7 @@ export default function AdminDashboard() {
           content: "If you want a screen showing your heart rate during workouts this is the wrong device. If you want to understand whether your body is ready to push hard or needs rest, this is the best tool available. Strain coach accuracy improves significantly after month two once the algorithm has enough baseline data.",
           pros: ["Strain coaching gets smarter over time", "Screenless means no distraction", "Battery 4 days consistent"],
           cons: ["Subscription expensive", "Algorithm needs 4–6 weeks to calibrate", "No GPS"],
-          likesCount: 145, helpfulCount: 67, forkCount: 0, commentCount: 2,
+          likesCount: 145, helpfulCount: 67, commentCount: 2,
           isVerifiedPurchase: false, isCampaignReview: true,
           productSource: "brand_sent", usageDuration: "1_3_months",
           eligibleForPayout: true, reviewType: "campaign",
@@ -731,7 +728,7 @@ export default function AdminDashboard() {
           content: "The Hotel Indigo Edinburgh experience is built around neighbourhood knowledge. The concierge sent me to a 40-year-old whisky bar that locals use, not tourists. Room design is genuinely thoughtful — the tiles reference the local geology. Not a generic hotel that happens to have a fashionable lobby. Points redemption is unnecessarily complex but the stays themselves are exceptional.",
           pros: ["Neighbourhood character genuine", "Staff local knowledge outstanding", "Design rooted in location"],
           cons: ["Points redemption complex", "App check-in unreliable"],
-          likesCount: 189, helpfulCount: 78, forkCount: 0, commentCount: 3,
+          likesCount: 189, helpfulCount: 78, commentCount: 3,
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "1_4_weeks",
           eligibleForPayout: false, reviewType: "verified",
@@ -746,7 +743,7 @@ export default function AdminDashboard() {
           content: "Walking distance to MoMA, Rockefeller, and the Park without the midtown hotel premium. The art deco lobby makes check-in feel like an arrival rather than a transaction. Rooms are compact but designed with zero wasted space — the storage solutions are actually clever. Breakfast quality inconsistent across visits.",
           pros: ["Location unbeatable for midtown", "Art deco lobby", "Room layout clever", "Upgrade on Ambassador tier"],
           cons: ["Rooms genuinely small", "Breakfast inconsistent", "Gym basic"],
-          likesCount: 123, helpfulCount: 56, forkCount: 0, commentCount: 2,
+          likesCount: 123, helpfulCount: 56, commentCount: 2,
           isVerifiedPurchase: false, isCampaignReview: true,
           productSource: "brand_sent", usageDuration: "1_4_weeks",
           eligibleForPayout: true, reviewType: "campaign",
@@ -763,7 +760,7 @@ export default function AdminDashboard() {
           content: "For parking emergency cash at 5% APY and trading options on your phone, Robinhood Gold is genuinely excellent. As a long-term investor trying to build a serious portfolio, I hit its ceiling quickly. No screeners, no bond purchasing, no proper tax-loss harvesting, customer support is email-only and slow. The interface is the best in the industry — I wish the tools matched it.",
           pros: ["5% APY on cash competitive", "UI best in class", "Options trading simple", "Instant deposits convenient"],
           cons: ["No bond purchasing", "Weak screeners", "Customer support email-only and slow", "No true tax-loss harvesting"],
-          likesCount: 156, helpfulCount: 89, forkCount: 0, commentCount: 3,
+          likesCount: 156, helpfulCount: 89, commentCount: 3,
           isVerifiedPurchase: true, isCampaignReview: false,
           productSource: "purchased", usageDuration: "3_plus_months",
           eligibleForPayout: false, reviewType: "verified",
@@ -778,7 +775,7 @@ export default function AdminDashboard() {
           content: "On $20,000 in idle cash, the 5% APY generates $83/month — the subscription costs $5. The math is obvious. Instant deposit limit increase from $1,000 to $50,000 was the feature that made me upgrade. Margin rates at 6.5% are competitive with Interactive Brokers. Interface is genuinely the best for quick trades.",
           pros: ["APY pays for itself immediately", "Instant deposit increase", "Margin rate competitive", "Slick interface"],
           cons: ["No fixed income products", "Customer support still weak"],
-          likesCount: 112, helpfulCount: 45, forkCount: 0, commentCount: 1,
+          likesCount: 112, helpfulCount: 45, commentCount: 1,
           isVerifiedPurchase: false, isCampaignReview: true,
           productSource: "brand_sent", usageDuration: "1_3_months",
           eligibleForPayout: true, reviewType: "campaign",
@@ -914,35 +911,6 @@ export default function AdminDashboard() {
         });
       }
 
-      setStatusMessage("Adding forks…");
-
-      // ── Forks — tests fork badge and fork count on ReviewCard ────────────
-      // Review [1] forks review [0] (Priya forks Alex's Sony review)
-      if (reviewIds[0] && reviewIds[1]) {
-        await updateDoc(doc(db, "reviews", reviewIds[1]), {
-          forkedFromReviewId: reviewIds[0],
-          forkedFromReviewerName: "Alex Chen",
-        });
-        await updateDoc(doc(db, "reviews", reviewIds[0]), { forkCount: 2 });
-        await addDoc(collection(db, "reviewForks"), {
-          originalReviewId: reviewIds[0], forkReviewId: reviewIds[1],
-          forkerId: "seed_u2", forkerName: "Priya Singh", createdAt: ago(28),
-        });
-      }
-
-      // Review [10] forks review [9] (Olivia forks Chris's Rivian review)
-      if (reviewIds[9] && reviewIds[10]) {
-        await updateDoc(doc(db, "reviews", reviewIds[10]), {
-          forkedFromReviewId: reviewIds[9],
-          forkedFromReviewerName: "Chris Meyers",
-        });
-        await updateDoc(doc(db, "reviews", reviewIds[9]), { forkCount: 2 });
-        await addDoc(collection(db, "reviewForks"), {
-          originalReviewId: reviewIds[9], forkReviewId: reviewIds[10],
-          forkerId: "seed_u11", forkerName: "Olivia Park", createdAt: ago(20),
-        });
-      }
-
       setStatusMessage("Adding threaded comments…");
 
       // ── Comments — tests nested comments & commentCount badge ─────────────
@@ -1049,35 +1017,6 @@ export default function AdminDashboard() {
         });
       }
 
-      setStatusMessage("Adding comparison forks for Counter-Take feature…");
-
-      // ── Extra fork: PS5 Pro — Leo's honest 3-star counter-take on Tom's 5-star ─
-      // This is the richest disagreement in the seed set: same product, very different views
-      if (reviewIds[13] && reviewIds[14]) {
-        await updateDoc(doc(db, "reviews", reviewIds[14]), {
-          forkedFromReviewId: reviewIds[13],
-          forkedFromReviewerName: "Tom Harrison",
-        });
-        await updateDoc(doc(db, "reviews", reviewIds[13]), { forkCount: 3 });
-        await addDoc(collection(db, "reviewForks"), {
-          originalReviewId: reviewIds[13], forkReviewId: reviewIds[14],
-          forkerId: "seed_u15", forkerName: "Leo Santos", createdAt: ago(7),
-        });
-      }
-
-      // ── Extra fork: Whoop — James's subscription-sceptic counter-take on Elena's ─
-      if (reviewIds[15] && reviewIds[16]) {
-        await updateDoc(doc(db, "reviews", reviewIds[16]), {
-          forkedFromReviewId: reviewIds[15],
-          forkedFromReviewerName: "Elena Rodriguez",
-        });
-        await updateDoc(doc(db, "reviews", reviewIds[15]), { forkCount: 2 });
-        await addDoc(collection(db, "reviewForks"), {
-          originalReviewId: reviewIds[15], forkReviewId: reviewIds[16],
-          forkerId: "seed_u17", forkerName: "James Okafor", createdAt: ago(14),
-        });
-      }
-
       setStatusMessage("Adding Q&A answers (Ask an Owner feature)…");
 
       // ── Q&A Answers (productDiscussionAnswers) ─────────────────────────────
@@ -1162,7 +1101,7 @@ export default function AdminDashboard() {
         }
       }
 
-      setStatusMessage(`✅ Done! Seeded ${campaigns.length} products (with slug + communitySlug), ${reviews.length} reviews (${reviews.filter(r => r.isVerifiedPurchase).length} verified, ${reviews.filter(r => r.biasFlag).length} bias-flagged), ${sampleChannels.length} communities (${sampleChannels.filter(c => c.multiplier > 1).length} boosted), 3 ownership journeys, 4 forks (Sony, Rivian, PS5, Whoop), threaded comments, discussion posts, and Q&A answers. All product links now route via /c/[community]/[slug].`);
+      setStatusMessage(`✅ Done! Seeded ${campaigns.length} products (with slug + communitySlug), ${reviews.length} reviews (${reviews.filter(r => r.isVerifiedPurchase).length} verified, ${reviews.filter(r => r.biasFlag).length} bias-flagged), ${sampleChannels.length} communities (${sampleChannels.filter(c => c.multiplier > 1).length} boosted), 3 ownership journeys, threaded comments, discussion posts, and Q&A answers. All product links now route via /c/[community]/[slug].`);
     } catch (error) {
       console.error(error);
       setStatusMessage("❌ Error seeding data. Check console.");
@@ -1224,7 +1163,6 @@ export default function AdminDashboard() {
           cons: ["Slightly bulky charging case"],
           likesCount: 214,
           helpfulCount: 87,
-          forkCount: 2,
           commentCount: 5,
           isCampaignReview: true,
           isVerifiedPurchase: false,
@@ -1241,7 +1179,6 @@ export default function AdminDashboard() {
           cons: ["App could be better", "ANC not quite Sony-level"],
           likesCount: 131,
           helpfulCount: 54,
-          forkCount: 1,
           commentCount: 3,
           isCampaignReview: true,
           isVerifiedPurchase: false,
@@ -1258,7 +1195,6 @@ export default function AdminDashboard() {
           cons: ["No wireless charging case"],
           likesCount: 88,
           helpfulCount: 41,
-          forkCount: 0,
           commentCount: 2,
           isCampaignReview: true,
           isVerifiedPurchase: false,
@@ -1326,7 +1262,6 @@ export default function AdminDashboard() {
             cons: r.cons,
             likesCount: r.likesCount,
             helpfulCount: r.helpfulCount,
-            forkCount: r.forkCount,
             commentCount: r.commentCount,
             productSource: r.isVerifiedPurchase ? "purchased" : "campaign",
             versionCount: 1,
@@ -1361,7 +1296,6 @@ export default function AdminDashboard() {
           notHelpfulCount: 0,
           notHelpfulBy: [],
           commentCount: r.commentCount,
-          forkCount: r.forkCount,
           versionCount: 1,
           isCampaignReview: r.isCampaignReview,
           isVerifiedPurchase: r.isVerifiedPurchase,
@@ -1515,7 +1449,6 @@ export default function AdminDashboard() {
         notHelpfulCount: 0,
         notHelpfulBy: [],
         commentCount: 3,
-        forkCount: 0,
         versionCount: 3,
         latestVersionLabel: "6-Month Update",
         campaignId2: "organic",
@@ -1596,7 +1529,6 @@ export default function AdminDashboard() {
         notHelpfulCount: 1,
         notHelpfulBy: [],
         commentCount: 8,
-        forkCount: 0,
         versionCount: 1,
         isCampaignReview: false,
         isVerifiedPurchase: true,
@@ -1640,7 +1572,6 @@ export default function AdminDashboard() {
         notHelpfulCount: 2,
         notHelpfulBy: [],
         commentCount: 5,
-        forkCount: 0,
         versionCount: 1,
         isCampaignReview: false,
         isVerifiedPurchase: true,

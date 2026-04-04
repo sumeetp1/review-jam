@@ -22,7 +22,6 @@ const TYPE_ICON: Record<string, string> = {
   helpful_vote: "✓",
   comment: "💬",
   payout_approved: "💰",
-  fork: "⑂",
 };
 
 export default function NotificationBell({ userId }: { userId: string }) {
