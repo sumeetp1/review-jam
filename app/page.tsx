@@ -9,17 +9,6 @@ import { onAuthStateChanged, signInWithPopup, User } from "firebase/auth";
 import { db, auth, googleProvider } from "../lib/firebase";
 import Avatar from "./components/Avatar";
 
-const CATEGORIES = [
-  { name: "Tech",       icon: "💻", color: "from-blue-500/10 to-indigo-500/10 border-blue-200 dark:border-blue-800 hover:border-blue-400 dark:hover:border-blue-600",       text: "text-blue-700 dark:text-blue-400" },
-  { name: "SaaS",       icon: "☁️", color: "from-violet-500/10 to-purple-500/10 border-violet-200 dark:border-violet-800 hover:border-violet-400 dark:hover:border-violet-600", text: "text-violet-700 dark:text-violet-400" },
-  { name: "Gaming",     icon: "🎮", color: "from-emerald-500/10 to-teal-500/10 border-emerald-200 dark:border-emerald-800 hover:border-emerald-400 dark:hover:border-emerald-600", text: "text-emerald-700 dark:text-emerald-400" },
-  { name: "Beauty",     icon: "✨", color: "from-pink-500/10 to-rose-500/10 border-pink-200 dark:border-pink-800 hover:border-pink-400 dark:hover:border-pink-600",           text: "text-pink-700 dark:text-pink-400" },
-  { name: "Home",       icon: "🏠", color: "from-amber-500/10 to-orange-500/10 border-amber-200 dark:border-amber-800 hover:border-amber-400 dark:hover:border-amber-600",     text: "text-amber-700 dark:text-amber-400" },
-  { name: "Fitness",    icon: "💪", color: "from-red-500/10 to-rose-500/10 border-red-200 dark:border-red-800 hover:border-red-400 dark:hover:border-red-600",                 text: "text-red-700 dark:text-red-400" },
-  { name: "Automotive", icon: "🚗", color: "from-slate-500/10 to-zinc-500/10 border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600",       text: "text-slate-700 dark:text-slate-400" },
-  { name: "Finance",    icon: "💰", color: "from-green-500/10 to-emerald-500/10 border-green-200 dark:border-green-800 hover:border-green-400 dark:hover:border-green-600",     text: "text-green-700 dark:text-green-400" },
-];
-
 export default function LandingPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
@@ -80,7 +69,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col transition-colors duration-200 bg-gradient-to-br from-white via-indigo-50/40 to-violet-50/30 dark:from-slate-950 dark:via-slate-950 dark:to-indigo-950/20">
+    <div className="min-h-screen flex flex-col transition-colors duration-200 bg-gradient-to-br from-white via-indigo-50/40 to-violet-50/30 dark:bg-none dark:bg-slate-950">
 
       {/* Top bar */}
       <header className="flex items-center justify-between px-4 md:px-8 h-14 shrink-0">
@@ -180,23 +169,6 @@ export default function LandingPage() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87" /><path d="M16 3.13a4 4 0 010 7.75" /></svg>
             Browse Communities
           </Link>
-        </div>
-
-        {/* Category cards */}
-        <div className="w-full max-w-[700px] mb-8">
-          <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center mb-3">Browse by category</p>
-          <div className="grid grid-cols-4 md:grid-cols-4 gap-2">
-            {CATEGORIES.map((cat) => (
-              <Link
-                key={cat.name}
-                href={`/explore?q=${encodeURIComponent(cat.name)}`}
-                className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border bg-gradient-to-br ${cat.color} transition-all hover:shadow-sm hover:scale-[1.03] active:scale-[0.98]`}
-              >
-                <span className="text-2xl md:text-3xl">{cat.icon}</span>
-                <span className={`text-[11px] md:text-xs font-semibold ${cat.text}`}>{cat.name}</span>
-              </Link>
-            ))}
-          </div>
         </div>
 
         {/* Stats */}
