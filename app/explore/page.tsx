@@ -47,6 +47,38 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: "newest",    label: "Newest" },
 ];
 
+// ─── Health Score Circle ──────────────────────────────────────────────────────
+
+function HealthCircle({ score }: { score: number }) {
+  const size = 40;
+  const stroke = 3;
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const progress = Math.min(score, 100) / 100;
+  const offset = circumference * (1 - progress);
+  const color = score >= 70 ? "#10b981" : score >= 40 ? "#f59e0b" : "#ef4444";
+
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="drop-shadow-md">
+        {/* Background circle */}
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="rgba(0,0,0,0.5)" stroke="rgba(255,255,255,0.15)" strokeWidth={stroke} />
+        {/* Progress arc */}
+        <circle
+          cx={size / 2} cy={size / 2} r={radius}
+          fill="none" stroke={color} strokeWidth={stroke}
+          strokeDasharray={circumference} strokeDashoffset={offset}
+          strokeLinecap="round"
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        />
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-white">
+        {score}
+      </span>
+    </div>
+  );
+}
+
 // ─── Create Hub Modal ─────────────────────────────────────────────────────────
 
 type AiPreview = {
@@ -493,41 +525,39 @@ function ExplorePage() {
                 className="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md transition"
               >
                 {/* Cover image */}
-                {p.coverImage ? (
-                  <div className="relative w-full h-40 overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
-                    <img
-                      src={p.coverImage}
-                      alt={p.name}
-                      className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                    <div className="absolute bottom-2 left-3 flex items-center gap-1.5">
-                      {isActive(p) && (
-                        <span className="text-[10px] font-semibold text-white bg-emerald-500/90 px-1.5 py-0.5 rounded-full backdrop-blur-sm">Live</span>
-                      )}
+                <div className="relative">
+                  {p.coverImage ? (
+                    <div className="relative w-full h-40 overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
+                      <img
+                        src={p.coverImage}
+                        alt={p.name}
+                        className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                      <div className="absolute bottom-2 left-3 flex items-center gap-1.5">
+                        {isActive(p) && (
+                          <span className="text-[10px] font-semibold text-white bg-emerald-500/90 px-1.5 py-0.5 rounded-full backdrop-blur-sm">Live</span>
+                        )}
+                        {p.avgRating > 0 && (
+                          <span className="text-[11px] font-semibold text-white flex items-center gap-0.5">
+                            <span className="text-amber-400">★</span> {p.avgRating.toFixed(1)}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className="absolute bottom-2 right-3 flex items-center gap-1.5">
-                      {p.avgHealthScore > 0 && (
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full backdrop-blur-sm ${
-                          p.avgHealthScore >= 70 ? "bg-emerald-500/90 text-white" :
-                          p.avgHealthScore >= 40 ? "bg-amber-500/90 text-white" :
-                          "bg-red-500/90 text-white"
-                        }`}>
-                          {p.avgHealthScore}
-                        </span>
-                      )}
-                      {p.avgRating > 0 && (
-                        <span className="text-[11px] font-semibold text-white flex items-center gap-0.5">
-                          <span className="text-amber-400">★</span> {p.avgRating.toFixed(1)}
-                        </span>
-                      )}
+                  ) : (
+                    <div className="w-full h-40 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center shrink-0">
+                      <span className="text-4xl opacity-30 select-none">📦</span>
                     </div>
-                  </div>
-                ) : (
-                  <div className="w-full h-40 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center shrink-0">
-                    <span className="text-4xl opacity-30 select-none">📦</span>
-                  </div>
-                )}
+                  )}
+
+                  {/* Health score circle — top right */}
+                  {p.avgHealthScore > 0 && (
+                    <div className="absolute top-2 right-2" title={`Health Score: ${p.avgHealthScore}/100`}>
+                      <HealthCircle score={p.avgHealthScore} />
+                    </div>
+                  )}
+                </div>
 
                 {/* Card body */}
                 <div className="p-4 flex flex-col gap-2 flex-1">
@@ -538,21 +568,8 @@ function ExplorePage() {
                       </h3>
                       <p className="text-[12px] text-slate-500 dark:text-slate-500 mt-0.5">{p.brandName}</p>
                     </div>
-                    {!p.coverImage && (
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {p.avgHealthScore > 0 && (
-                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                            p.avgHealthScore >= 70 ? "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400" :
-                            p.avgHealthScore >= 40 ? "bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400" :
-                            "bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-400"
-                          }`}>
-                            {p.avgHealthScore}
-                          </span>
-                        )}
-                        {p.avgRating > 0 && (
-                          <span className="text-[11px] text-amber-500 font-semibold">★ {p.avgRating.toFixed(1)}</span>
-                        )}
-                      </div>
+                    {!p.coverImage && p.avgRating > 0 && (
+                      <span className="text-[11px] text-amber-500 font-semibold shrink-0">★ {p.avgRating.toFixed(1)}</span>
                     )}
                   </div>
 
