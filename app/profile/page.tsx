@@ -63,11 +63,13 @@ export default function ProfilePage() {
   const [ledger, setLedger] = useState<LedgerEntry[]>([]);
   const [myReviews, setMyReviews] = useState<ReviewSummary[]>([]);
 
-  const [activeTab, setActiveTab] = useState<"overview" | "reviews" | "earnings" | "interests">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "reviews" | "earnings" | "interests" | "invites">("overview");
   const [updatingReview, setUpdatingReview] = useState<ReviewSummary | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [anchorInvites, setAnchorInvites] = useState<any[]>([]);
+  const [updatingInviteId, setUpdatingInviteId] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -77,6 +79,7 @@ export default function ProfilePage() {
           fetchUserData(currentUser),
           fetchLedger(currentUser.uid),
           fetchMyReviews(currentUser.uid),
+          fetchAnchorInvites(currentUser.uid),
         ]);
       }
       setIsLoading(false);
@@ -126,6 +129,32 @@ export default function ProfilePage() {
     }
   }
 
+  async function fetchAnchorInvites(uid: string) {
+    try {
+      const q = query(collection(db, "seedingInvites"), where("userId", "==", uid));
+      const snap = await getDocs(q);
+      setAnchorInvites(snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a: any, b: any) => (b.invitedAt ?? "").localeCompare(a.invitedAt ?? "")));
+    } catch {}
+  }
+
+  async function handleAcceptInvite(inviteId: string) {
+    setUpdatingInviteId(inviteId);
+    try {
+      await updateDoc(doc(db, "seedingInvites", inviteId), { status: "accepted", acceptedAt: new Date().toISOString() });
+      setAnchorInvites((prev) => prev.map((inv) => inv.id === inviteId ? { ...inv, status: "accepted", acceptedAt: new Date().toISOString() } : inv));
+    } catch {}
+    setUpdatingInviteId(null);
+  }
+
+  async function handleDeclineInvite(inviteId: string) {
+    setUpdatingInviteId(inviteId);
+    try {
+      await updateDoc(doc(db, "seedingInvites", inviteId), { status: "declined", declinedAt: new Date().toISOString() });
+      setAnchorInvites((prev) => prev.map((inv) => inv.id === inviteId ? { ...inv, status: "declined", declinedAt: new Date().toISOString() } : inv));
+    } catch {}
+    setUpdatingInviteId(null);
+  }
+
   const handleSaveInterests = async () => {
     if (!user) return;
     setIsSaving(true);
@@ -166,9 +195,11 @@ export default function ProfilePage() {
     ? (myReviews.reduce((s, r) => s + (r.rating || 0), 0) / myReviews.length).toFixed(1)
     : null;
 
+  const pendingInvites = anchorInvites.filter((i) => i.status === "invited" || i.status === "accepted");
   const TABS = [
     { id: "overview",  label: "Overview" },
     { id: "reviews",   label: `Reviews (${myReviews.length})` },
+    { id: "invites",   label: `Invites${pendingInvites.length > 0 ? ` (${pendingInvites.length})` : ""}` },
     { id: "earnings",  label: `Earnings (${ledger.length})` },
     { id: "interests", label: "Interests" },
   ] as const;
@@ -403,6 +434,64 @@ export default function ProfilePage() {
             )}
 
             {/* ── Interests ── */}
+            {/* ── Invites ── */}
+            {activeTab === "invites" && (
+              <div className="space-y-3">
+                {anchorInvites.length === 0 ? (
+                  <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-8">No anchor review invites yet.</p>
+                ) : (
+                  anchorInvites.map((inv) => (
+                    <div key={inv.id} className={`p-4 rounded-xl border transition ${
+                      inv.status === "completed" ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20" :
+                      inv.status === "declined" ? "border-slate-200 dark:border-slate-800 opacity-60" :
+                      "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
+                    }`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{inv.productName}</p>
+                          <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-0.5">
+                            {inv.category} · {inv.minUsageDays}-day minimum usage · ${inv.anchorPayoutAmount} payout
+                          </p>
+                          <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
+                            Invited {inv.invitedAt ? new Date(inv.invitedAt).toLocaleDateString() : ""}
+                            {inv.acceptedAt && <span> · Accepted {new Date(inv.acceptedAt).toLocaleDateString()}</span>}
+                          </p>
+                        </div>
+                        <div className="shrink-0 flex items-center gap-2">
+                          {inv.status === "invited" && (
+                            <>
+                              <button type="button" onClick={() => handleAcceptInvite(inv.id)} disabled={updatingInviteId === inv.id}
+                                className="text-[12px] font-semibold bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-500 disabled:opacity-50 transition">
+                                Accept
+                              </button>
+                              <button type="button" onClick={() => handleDeclineInvite(inv.id)} disabled={updatingInviteId === inv.id}
+                                className="text-[12px] font-medium text-slate-500 dark:text-slate-400 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 transition">
+                                Decline
+                              </button>
+                            </>
+                          )}
+                          {inv.status === "accepted" && inv.productSlug && inv.communitySlug && (
+                            <Link href={`/c/${inv.communitySlug}/${inv.productSlug}`}
+                              className="text-[12px] font-semibold bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-500 transition">
+                              Write Review
+                            </Link>
+                          )}
+                          {inv.status === "completed" && (
+                            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/40 px-2 py-1 rounded-full">
+                              Completed · ${inv.anchorPayoutAmount}
+                            </span>
+                          )}
+                          {inv.status === "declined" && (
+                            <span className="text-[11px] text-slate-400">Declined</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
             {activeTab === "interests" && (
               <div className="space-y-4">
                 <p className="text-sm text-slate-500 dark:text-slate-500">Used to personalize your default feed.</p>

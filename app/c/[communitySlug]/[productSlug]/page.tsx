@@ -377,7 +377,50 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
       variantId: data.variantId ?? null, variantName: data.variantName ?? null,
       createdAt: new Date().toISOString(),
     };
+    // Check if this is an anchor review (reviewer has an accepted seeding invite for this product)
+    let anchorInviteId: string | null = null;
+    let anchorPayAmount = 0;
+    try {
+      const invSnap = await getDocs(query(
+        collection(db, "seedingInvites"),
+        where("userId", "==", user.uid),
+        where("productId", "==", product.id),
+        where("status", "==", "accepted"),
+      ));
+      if (!invSnap.empty) {
+        anchorInviteId = invSnap.docs[0].id;
+        anchorPayAmount = invSnap.docs[0].data().anchorPayoutAmount ?? 50;
+        newReview.isAnchorReview = true;
+        newReview.eligibleForPayout = false;
+        newReview.productSource = "received_for_review";
+      }
+    } catch {}
+
     const docRef = await addDoc(collection(db, "reviews"), newReview);
+
+    // Complete anchor invite flow: mark invite, pay reviewer
+    if (anchorInviteId) {
+      try {
+        await updateDoc(doc(db, "seedingInvites", anchorInviteId), {
+          status: "completed", reviewId: docRef.id, completedAt: new Date().toISOString(),
+        });
+        await updateDoc(doc(db, "users", user.uid), { walletBalance: increment(anchorPayAmount), totalEarned: increment(anchorPayAmount) });
+        await addDoc(collection(db, "payoutLedger"), {
+          userId: user.uid, reviewerName: user.displayName || "Anonymous",
+          reviewId: docRef.id, payoutType: "anchor_review",
+          productName: product.name, productId: product.id,
+          amount: anchorPayAmount, healthScore: 0, weightedScore: 0, categoryMultiplier: 1,
+          rawLikes: 0, hasPhoto: mediaUrls.length > 0, status: "paid", paidAt: new Date().toISOString(),
+        });
+        await addDoc(collection(db, "notifications"), {
+          userId: user.uid, type: "anchor_payout",
+          title: "Anchor review payment received!",
+          body: `$${anchorPayAmount.toFixed(2)} for your anchor review of ${product.name}`,
+          read: false, createdAt: new Date().toISOString(),
+        });
+      } catch {}
+    }
+
     setReviews((prev) => [{ id: docRef.id, ...newReview }, ...prev]);
     setHasAlreadyReviewed(true);
     if (data.reviewType !== "generic") updateUserBadges(user.uid).catch(() => {});

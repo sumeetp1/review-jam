@@ -62,18 +62,15 @@ export default function AdminDashboard() {
   const [updatingAppId, setUpdatingAppId] = useState<string | null>(null);
   const [globalPool, setGlobalPool] = useState("");
   const [dividendStats, setDividendStats] = useState<{ totalReviews: number; eligibleReviews: number; payoutsMade: number; uniqueReviewers: number; totalDistributed: number } | null>(null);
-  // Expert Seeding
-  const [seedInventory, setSeedInventory] = useState<{ id: string; productName: string; brandName: string; category: string; quantity: number; status: string }[]>([]);
+  // Expert Seeding / Anchor Reviews
   const [trustedReviewers, setTrustedReviewers] = useState<{ id: string; displayName?: string; email?: string; trustScore?: number }[]>([]);
   const [isLoadingReviewers, setIsLoadingReviewers] = useState(false);
-  const [invProduct, setInvProduct] = useState("");
-  const [invBrand, setInvBrand] = useState("");
-  const [invCategory, setInvCategory] = useState("Tech");
-  const [invQty, setInvQty] = useState("1");
-  const [invNotes, setInvNotes] = useState("");
+  const [anchorProductId, setAnchorProductId] = useState("");
+  const [anchorPayout, setAnchorPayout] = useState("50");
+  const [anchorExistingCount, setAnchorExistingCount] = useState(0);
   const [invitingUserId, setInvitingUserId] = useState<string | null>(null);
-  const [selectedInvId, setSelectedInvId] = useState("");
   const [seedingMessage, setSeedingMessage] = useState("");
+  const [allProducts, setAllProducts] = useState<{ id: string; name: string; category: string; slug?: string; communitySlug?: string }[]>([]);
 
   const [aiCheckEnabled, setAiCheckEnabled] = useState(true);
   const [isTogglingAi, setIsTogglingAi] = useState(false);
@@ -1750,29 +1747,26 @@ export default function AdminDashboard() {
     }
   };
 
-  // ── Expert Seeding handlers ───────────────────────────────────────────────
-  async function handleAddInventory(e: React.FormEvent) {
-    e.preventDefault();
-    setSeedingMessage("");
+  // ── Anchor Review handlers ──────────────────────────────────────────────
+
+  const MIN_USAGE_DAYS: Record<string, number> = {
+    Tech: 14, Home: 21, SaaS: 14, Automotive: 30, Beauty: 14,
+    Gaming: 14, Fitness: 21, Travel: 7, Finance: 14,
+  };
+
+  async function loadProductsForSeeding() {
     try {
-      const ref = await addDoc(collection(db, "inventory"), {
-        productName: invProduct.trim(),
-        brandName: invBrand.trim(),
-        category: invCategory,
-        quantity: Number(invQty),
-        notes: invNotes.trim(),
-        status: "available",
-        createdAt: new Date().toISOString(),
-      });
-      setSeedInventory((prev) => [
-        ...prev,
-        { id: ref.id, productName: invProduct.trim(), brandName: invBrand.trim(), category: invCategory, quantity: Number(invQty), status: "available" },
-      ]);
-      setSeedingMessage(`✅ "${invProduct.trim()}" added to seeding inventory.`);
-      setInvProduct(""); setInvBrand(""); setInvQty("1"); setInvNotes("");
-    } catch {
-      setSeedingMessage("❌ Failed to add inventory item.");
-    }
+      const snap = await getDocs(collection(db, "products"));
+      setAllProducts(snap.docs.map((d) => ({ id: d.id, name: d.data().name, category: d.data().category, slug: d.data().slug, communitySlug: d.data().communitySlug })));
+    } catch {}
+  }
+
+  async function checkAnchorCount(productId: string) {
+    try {
+      const snap = await getDocs(query(collection(db, "seedingInvites"), where("productId", "==", productId)));
+      const active = snap.docs.filter((d) => !["declined", "expired"].includes(d.data().status));
+      setAnchorExistingCount(active.length);
+    } catch { setAnchorExistingCount(0); }
   }
 
   async function loadTrustedReviewers() {
@@ -1795,25 +1789,41 @@ export default function AdminDashboard() {
   }
 
   async function handleInviteReviewer(reviewer: { id: string; displayName?: string }) {
+    if (!anchorProductId) { setSeedingMessage("❌ Select a product first."); return; }
+    if (anchorExistingCount >= 5) { setSeedingMessage("❌ Max 5 anchor reviews per product."); return; }
+
+    const product = allProducts.find((p) => p.id === anchorProductId);
+    if (!product) { setSeedingMessage("❌ Product not found."); return; }
+
+    const minDays = MIN_USAGE_DAYS[product.category] ?? 14;
+
     setInvitingUserId(reviewer.id);
     setSeedingMessage("");
     try {
       await addDoc(collection(db, "seedingInvites"), {
         userId: reviewer.id,
         userName: reviewer.displayName || "Unknown",
-        inventoryId: selectedInvId || null,
+        productId: product.id,
+        productName: product.name,
+        productSlug: product.slug || null,
+        communitySlug: product.communitySlug || null,
+        category: product.category,
+        minUsageDays: minDays,
+        anchorPayoutAmount: Number(anchorPayout),
         status: "invited",
         invitedAt: new Date().toISOString(),
       });
       await addDoc(collection(db, "notifications"), {
         userId: reviewer.id,
         type: "seeding_invite",
-        title: "You've been invited to review a product!",
-        body: "Review Jam has selected you as a trusted reviewer for a seeding opportunity. Check your email for details.",
+        title: `Anchor review invite: ${product.name}`,
+        body: `Review Jam has selected you to write an anchor review for ${product.name}. You'll receive $${anchorPayout} for a quality review after ${minDays} days of usage. Check your profile to accept.`,
+        link: "/profile",
         read: false,
         createdAt: new Date().toISOString(),
       });
-      setSeedingMessage(`✅ Invite sent to ${reviewer.displayName || reviewer.id}.`);
+      setAnchorExistingCount((c) => c + 1);
+      setSeedingMessage(`✅ Anchor invite sent to ${reviewer.displayName || reviewer.id} for ${product.name} ($${anchorPayout}, ${minDays}-day min usage).`);
     } catch {
       setSeedingMessage("❌ Failed to send invite.");
     } finally {
@@ -2192,83 +2202,63 @@ export default function AdminDashboard() {
 
         </div>
 
-        {/* ── Expert Seeding ── */}
+        {/* ── Anchor Reviews ── */}
         <div className="mt-8 bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-2xl font-bold">🧪 Expert Seeding</h2>
+            <h2 className="text-2xl font-bold">🎯 Anchor Reviews</h2>
             <span className="text-xs px-3 py-1 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 font-semibold">
-              Brand inventory → trusted reviewers
+              Max 5 per product
             </span>
           </div>
           <p className="text-slate-400 text-sm mb-6">
-            Log products sent by brands for seeding, then invite reviewers with a Trust Score &gt; 250 to write anchor reviews.
+            Select a product, then invite top reviewers (trust &gt; 250) to write anchor reviews. Review Jam pays reviewers directly. Reviewers must use the product for the minimum period before submitting.
           </p>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* LEFT: Add inventory item */}
+            {/* LEFT: Product selection + config */}
             <div>
-              <h3 className="text-base font-bold text-slate-300 mb-4">Add inventory item</h3>
-              <form onSubmit={handleAddInventory} className="space-y-3">
-                <input
-                  type="text" required value={invProduct} onChange={(e) => setInvProduct(e.target.value)}
-                  placeholder="Product name"
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none focus:border-violet-500 transition text-sm"
-                />
-                <div className="grid grid-cols-2 gap-3">
-                  <input
-                    type="text" required value={invBrand} onChange={(e) => setInvBrand(e.target.value)}
-                    placeholder="Brand name"
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none text-sm"
-                  />
+              <h3 className="text-base font-bold text-slate-300 mb-4">Select product</h3>
+              <div className="space-y-3">
+                <div className="flex gap-2">
                   <select
-                    value={invCategory} onChange={(e) => setInvCategory(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none text-sm"
+                    value={anchorProductId}
+                    onChange={(e) => { setAnchorProductId(e.target.value); if (e.target.value) checkAnchorCount(e.target.value); }}
+                    className="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none focus:border-violet-500 transition text-sm"
                   >
-                    {["Tech","Home","SaaS","Beauty","Gaming","Automotive","Fitness","Travel","Finance"].map((c) => (
-                      <option key={c} value={c}>{c}</option>
+                    <option value="">Select a product</option>
+                    {allProducts.map((p) => (
+                      <option key={p.id} value={p.id}>{p.name} ({p.category})</option>
                     ))}
                   </select>
+                  <button type="button" onClick={loadProductsForSeeding} className="bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold px-3 py-1.5 rounded-xl transition text-xs shrink-0">
+                    Refresh
+                  </button>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <input
-                    type="number" min="1" value={invQty} onChange={(e) => setInvQty(e.target.value)}
-                    placeholder="Quantity"
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none text-sm"
-                  />
-                  <input
-                    type="text" value={invNotes} onChange={(e) => setInvNotes(e.target.value)}
-                    placeholder="Notes (optional)"
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none text-sm"
-                  />
-                </div>
-                <button type="submit" className="w-full bg-violet-600 hover:bg-violet-500 text-white font-bold py-3 rounded-xl transition text-sm">
-                  + Add to Inventory
-                </button>
-              </form>
 
-              {/* Inventory list */}
-              {seedInventory.length > 0 && (
-                <div className="mt-4 space-y-2">
-                  <p className="text-xs text-slate-500 uppercase tracking-wide font-semibold">This session</p>
-                  {seedInventory.map((item) => (
-                    <div
-                      key={item.id}
-                      onClick={() => setSelectedInvId(item.id)}
-                      className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition text-sm ${
-                        selectedInvId === item.id
-                          ? "border-violet-500 bg-violet-900/20 text-white"
-                          : "border-slate-700 bg-slate-900 text-slate-300 hover:border-slate-500"
-                      }`}
-                    >
-                      <div>
-                        <p className="font-medium">{item.productName}</p>
-                        <p className="text-[11px] text-slate-500">{item.brandName} · {item.category} · qty {item.quantity}</p>
-                      </div>
-                      {selectedInvId === item.id && <span className="text-violet-400 text-xs font-bold">Selected</span>}
+                {anchorProductId && (
+                  <div className="bg-slate-900 rounded-xl p-3 border border-slate-700 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-slate-400">Anchors used</span>
+                      <span className={`text-xs font-bold ${anchorExistingCount >= 5 ? "text-red-400" : "text-emerald-400"}`}>
+                        {anchorExistingCount} / 5
+                      </span>
                     </div>
-                  ))}
-                </div>
-              )}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-slate-400">Min usage period</span>
+                      <span className="text-xs font-semibold text-white">
+                        {MIN_USAGE_DAYS[allProducts.find((p) => p.id === anchorProductId)?.category ?? "Tech"] ?? 14} days
+                      </span>
+                    </div>
+                    <div>
+                      <label className="text-xs text-slate-400">Payout per review ($)</label>
+                      <input
+                        type="number" min="10" value={anchorPayout} onChange={(e) => setAnchorPayout(e.target.value)}
+                        className="w-full mt-1 bg-slate-800 border border-slate-600 rounded-lg p-2 text-white outline-none text-sm"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* RIGHT: Trusted reviewers */}
@@ -2287,7 +2277,7 @@ export default function AdminDashboard() {
 
               {trustedReviewers.length === 0 && !isLoadingReviewers && (
                 <p className="text-sm text-slate-500 text-center py-8">
-                  Click "Load" to fetch reviewers with trust score &gt; 250.
+                  Click &quot;Load&quot; to fetch reviewers with trust score &gt; 250.
                 </p>
               )}
 
@@ -2301,7 +2291,7 @@ export default function AdminDashboard() {
                     <button
                       type="button"
                       onClick={() => handleInviteReviewer(r)}
-                      disabled={invitingUserId === r.id}
+                      disabled={invitingUserId === r.id || anchorExistingCount >= 5 || !anchorProductId}
                       className="text-xs bg-violet-600 hover:bg-violet-500 text-white font-bold px-3 py-1.5 rounded-lg transition disabled:opacity-50 shrink-0 ml-3"
                     >
                       {invitingUserId === r.id ? "Sending…" : "Invite"}

@@ -69,6 +69,8 @@ export type ReviewData = {
   variantName?: string;
   // Purchase verification
   isVerifiedPurchase?: boolean;
+  // Anchor review
+  isAnchorReview?: boolean;
 };
 
 type Comment = {
@@ -338,6 +340,12 @@ export default function ReviewCard({
               {review.isVerifiedPurchase && (
                 <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/50">
                   ✓ Verified Owner
+                </span>
+              )}
+              {/* Anchor review badge */}
+              {review.isAnchorReview && (
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-400 px-1.5 py-0.5 rounded border border-sky-200 dark:border-sky-800/50">
+                  🎯 Received for review
                 </span>
               )}
               {(review.communitySlug || review.channelSlug) && (
