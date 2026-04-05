@@ -16,11 +16,11 @@ import Avatar from "../components/Avatar";
 import { getTierLabel } from "../../lib/trustScore";
 
 function getTierStyle(score: number): { bg: string; text: string; emoji: string } {
-  if (score >= 500) return { bg: "bg-amber-100 dark:bg-amber-900/40 border border-amber-300 dark:border-amber-700", text: "text-amber-700 dark:text-amber-300", emoji: "🏆" };
-  if (score >= 250) return { bg: "bg-violet-100 dark:bg-violet-900/40 border border-violet-300 dark:border-violet-700", text: "text-violet-700 dark:text-violet-300", emoji: "⭐" };
-  if (score >= 100) return { bg: "bg-emerald-100 dark:bg-emerald-900/40 border border-emerald-300 dark:border-emerald-700", text: "text-emerald-700 dark:text-emerald-300", emoji: "✅" };
-  if (score >= 50)  return { bg: "bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700", text: "text-blue-700 dark:text-blue-300", emoji: "🔵" };
-  return { bg: "bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700", text: "text-slate-600 dark:text-slate-400", emoji: "🌱" };
+  if (score >= 500) return { bg: "bg-amber-900/40 border border-amber-700", text: "text-amber-300", emoji: "🏆" };
+  if (score >= 250) return { bg: "bg-violet-900/40 border border-violet-700", text: "text-violet-300", emoji: "⭐" };
+  if (score >= 100) return { bg: "bg-emerald-900/40 border border-emerald-700", text: "text-emerald-300", emoji: "✅" };
+  if (score >= 50)  return { bg: "bg-blue-900/40 border border-blue-700", text: "text-blue-300", emoji: "🔵" };
+  return { bg: "bg-white/[0.03] border border-white/[0.06]", text: "text-zinc-400", emoji: "🌱" };
 }
 
 
@@ -159,7 +159,7 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950 text-sm text-slate-500">
+      <div className="min-h-screen flex items-center justify-center bg-[#09090b] text-sm text-zinc-500">
         Loading…
       </div>
     );
@@ -167,9 +167,9 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-slate-950 p-8 gap-3">
-        <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Sign in to view your profile</h2>
-        <Link href="/" className="text-sm text-slate-600 dark:text-slate-400 hover:underline">← Home</Link>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#09090b] p-8 gap-3">
+        <h2 className="text-base font-semibold text-zinc-100">Sign in to view your profile</h2>
+        <Link href="/" className="text-sm text-zinc-400 hover:underline">← Home</Link>
       </div>
     );
   }
@@ -188,18 +188,17 @@ export default function ProfilePage() {
   ] as const;
 
   return (
-    <main className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200">
+    <main className="min-h-screen bg-[#09090b] text-zinc-200">
       {/* Nav */}
-      <nav className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+      <nav className="sticky top-0 z-40 bg-[#09090b]/95 backdrop-blur-md border-b border-white/[0.06]">
         <div className="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
           <Link href="/" className="shrink-0">
-            <Image src="/logo.svg" alt="Review Jam" width={110} height={26} className="dark:hidden" />
-            <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} className="hidden dark:block" />
+            <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} />
           </Link>
           <button
             type="button"
             onClick={handleLogout}
-            className="text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 px-2 py-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-900"
+            className="text-xs font-medium text-zinc-400 hover:text-red-400 px-2 py-1 rounded-md hover:bg-white/[0.03]"
           >
             Sign out
           </button>
@@ -208,11 +207,11 @@ export default function ProfilePage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         {/* Identity card */}
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-4">
+        <div className="bg-white/[0.03] p-5 rounded-xl border border-white/[0.06] flex items-center gap-4">
           <Avatar name={user.displayName} src={user.photoURL} size="lg" />
           <div className="min-w-0 flex-1">
-            <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 truncate">{user.displayName}</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-500 truncate">{user.email}</p>
+            <h2 className="text-base font-semibold text-zinc-100 truncate">{user.displayName}</h2>
+            <p className="text-sm text-zinc-500 truncate">{user.email}</p>
             {/* Trust Tier badge */}
             {(() => {
               const { bg, text, emoji } = getTierStyle(trustScore);
@@ -230,7 +229,7 @@ export default function ProfilePage() {
                 {badges.map((bid) => {
                   const b = getBadgeById(bid);
                   return b ? (
-                    <span key={bid} title={b.description} className="inline-flex items-center gap-0.5 text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-md font-medium">
+                    <span key={bid} title={b.description} className="inline-flex items-center gap-0.5 text-[11px] bg-white/[0.05] text-zinc-400 px-2 py-0.5 rounded-md font-medium">
                       {b.emoji} {b.label}
                     </span>
                   ) : null;
@@ -248,30 +247,30 @@ export default function ProfilePage() {
             { label: "Total earned", value: `$${totalEarned.toFixed(2)}` },
             { label: "Trust score", value: trustScore, sub: getTierLabel(trustScore) },
           ].map((s) => (
-            <div key={s.label} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 text-center">
-              <p className="text-xl font-semibold text-slate-900 dark:text-slate-100 tabular-nums">{s.value}</p>
-              <p className="text-[11px] text-slate-500 dark:text-slate-500 mt-0.5 uppercase tracking-wide">{s.label}</p>
+            <div key={s.label} className="bg-white/[0.03] rounded-xl border border-white/[0.06] p-4 text-center">
+              <p className="text-xl font-semibold text-zinc-100 tabular-nums">{s.value}</p>
+              <p className="text-[11px] text-zinc-500 mt-0.5 uppercase tracking-wide">{s.label}</p>
               {"sub" in s && s.sub && (
-                <p className="text-[10px] text-indigo-500 dark:text-indigo-400 font-medium mt-0.5">{s.sub}</p>
+                <p className="text-[10px] text-indigo-400 font-medium mt-0.5">{s.sub}</p>
               )}
             </div>
           ))}
         </div>
 
         {/* Wallet */}
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div className="bg-white/[0.03] p-4 rounded-xl border border-white/[0.06] flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wide mb-0.5">Available balance</p>
-            <p className="text-2xl font-semibold tabular-nums text-slate-900 dark:text-slate-100">${walletBalance.toFixed(2)}</p>
+            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-0.5">Available balance</p>
+            <p className="text-2xl font-semibold tabular-nums text-zinc-100">${walletBalance.toFixed(2)}</p>
           </div>
-          <span className="text-xs text-slate-400 dark:text-slate-600 max-w-[140px] text-right leading-relaxed">
+          <span className="text-xs text-zinc-600 max-w-[140px] text-right leading-relaxed">
             Credited based on engagement
           </span>
         </div>
 
         {/* Tabs */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-          <div className="flex border-b border-slate-200 dark:border-slate-800 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="bg-white/[0.03] rounded-xl border border-white/[0.06] overflow-hidden">
+          <div className="flex border-b border-white/[0.06] overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
@@ -279,8 +278,8 @@ export default function ProfilePage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px ${
                   activeTab === tab.id
-                    ? "border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100"
-                    : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+                    ? "border-indigo-500 text-zinc-100"
+                    : "border-transparent text-zinc-500 hover:text-zinc-300"
                 }`}
               >
                 {tab.label}
@@ -292,7 +291,7 @@ export default function ProfilePage() {
             {/* ── Overview ── */}
             {activeTab === "overview" && (
               <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Badges</h3>
+                <h3 className="text-sm font-semibold text-zinc-100">Badges</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {ALL_BADGES.map((b) => {
                     const earned = badges.includes(b.id);
@@ -301,13 +300,13 @@ export default function ProfilePage() {
                         key={b.id}
                         className={`p-3 rounded-lg border text-left transition-colors ${
                           earned
-                            ? "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700"
-                            : "opacity-35 border-slate-100 dark:border-slate-800/50"
+                            ? "bg-white/[0.05] border-white/[0.08]"
+                            : "opacity-35 border-white/[0.04]"
                         }`}
                       >
                         <span className="text-xl block mb-1">{b.emoji}</span>
-                        <p className="text-[12px] font-medium text-slate-800 dark:text-slate-200 leading-tight">{b.label}</p>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-500 leading-snug mt-0.5">{b.description}</p>
+                        <p className="text-[12px] font-medium text-zinc-200 leading-tight">{b.label}</p>
+                        <p className="text-[11px] text-zinc-500 leading-snug mt-0.5">{b.description}</p>
                       </div>
                     );
                   })}
@@ -319,34 +318,34 @@ export default function ProfilePage() {
             {activeTab === "reviews" && (
               <div className="space-y-3">
                 {myReviews.length === 0 ? (
-                  <p className="text-sm text-slate-500 dark:text-slate-500">No reviews yet.</p>
+                  <p className="text-sm text-zinc-500">No reviews yet.</p>
                 ) : (
                   myReviews.map((r) => (
-                    <div key={r.id} className="border border-slate-100 dark:border-slate-800 rounded-lg p-3">
+                    <div key={r.id} className="border border-white/[0.06] rounded-lg p-3">
                       <div className="flex items-start justify-between gap-2">
-                        <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{r.productName}</p>
-                        <span className="text-[11px] text-amber-600 dark:text-amber-400 shrink-0">★ {r.rating}</span>
+                        <p className="text-sm font-medium text-zinc-100">{r.productName}</p>
+                        <span className="text-[11px] text-amber-400 shrink-0">★ {r.rating}</span>
                       </div>
                       {(r.summary || r.marketingQuote) && (
-                        <p className="text-[13px] text-slate-600 dark:text-slate-400 mt-0.5 leading-snug">
+                        <p className="text-[13px] text-zinc-400 mt-0.5 leading-snug">
                           "{r.summary || r.marketingQuote}"
                         </p>
                       )}
-                      <div className="flex items-center gap-3 mt-1.5 text-[11px] text-slate-500 dark:text-slate-500 flex-wrap">
+                      <div className="flex items-center gap-3 mt-1.5 text-[11px] text-zinc-500 flex-wrap">
                         <span>👍 {r.likesCount || 0}</span>
                         {r.healthScore != null && (
-                          <span className={`font-medium ${r.healthScore >= 70 ? "text-emerald-600 dark:text-emerald-400" : r.healthScore >= 40 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400"}`}>
+                          <span className={`font-medium ${r.healthScore >= 70 ? "text-emerald-400" : r.healthScore >= 40 ? "text-amber-400" : "text-red-400"}`}>
                             Score: {r.healthScore}
                           </span>
                         )}
                         <span>{new Date(r.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>
                         {(r.versionCount ?? 0) > 1 && (
-                          <span className="text-blue-600 dark:text-blue-400 font-medium">{r.versionCount} updates</span>
+                          <span className="text-blue-400 font-medium">{r.versionCount} updates</span>
                         )}
                         <button
                           type="button"
                           onClick={() => setUpdatingReview(r)}
-                          className="ml-auto text-[11px] font-medium text-slate-600 dark:text-slate-300 px-2 py-0.5 border border-slate-200 dark:border-slate-700 rounded hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                          className="ml-auto text-[11px] font-medium text-zinc-300 px-2 py-0.5 border border-white/[0.06] rounded hover:bg-white/[0.05] transition"
                         >
                           Post Update
                         </button>
@@ -379,13 +378,13 @@ export default function ProfilePage() {
             {activeTab === "earnings" && (
               <div className="space-y-3">
                 {ledger.length === 0 ? (
-                  <p className="text-sm text-slate-500 dark:text-slate-500">No payouts yet. Earn by getting likes on your verified reviews.</p>
+                  <p className="text-sm text-zinc-500">No payouts yet. Earn by getting likes on your verified reviews.</p>
                 ) : (
                   <>
                     <div className="overflow-x-auto -mx-1">
                       <table className="w-full text-[13px]">
                         <thead>
-                          <tr className="text-left text-[11px] text-slate-400 dark:text-slate-500 uppercase tracking-wide">
+                          <tr className="text-left text-[11px] text-zinc-500 uppercase tracking-wide">
                             <th className="pb-2 pr-4 font-medium">Product</th>
                             <th className="pb-2 pr-4 font-medium">Likes</th>
                             <th className="pb-2 pr-4 font-medium">Photo</th>
@@ -393,14 +392,14 @@ export default function ProfilePage() {
                             <th className="pb-2 font-medium">Date</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        <tbody className="divide-y divide-white/[0.06]">
                           {ledger.map((e) => (
                             <tr key={e.id}>
-                              <td className="py-2 pr-4 font-medium text-slate-800 dark:text-slate-200 max-w-[140px] truncate">{e.productName || e.campaignId}</td>
-                              <td className="py-2 pr-4 text-slate-600 dark:text-slate-400 tabular-nums">{e.rawLikes}</td>
-                              <td className="py-2 pr-4 text-slate-600 dark:text-slate-400">{e.hasPhoto ? "1.5×" : "—"}</td>
-                              <td className="py-2 pr-4 text-emerald-600 dark:text-emerald-400 font-semibold tabular-nums">${e.amount.toFixed(2)}</td>
-                              <td className="py-2 text-slate-500 dark:text-slate-500 tabular-nums whitespace-nowrap">
+                              <td className="py-2 pr-4 font-medium text-zinc-200 max-w-[140px] truncate">{e.productName || e.campaignId}</td>
+                              <td className="py-2 pr-4 text-zinc-400 tabular-nums">{e.rawLikes}</td>
+                              <td className="py-2 pr-4 text-zinc-400">{e.hasPhoto ? "1.5×" : "—"}</td>
+                              <td className="py-2 pr-4 text-emerald-400 font-semibold tabular-nums">${e.amount.toFixed(2)}</td>
+                              <td className="py-2 text-zinc-500 tabular-nums whitespace-nowrap">
                                 {new Date(e.paidAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
                               </td>
                             </tr>
@@ -408,7 +407,7 @@ export default function ProfilePage() {
                         </tbody>
                       </table>
                     </div>
-                    <p className="text-[11px] text-slate-400 dark:text-slate-600">
+                    <p className="text-[11px] text-zinc-600">
                       Photo reviews earn 1.5× their likes weight in payout calculations.
                     </p>
                   </>
@@ -421,21 +420,21 @@ export default function ProfilePage() {
             {activeTab === "invites" && (
               <div className="space-y-3">
                 {anchorInvites.length === 0 ? (
-                  <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-8">No anchor review invites yet.</p>
+                  <p className="text-sm text-zinc-500 text-center py-8">No anchor review invites yet.</p>
                 ) : (
                   anchorInvites.map((inv) => (
                     <div key={inv.id} className={`p-4 rounded-xl border transition ${
-                      inv.status === "completed" ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20" :
-                      inv.status === "declined" ? "border-slate-200 dark:border-slate-800 opacity-60" :
-                      "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
+                      inv.status === "completed" ? "border-emerald-800 bg-emerald-950/20" :
+                      inv.status === "declined" ? "border-white/[0.06] opacity-60" :
+                      "border-white/[0.06] bg-white/[0.03]"
                     }`}>
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{inv.productName}</p>
-                          <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-0.5">
+                          <p className="text-sm font-semibold text-zinc-100">{inv.productName}</p>
+                          <p className="text-[12px] text-zinc-400 mt-0.5">
                             {inv.category} · {inv.minUsageDays}-day minimum usage · ${inv.anchorPayoutAmount} payout
                           </p>
-                          <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
+                          <p className="text-[11px] text-zinc-500 mt-1">
                             Invited {inv.invitedAt ? new Date(inv.invitedAt).toLocaleDateString() : ""}
                             {inv.acceptedAt && <span> · Accepted {new Date(inv.acceptedAt).toLocaleDateString()}</span>}
                           </p>
@@ -448,7 +447,7 @@ export default function ProfilePage() {
                                 Accept
                               </button>
                               <button type="button" onClick={() => handleDeclineInvite(inv.id)} disabled={updatingInviteId === inv.id}
-                                className="text-[12px] font-medium text-slate-500 dark:text-slate-400 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 transition">
+                                className="text-[12px] font-medium text-zinc-400 px-3 py-1.5 rounded-lg border border-white/[0.06] hover:bg-white/[0.05] disabled:opacity-50 transition">
                                 Decline
                               </button>
                             </>
@@ -460,12 +459,12 @@ export default function ProfilePage() {
                             </Link>
                           )}
                           {inv.status === "completed" && (
-                            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/40 px-2 py-1 rounded-full">
+                            <span className="text-[11px] font-bold text-emerald-400 bg-emerald-950/40 px-2 py-1 rounded-full">
                               Completed · ${inv.anchorPayoutAmount}
                             </span>
                           )}
                           {inv.status === "declined" && (
-                            <span className="text-[11px] text-slate-400">Declined</span>
+                            <span className="text-[11px] text-zinc-600">Declined</span>
                           )}
                         </div>
                       </div>
@@ -477,7 +476,7 @@ export default function ProfilePage() {
 
             {activeTab === "interests" && (
               <div className="space-y-4">
-                <p className="text-sm text-slate-500 dark:text-slate-500">Used to personalize your default feed.</p>
+                <p className="text-sm text-zinc-500">Used to personalize your default feed.</p>
                 <div className="flex flex-wrap gap-2">
                   {availableCategories.map((cat) => (
                     <button
@@ -490,8 +489,8 @@ export default function ProfilePage() {
                       }
                       className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
                         interests.includes(cat)
-                          ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100"
-                          : "bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-600"
+                          ? "bg-indigo-600 text-white border-indigo-600"
+                          : "bg-white/[0.03] text-zinc-400 border-white/[0.06] hover:border-white/[0.12]"
                       }`}
                     >
                       {cat}
@@ -503,12 +502,12 @@ export default function ProfilePage() {
                     type="button"
                     onClick={handleSaveInterests}
                     disabled={isSaving}
-                    className="bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-sm font-medium px-4 py-2 rounded-lg hover:opacity-90 transition disabled:opacity-50"
+                    className="bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-indigo-500 transition disabled:opacity-50"
                   >
                     {isSaving ? "Saving…" : "Save"}
                   </button>
                   {saveMessage && (
-                    <span className="text-sm text-emerald-600 dark:text-emerald-500">{saveMessage}</span>
+                    <span className="text-sm text-emerald-400">{saveMessage}</span>
                   )}
                 </div>
               </div>

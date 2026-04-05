@@ -129,7 +129,7 @@ export default function BrandWidgetsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950 text-slate-400 text-sm animate-pulse">
+      <div className="min-h-screen flex items-center justify-center bg-[#09090b] text-zinc-400 text-sm animate-pulse">
         Loading…
       </div>
     );
@@ -137,22 +137,22 @@ export default function BrandWidgetsPage() {
 
   if (!user) {
     return (
-      <main className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-4 p-8">
+      <main className="min-h-screen bg-[#09090b] flex flex-col items-center justify-center gap-4 p-8">
         <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mb-1">
           <span className="text-2xl">🔒</span>
         </div>
         <h2 className="text-lg font-semibold text-white">Sign in to access your widgets</h2>
-        <p className="text-slate-400 text-sm max-w-xs text-center">
+        <p className="text-zinc-400 text-sm max-w-xs text-center">
           Use the same email as your Review Jam brand account.
         </p>
         <button
           type="button"
           onClick={handleLogin}
-          className="bg-white text-slate-950 px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-100 transition"
+          className="bg-white text-[#09090b] px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-zinc-200 transition"
         >
           Sign in with Google
         </button>
-        <Link href="/brands" className="text-sm text-slate-500 hover:text-slate-300 transition">
+        <Link href="/brands" className="text-sm text-zinc-500 hover:text-zinc-300 transition">
           Don&apos;t have a product listed? →
         </Link>
       </main>
@@ -161,17 +161,17 @@ export default function BrandWidgetsPage() {
 
   if (!isAuthorized) {
     return (
-      <main className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-4 p-8 text-center">
+      <main className="min-h-screen bg-[#09090b] flex flex-col items-center justify-center gap-4 p-8 text-center">
         <h2 className="text-lg font-semibold text-white">No products found</h2>
-        <p className="text-slate-400 text-sm max-w-sm">
+        <p className="text-zinc-400 text-sm max-w-sm">
           We couldn&apos;t find any products for <strong className="text-white">{user.email}</strong>.
           Widgets are available on the $500+ tier.
         </p>
         <div className="flex gap-3 mt-1">
-          <Link href="/brands" className="text-sm font-medium bg-white text-slate-950 px-4 py-2 rounded-lg hover:bg-slate-100 transition">
+          <Link href="/brands" className="text-sm font-medium bg-white text-[#09090b] px-4 py-2 rounded-lg hover:bg-zinc-200 transition">
             List a product
           </Link>
-          <button type="button" onClick={() => auth.signOut()} className="text-sm text-slate-400 hover:text-white transition">
+          <button type="button" onClick={() => auth.signOut()} className="text-sm text-zinc-400 hover:text-white transition">
             Sign out
           </button>
         </div>
@@ -194,15 +194,15 @@ export default function BrandWidgetsPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-200">
+    <main className="min-h-screen bg-[#09090b] text-zinc-200">
       {/* Header */}
-      <div className="border-b border-slate-800 bg-slate-900/60">
+      <div className="border-b border-white/[0.06] bg-white/[0.02]">
         <div className="max-w-6xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 mb-0.5">
-              <Link href="/brands" className="text-xs text-slate-500 hover:text-slate-300 transition">Brands</Link>
-              <span className="text-slate-700">/</span>
-              <span className="text-xs text-slate-300 font-medium">Trust Widgets</span>
+              <Link href="/brands" className="text-xs text-zinc-500 hover:text-zinc-300 transition">Brands</Link>
+              <span className="text-zinc-700">/</span>
+              <span className="text-xs text-zinc-300 font-medium">Trust Widgets</span>
             </div>
             <h1 className="text-lg font-semibold text-white flex items-center gap-2">
               <span className="text-xl">🧩</span> Brand Trust Widget Generator
@@ -211,14 +211,14 @@ export default function BrandWidgetsPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/brands/dashboard"
-              className="text-xs font-medium text-slate-400 hover:text-white transition"
+              className="text-xs font-medium text-zinc-400 hover:text-white transition"
             >
               ← Dashboard
             </Link>
             <button
               type="button"
               onClick={() => auth.signOut()}
-              className="text-xs text-slate-500 hover:text-white transition"
+              className="text-xs text-zinc-500 hover:text-white transition"
             >
               Sign out
             </button>
@@ -231,7 +231,7 @@ export default function BrandWidgetsPage() {
         <div className="bg-gradient-to-r from-amber-950/40 to-orange-950/30 border border-amber-800/40 rounded-xl p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="flex-1">
             <h2 className="text-sm font-semibold text-amber-300 mb-1">Embed verified trust on any page</h2>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-zinc-400 leading-relaxed">
               Paste the widget on your website, Shopify store, landing page, or app.
               It shows live Health Score, star rating, top pros &amp; cons, and a direct link to your review page — auto-updated every hour.
             </p>
@@ -249,7 +249,7 @@ export default function BrandWidgetsPage() {
 
             {/* Product selector */}
             <div>
-              <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
+              <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-3">
                 1 — Select product
               </h3>
               <div className="space-y-2">
@@ -261,11 +261,11 @@ export default function BrandWidgetsPage() {
                     className={`w-full text-left px-4 py-3 rounded-xl border transition ${
                       selectedProduct?.id === p.id
                         ? "bg-amber-500/10 border-amber-500/40 text-white"
-                        : "bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-600"
+                        : "bg-white/[0.03] border-white/[0.06] text-zinc-300 hover:border-white/[0.12]"
                     }`}
                   >
                     <p className="text-sm font-medium leading-tight">{p.name}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{p.brandName} · {p.category}</p>
+                    <p className="text-xs text-zinc-500 mt-0.5">{p.brandName} · {p.category}</p>
                   </button>
                 ))}
               </div>
@@ -273,7 +273,7 @@ export default function BrandWidgetsPage() {
 
             {/* Theme picker */}
             <div>
-              <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
+              <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-3">
                 2 — Choose theme
               </h3>
               <div className="flex gap-2">
@@ -285,7 +285,7 @@ export default function BrandWidgetsPage() {
                     className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-xl border text-xs font-medium transition ${
                       theme === t.id
                         ? "bg-amber-500/10 border-amber-500/40 text-amber-300"
-                        : "bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-600"
+                        : "bg-white/[0.03] border-white/[0.06] text-zinc-400 hover:border-white/[0.12]"
                     }`}
                   >
                     <span className="text-lg">{t.emoji}</span>
@@ -293,7 +293,7 @@ export default function BrandWidgetsPage() {
                   </button>
                 ))}
               </div>
-              <p className="text-[11px] text-slate-600 mt-2">
+              <p className="text-[11px] text-zinc-600 mt-2">
                 "Auto" follows the visitor&apos;s system preference.
               </p>
             </div>
@@ -301,7 +301,7 @@ export default function BrandWidgetsPage() {
             {/* Code snippet */}
             {selectedProduct && (
               <div>
-                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
+                <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-3">
                   3 — Copy embed code
                 </h3>
 
@@ -314,8 +314,8 @@ export default function BrandWidgetsPage() {
                       onClick={() => setSnippetTab(tab.id)}
                       className={`px-3 py-1.5 rounded-md text-xs font-medium border transition ${
                         snippetTab === tab.id
-                          ? "bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white border-transparent"
-                          : "bg-transparent text-slate-500 border-slate-800 hover:border-slate-600"
+                          ? "bg-white/[0.06] text-white border-transparent"
+                          : "bg-transparent text-zinc-500 border-white/[0.06] hover:border-white/[0.12]"
                       }`}
                     >
                       {tab.label}
@@ -325,7 +325,7 @@ export default function BrandWidgetsPage() {
 
                 {/* Code block */}
                 <div className="relative">
-                  <pre className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-[11px] text-slate-300 font-mono overflow-x-auto leading-relaxed whitespace-pre-wrap break-all">
+                  <pre className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 text-[11px] text-zinc-300 font-mono overflow-x-auto leading-relaxed whitespace-pre-wrap break-all">
                     {snippet}
                   </pre>
                   <button
@@ -334,7 +334,7 @@ export default function BrandWidgetsPage() {
                     className={`absolute top-3 right-3 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition ${
                       copied
                         ? "bg-emerald-600 text-white"
-                        : "bg-slate-700 hover:bg-slate-600 text-slate-200"
+                        : "bg-white/[0.06] hover:bg-white/[0.08] text-zinc-200"
                     }`}
                   >
                     {copied ? "✓ Copied!" : "Copy"}
@@ -343,7 +343,7 @@ export default function BrandWidgetsPage() {
 
                 {/* Direct widget URL */}
                 <div className="mt-3 flex items-center gap-2">
-                  <code className="flex-1 text-[10px] bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-500 font-mono truncate">
+                  <code className="flex-1 text-[10px] bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2 text-zinc-500 font-mono truncate">
                     {baseUrl}/api/widget/{selectedProduct.id}?theme={theme}
                   </code>
                   <button
@@ -353,7 +353,7 @@ export default function BrandWidgetsPage() {
                         `${baseUrl}/api/widget/${selectedProduct.id}?theme=${theme}`,
                       )
                     }
-                    className="shrink-0 text-[11px] text-slate-500 hover:text-white border border-slate-800 hover:border-slate-600 px-2.5 py-2 rounded-lg transition"
+                    className="shrink-0 text-[11px] text-zinc-500 hover:text-white border border-white/[0.06] hover:border-white/[0.12] px-2.5 py-2 rounded-lg transition"
                   >
                     Copy URL
                   </button>
@@ -364,26 +364,26 @@ export default function BrandWidgetsPage() {
 
           {/* ── Right panel: live preview ─────────────────────────────────── */}
           <div>
-            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
+            <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-3">
               Live preview
             </h3>
 
             {selectedProduct ? (
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col items-center">
+              <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6 flex flex-col items-center">
                 {/* Simulated browser chrome */}
-                <div className="w-full max-w-[380px] bg-slate-800 rounded-t-xl px-4 py-2.5 flex items-center gap-2 border border-slate-700 border-b-0">
+                <div className="w-full max-w-[380px] bg-white/[0.05] rounded-t-xl px-4 py-2.5 flex items-center gap-2 border border-white/[0.06] border-b-0">
                   <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-slate-600" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-slate-600" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-slate-600" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-zinc-600" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-zinc-600" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-zinc-600" />
                   </div>
-                  <div className="flex-1 bg-slate-700 rounded-md px-3 py-1 text-[10px] text-slate-500 font-mono truncate">
+                  <div className="flex-1 bg-white/[0.06] rounded-md px-3 py-1 text-[10px] text-zinc-500 font-mono truncate">
                     {baseUrl}/api/widget/{selectedProduct.id}
                   </div>
                 </div>
 
                 {/* iframe embed */}
-                <div className="w-full max-w-[380px] border border-slate-700 border-t-0 rounded-b-xl overflow-hidden bg-white dark:bg-slate-950">
+                <div className="w-full max-w-[380px] border border-white/[0.06] border-t-0 rounded-b-xl overflow-hidden bg-[#09090b]">
                   <iframe
                     key={iframeKey}
                     src={`/api/widget/${selectedProduct.id}?theme=${theme}`}
@@ -395,20 +395,20 @@ export default function BrandWidgetsPage() {
                   />
                 </div>
 
-                <p className="text-[11px] text-slate-600 mt-3 text-center">
+                <p className="text-[11px] text-zinc-600 mt-3 text-center">
                   Auto-refreshes when you change settings.
                   Live data is cached for up to 1 hour.
                 </p>
               </div>
             ) : (
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-12 flex items-center justify-center">
-                <p className="text-slate-500 text-sm">Select a product to preview the widget</p>
+              <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-12 flex items-center justify-center">
+                <p className="text-zinc-500 text-sm">Select a product to preview the widget</p>
               </div>
             )}
 
             {/* Feature checklist */}
-            <div className="mt-6 bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-2.5">
-              <h4 className="text-xs font-semibold text-slate-300 mb-3">What the widget shows</h4>
+            <div className="mt-6 bg-white/[0.02] border border-white/[0.06] rounded-xl p-5 space-y-2.5">
+              <h4 className="text-xs font-semibold text-zinc-300 mb-3">What the widget shows</h4>
               {[
                 ["🔢", "Live Health Score (0–100) with colour-coded ring"],
                 ["⭐", "Average star rating + review count"],
@@ -418,7 +418,7 @@ export default function BrandWidgetsPage() {
                 ["🔄", "Auto-updated every hour — no rebuild needed"],
                 ["🎨", "Light / Dark / Auto theme support"],
               ].map(([icon, text]) => (
-                <div key={String(text)} className="flex items-start gap-2.5 text-xs text-slate-400">
+                <div key={String(text)} className="flex items-start gap-2.5 text-xs text-zinc-400">
                   <span className="shrink-0">{icon}</span>
                   <span>{text}</span>
                 </div>

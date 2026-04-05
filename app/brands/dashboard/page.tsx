@@ -147,7 +147,7 @@ export default function BrandDashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950 text-slate-400 text-sm animate-pulse">
+      <div className="min-h-screen flex items-center justify-center bg-[#09090b] text-zinc-400 text-sm animate-pulse">
         Loading…
       </div>
     );
@@ -155,36 +155,36 @@ export default function BrandDashboardPage() {
 
   if (!user) {
     return (
-      <main className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-4 p-8">
+      <main className="min-h-screen bg-[#09090b] flex flex-col items-center justify-center gap-4 p-8">
         <h2 className="text-lg font-semibold text-white">Brand Dashboard</h2>
-        <p className="text-slate-400 text-sm max-w-xs text-center">
+        <p className="text-zinc-400 text-sm max-w-xs text-center">
           Sign in with the email used when setting up your campaign to access your brand analytics.
         </p>
         <button
           type="button"
           onClick={handleLogin}
-          className="bg-white text-slate-950 px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-100 transition"
+          className="bg-white text-[#09090b] px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-zinc-200 transition"
         >
           Sign in with Google
         </button>
-        <Link href="/brands" className="text-sm text-slate-500 hover:text-slate-300">Don&apos;t have a campaign yet? →</Link>
+        <Link href="/brands" className="text-sm text-zinc-500 hover:text-zinc-300">Don&apos;t have a campaign yet? →</Link>
       </main>
     );
   }
 
   if (!isAuthorized) {
     return (
-      <main className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-4 p-8">
+      <main className="min-h-screen bg-[#09090b] flex flex-col items-center justify-center gap-4 p-8">
         <h2 className="text-lg font-semibold text-white">No campaigns found</h2>
-        <p className="text-slate-400 text-sm max-w-sm text-center">
+        <p className="text-zinc-400 text-sm max-w-sm text-center">
           We couldn&apos;t find any campaigns associated with <strong className="text-white">{user.email}</strong>.
           Make sure your campaign was created with this email, or contact us to get set up.
         </p>
         <div className="flex gap-3">
-          <Link href="/brands" className="text-sm font-medium bg-white text-slate-950 px-4 py-2 rounded-lg hover:bg-slate-100 transition">
+          <Link href="/brands" className="text-sm font-medium bg-white text-[#09090b] px-4 py-2 rounded-lg hover:bg-zinc-200 transition">
             Request a campaign
           </Link>
-          <button type="button" onClick={() => { auth.signOut(); }} className="text-sm text-slate-400 hover:text-white transition">
+          <button type="button" onClick={() => { auth.signOut(); }} className="text-sm text-zinc-400 hover:text-white transition">
             Sign out
           </button>
         </div>
@@ -193,12 +193,12 @@ export default function BrandDashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-200">
+    <main className="min-h-screen bg-[#09090b] text-zinc-200">
       {/* Header */}
-      <div className="border-b border-slate-800 bg-slate-900/50">
+      <div className="border-b border-white/[0.06] bg-white/[0.02]">
         <div className="max-w-6xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between">
           <div>
-            <p className="text-xs text-slate-500 uppercase tracking-wide mb-0.5">Brand Dashboard</p>
+            <p className="text-xs text-zinc-500 uppercase tracking-wide mb-0.5">Brand Dashboard</p>
             <h1 className="text-lg font-semibold text-white">{campaigns[0]?.brandName}</h1>
           </div>
           <div className="flex items-center gap-3">
@@ -212,7 +212,7 @@ export default function BrandDashboardPage() {
             <button
               type="button"
               onClick={() => auth.signOut()}
-              className="text-xs text-slate-400 hover:text-white transition"
+              className="text-xs text-zinc-400 hover:text-white transition"
             >
               Sign out
             </button>
@@ -229,7 +229,7 @@ export default function BrandDashboardPage() {
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
               selectedCampaign === "all"
                 ? "bg-indigo-600 text-white"
-                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                : "bg-white/[0.03] text-zinc-300 hover:bg-white/[0.06]"
             }`}
           >
             All campaigns
@@ -242,7 +242,7 @@ export default function BrandDashboardPage() {
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
                 selectedCampaign === c.campaignId
                   ? "bg-indigo-600 text-white"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  : "bg-white/[0.03] text-zinc-300 hover:bg-white/[0.06]"
               }`}
             >
               {c.name}
@@ -258,29 +258,29 @@ export default function BrandDashboardPage() {
             { label: "Total likes", value: totalLikes },
             { label: "Quotes ready", value: filteredReviews.filter(r => r.summary || r.marketingQuote).length },
           ].map((s) => (
-            <div key={s.label} className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+            <div key={s.label} className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4">
               <p className="text-2xl font-bold text-white tabular-nums">{s.value}</p>
-              <p className="text-xs text-slate-400 uppercase tracking-wide mt-0.5">{s.label}</p>
+              <p className="text-xs text-zinc-400 uppercase tracking-wide mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
 
         {/* ── Fund a Review Bounty ── */}
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5">
           <h3 className="text-sm font-semibold text-white flex items-center gap-2 mb-1">
             💰 Fund a Review Bounty
           </h3>
-          <p className="text-xs text-slate-400 leading-relaxed mb-4">
+          <p className="text-xs text-zinc-400 leading-relaxed mb-4">
             Incentivize honest reviews by funding a bounty pool. Payouts are based on review quality (health score), not sentiment — negative reviews earn the same as positive ones.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
             <div>
-              <label className="block text-[11px] text-slate-500 uppercase tracking-wide mb-1 font-semibold">Product</label>
+              <label className="block text-[11px] text-zinc-500 uppercase tracking-wide mb-1 font-semibold">Product</label>
               <select
                 value={bountyProductId}
                 onChange={(e) => setBountyProductId(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-sm outline-none focus:border-indigo-500 transition"
+                className="w-full bg-white/[0.03] border border-white/[0.06] rounded-lg p-2.5 text-white text-sm outline-none focus:border-indigo-500 transition"
               >
                 <option value="">Select a product</option>
                 {campaigns.map((c) => (
@@ -289,43 +289,43 @@ export default function BrandDashboardPage() {
               </select>
             </div>
             <div>
-              <label className="block text-[11px] text-slate-500 uppercase tracking-wide mb-1 font-semibold">Pool Amount ($)</label>
+              <label className="block text-[11px] text-zinc-500 uppercase tracking-wide mb-1 font-semibold">Pool Amount ($)</label>
               <input
                 type="number"
                 value={bountyAmount}
                 onChange={(e) => setBountyAmount(e.target.value)}
                 min="50"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-sm outline-none focus:border-indigo-500 transition"
+                className="w-full bg-white/[0.03] border border-white/[0.06] rounded-lg p-2.5 text-white text-sm outline-none focus:border-indigo-500 transition"
               />
             </div>
             <div>
-              <label className="block text-[11px] text-slate-500 uppercase tracking-wide mb-1 font-semibold">Max per review ($)</label>
+              <label className="block text-[11px] text-zinc-500 uppercase tracking-wide mb-1 font-semibold">Max per review ($)</label>
               <input
                 type="number"
                 value={bountyMaxPerReview}
                 onChange={(e) => setBountyMaxPerReview(e.target.value)}
                 min="5"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-sm outline-none focus:border-indigo-500 transition"
+                className="w-full bg-white/[0.03] border border-white/[0.06] rounded-lg p-2.5 text-white text-sm outline-none focus:border-indigo-500 transition"
               />
             </div>
             <div>
-              <label className="block text-[11px] text-slate-500 uppercase tracking-wide mb-1 font-semibold">Min health score (0-100)</label>
+              <label className="block text-[11px] text-zinc-500 uppercase tracking-wide mb-1 font-semibold">Min health score (0-100)</label>
               <input
                 type="number"
                 value={bountyMinScore}
                 onChange={(e) => setBountyMinScore(e.target.value)}
                 min="0" max="100"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-sm outline-none focus:border-indigo-500 transition"
+                className="w-full bg-white/[0.03] border border-white/[0.06] rounded-lg p-2.5 text-white text-sm outline-none focus:border-indigo-500 transition"
               />
             </div>
             <div>
-              <label className="block text-[11px] text-slate-500 uppercase tracking-wide mb-1 font-semibold">Duration (days)</label>
+              <label className="block text-[11px] text-zinc-500 uppercase tracking-wide mb-1 font-semibold">Duration (days)</label>
               <input
                 type="number"
                 value={bountyDuration}
                 onChange={(e) => setBountyDuration(e.target.value)}
                 min="7" max="90"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-sm outline-none focus:border-indigo-500 transition"
+                className="w-full bg-white/[0.03] border border-white/[0.06] rounded-lg p-2.5 text-white text-sm outline-none focus:border-indigo-500 transition"
               />
             </div>
             <div className="flex items-end">
@@ -333,7 +333,7 @@ export default function BrandDashboardPage() {
                 type="button"
                 onClick={handleFundBounty}
                 disabled={isBountyLoading || !bountyProductId || !bountyAmount}
-                className="w-full px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 text-white font-bold rounded-lg text-sm transition"
+                className="w-full px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-zinc-500 text-white font-bold rounded-lg text-sm transition"
               >
                 {isBountyLoading ? "Funding..." : "Fund Bounty"}
               </button>
@@ -348,14 +348,14 @@ export default function BrandDashboardPage() {
 
           {/* Active bounties */}
           {campaigns.filter((c: any) => c.bountyStatus === "active" && (c.bountyPoolRemaining ?? 0) > 0).length > 0 && (
-            <div className="mt-4 border-t border-slate-700 pt-4">
-              <p className="text-[11px] text-slate-500 uppercase tracking-wide font-semibold mb-2">Active Bounties</p>
+            <div className="mt-4 border-t border-white/[0.06] pt-4">
+              <p className="text-[11px] text-zinc-500 uppercase tracking-wide font-semibold mb-2">Active Bounties</p>
               <div className="space-y-2">
                 {campaigns.filter((c: any) => c.bountyStatus === "active").map((c: any) => (
-                  <div key={c.id} className="flex items-center justify-between bg-slate-900 rounded-lg px-3 py-2.5">
+                  <div key={c.id} className="flex items-center justify-between bg-white/[0.03] rounded-lg px-3 py-2.5">
                     <div>
                       <p className="text-sm font-medium text-white">{c.name}</p>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="text-[11px] text-zinc-400">
                         ${(c.bountyPoolRemaining ?? 0).toFixed(0)} remaining of ${(c.bountyPool ?? 0).toFixed(0)}
                         {c.bountyExpiresAt && <span> · Expires {new Date(c.bountyExpiresAt).toLocaleDateString()}</span>}
                       </p>
@@ -364,7 +364,7 @@ export default function BrandDashboardPage() {
                       type="button"
                       onClick={() => handleDistribute(c.id)}
                       disabled={isDistributing === c.id}
-                      className="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 text-white transition"
+                      className="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-800 text-white transition"
                     >
                       {isDistributing === c.id ? "..." : "Distribute"}
                     </button>
@@ -377,8 +377,8 @@ export default function BrandDashboardPage() {
 
         {/* Top marketing quotes */}
         {filteredReviews.filter(r => r.summary || r.marketingQuote).length > 0 && (
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wide mb-3">
+          <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5">
+            <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide mb-3">
               Top marketing quotes
             </h3>
             <div className="space-y-2">
@@ -390,7 +390,7 @@ export default function BrandDashboardPage() {
                     <span className="text-amber-400 text-sm shrink-0">★ {r.rating}</span>
                     <div>
                       <p className="text-[14px] text-white leading-snug">"{r.summary || r.marketingQuote}"</p>
-                      <p className="text-[12px] text-slate-500 mt-0.5">— {r.reviewerName} · {r.likesCount} likes</p>
+                      <p className="text-[12px] text-zinc-500 mt-0.5">— {r.reviewerName} · {r.likesCount} likes</p>
                     </div>
                   </div>
                 ))}
@@ -399,13 +399,13 @@ export default function BrandDashboardPage() {
         )}
 
         {/* Reviews list */}
-        <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-700">
+        <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-white/[0.06]">
             <h3 className="text-sm font-semibold text-white">All reviews ({filteredReviews.length})</h3>
           </div>
-          <div className="divide-y divide-slate-700/60 max-h-[600px] overflow-y-auto">
+          <div className="divide-y divide-white/[0.06] max-h-[600px] overflow-y-auto">
             {filteredReviews.length === 0 ? (
-              <p className="px-5 py-8 text-sm text-slate-400 text-center">No reviews yet for this campaign.</p>
+              <p className="px-5 py-8 text-sm text-zinc-400 text-center">No reviews yet for this campaign.</p>
             ) : (
               filteredReviews.map((r) => (
                 <div key={r.id} className="px-5 py-4">
@@ -414,7 +414,7 @@ export default function BrandDashboardPage() {
                       <Avatar name={r.reviewerName} size="sm" />
                       <p className="text-sm font-medium text-white">{r.reviewerName}</p>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0 text-[12px] text-slate-400">
+                    <div className="flex items-center gap-2 shrink-0 text-[12px] text-zinc-400">
                       <span className="text-amber-400">★ {r.rating}</span>
                       <span>👍 {r.likesCount}</span>
                     </div>
@@ -429,8 +429,8 @@ export default function BrandDashboardPage() {
                       ))}
                     </div>
                   )}
-                  <p className="text-[13px] text-slate-300 leading-relaxed">{r.content}</p>
-                  <p className="text-[11px] text-slate-500 mt-1">
+                  <p className="text-[13px] text-zinc-300 leading-relaxed">{r.content}</p>
+                  <p className="text-[11px] text-zinc-500 mt-1">
                     {new Date(r.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                     {r.mediaUrls && r.mediaUrls.length > 0 && <span className="ml-2">📸 {r.mediaUrls.length} photo{r.mediaUrls.length > 1 ? "s" : ""}</span>}
                   </p>
