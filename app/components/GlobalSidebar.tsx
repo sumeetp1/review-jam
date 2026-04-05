@@ -143,7 +143,7 @@ export default function GlobalSidebar() {
 
   return (
     <>
-      <aside className={`hidden md:flex flex-col ${isCollapsed ? "w-[60px]" : "w-[240px] xl:w-[256px]"} h-screen sticky top-0 border-r border-slate-200 dark:border-white/[0.06] bg-white dark:bg-[#09090b] overflow-y-auto overflow-x-hidden pb-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] transition-all duration-200 shrink-0`}>
+      <aside className={`hidden md:flex flex-col ${isCollapsed ? "w-[60px]" : "w-[240px] xl:w-[256px]"} h-screen fixed top-0 left-0 z-40 border-r border-slate-200 dark:border-white/[0.06] bg-white dark:bg-[#09090b] overflow-y-auto overflow-x-hidden pb-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] transition-all duration-200`}>
 
         {/* Logo + collapse toggle */}
         <div className={`flex items-center ${isCollapsed ? "justify-center" : "justify-between"} px-3 pt-4 pb-2 shrink-0`}>
