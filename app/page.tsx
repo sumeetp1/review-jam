@@ -148,22 +148,22 @@ export default function LandingPage() {
         </div>
 
         {/* Stats row */}
-        <div className="flex items-center gap-10 md:gap-14 pt-8 border-t border-white/[0.06]">
+        <div className="grid grid-cols-4 gap-6 md:gap-14 pt-8 border-t border-white/[0.06] w-full max-w-md">
           <div className="text-center">
             <div className="text-2xl md:text-3xl font-extrabold text-emerald-400 tracking-tight">92</div>
-            <div className="text-[11px] text-zinc-600 font-medium mt-1">Avg Health Score</div>
+            <div className="text-[10px] md:text-[11px] text-zinc-600 font-medium mt-1 leading-tight">Health Score</div>
           </div>
           <div className="text-center">
             <div className="text-2xl md:text-3xl font-extrabold text-zinc-100 tracking-tight">2.4K</div>
-            <div className="text-[11px] text-zinc-600 font-medium mt-1">Reviews</div>
+            <div className="text-[10px] md:text-[11px] text-zinc-600 font-medium mt-1 leading-tight">Reviews</div>
           </div>
           <div className="text-center">
             <div className="text-2xl md:text-3xl font-extrabold text-zinc-100 tracking-tight">9</div>
-            <div className="text-[11px] text-zinc-600 font-medium mt-1">Communities</div>
+            <div className="text-[10px] md:text-[11px] text-zinc-600 font-medium mt-1 leading-tight">Communities</div>
           </div>
           <div className="text-center">
             <div className="text-2xl md:text-3xl font-extrabold text-zinc-100 tracking-tight">850+</div>
-            <div className="text-[11px] text-zinc-600 font-medium mt-1">Products</div>
+            <div className="text-[10px] md:text-[11px] text-zinc-600 font-medium mt-1 leading-tight">Products</div>
           </div>
         </div>
       </main>
