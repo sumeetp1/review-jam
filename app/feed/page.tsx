@@ -583,8 +583,7 @@ function FeedPageInner() {
 
           <div className="sticky top-12 md:top-0 z-30 bg-white/95 dark:bg-[#09090b]/90 backdrop-blur-sm border-b border-white/[0.06] dark:border-white/[0.06]">
             <div className="hidden md:flex items-center justify-between h-12 px-4 border-b border-white/[0.06] dark:border-white/[0.06]">
-              <h1 className="text-lg font-semibold text-zinc-100 dark:text-zinc-100">Home</h1>
-              {user && <NotificationBell userId={user.uid} />}
+              {user && <div className="ml-auto"><NotificationBell userId={user.uid} /></div>}
             </div>
 
             {/* Feed Tabs */}

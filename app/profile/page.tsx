@@ -192,7 +192,7 @@ export default function ProfilePage() {
       {/* Nav */}
       <nav className="sticky top-0 z-40 bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/[0.06]">
         <div className="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-          <Link href="/" className="shrink-0">
+          <Link href="/" className="shrink-0 md:hidden">
             <Image src="/logo.svg" alt="Review Jam" width={110} height={26} className="dark:hidden" />
             <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} className="hidden dark:block" />
           </Link>
