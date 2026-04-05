@@ -2,11 +2,16 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #09090b;
-  --foreground: #fafafa;
+  --background: #ffffff;
+  --foreground: #0f172a;
   --brand: #6366f1;
   --brand-dark: #4f46e5;
   --brand-hover: #818cf8;
+}
+
+:root.dark {
+  --background: #09090b;
+  --foreground: #fafafa;
 }
 
 @theme inline {
@@ -24,11 +29,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Light mode override */
-:root:not(.dark) {
-  --background: #ffffff;
-  --foreground: #0f172a;
-}
 
 /* ─── Utility classes ─────────────────────────────────────────────────────── */
 

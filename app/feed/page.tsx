@@ -42,24 +42,14 @@ export default function FeedPage() {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [currentTime, setCurrentTime] = useState(Date.now());
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [boostedCategories, setBoostedCategories] = useState<Set<string>>(new Set());
   const [dynamicCategories, setDynamicCategories] = useState<string[]>([]);
 
   const categoriesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (
-      localStorage.theme === "dark" ||
-      (!("theme" in localStorage) &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches)
-    ) {
-      document.documentElement.classList.add("dark");
-      setIsDarkMode(true);
-    } else {
-      document.documentElement.classList.remove("dark");
-      setIsDarkMode(false);
-    }
+    setIsDarkMode(document.documentElement.classList.contains("dark"));
 
     if (user) {
       const userRef = doc(db, "users", user.uid);
@@ -83,15 +73,15 @@ export default function FeedPage() {
   }, []);
 
   const toggleDarkMode = () => {
-    if (isDarkMode) {
-      document.documentElement.classList.remove("dark");
-      localStorage.theme = "light";
-      setIsDarkMode(false);
-    } else {
+    const next = !isDarkMode;
+    if (next) {
       document.documentElement.classList.add("dark");
-      localStorage.theme = "dark";
-      setIsDarkMode(true);
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
     }
+    setIsDarkMode(next);
   };
 
   const scrollCategories = (direction: "left" | "right") => {

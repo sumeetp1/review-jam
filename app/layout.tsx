@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import VisitorCounter from "./components/VisitorCounter";
 import BottomNav from "./components/BottomNav";
+import ThemeProvider from "./components/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,13 +41,13 @@ export default function RootLayout({
     >
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-        <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
-        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#09090b" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
-      <body className="min-h-full flex flex-col font-sans text-[15px] leading-normal text-slate-100 bg-[#09090b]">
+      <body className="min-h-full flex flex-col font-sans text-[15px] leading-normal text-slate-900 dark:text-slate-100 bg-white dark:bg-[#09090b]">
+        <ThemeProvider />
         <div className="flex min-h-full flex-1 flex-col">
           <div className="flex-1 pb-[56px] md:pb-0">{children}</div>
           <VisitorCounter />
