@@ -4,10 +4,6 @@ import type { SubjectType } from "./types";
 
 export const ADMIN_EMAIL = "sumit.pandey75@gmail.com";
 
-export const ALLOWED_EMAILS = [
-  "sumit.pandey75@gmail.com",
-  // Add more allowed emails below:
-];
 
 export const SUGGESTED_CATEGORIES = [
   "Tech", "Home", "SaaS", "Automotive", "Beauty",

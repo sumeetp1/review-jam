@@ -1,11 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signInWithPopup, signOut } from "firebase/auth";
-import { auth, googleProvider } from "../../lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, googleProvider, db } from "../../lib/firebase";
 import { useAuth } from "../../lib/hooks/useAuth";
-import { ALLOWED_EMAILS } from "../../lib/constants";
+import { ADMIN_EMAIL } from "../../lib/constants";
 import GlobalSidebar from "./GlobalSidebar";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -13,10 +15,27 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const isMarketingPage = pathname === "/" || pathname === "/compare" || pathname === "/brands";
 
-  const isAllowed = user?.email && ALLOWED_EMAILS.map(e => e.toLowerCase()).includes(user.email.toLowerCase());
+  const [allowedEmails, setAllowedEmails] = useState<string[]>([]);
+  const [loadingAllowlist, setLoadingAllowlist] = useState(true);
+
+  useEffect(() => {
+    getDoc(doc(db, "config", "allowedEmails"))
+      .then((snap) => {
+        const emails: string[] = snap.exists() ? (snap.data().emails || []) : [];
+        // Admin is always allowed
+        const combined = [...new Set([ADMIN_EMAIL.toLowerCase(), ...emails.map((e: string) => e.toLowerCase())])];
+        setAllowedEmails(combined);
+      })
+      .catch(() => {
+        setAllowedEmails([ADMIN_EMAIL.toLowerCase()]);
+      })
+      .finally(() => setLoadingAllowlist(false));
+  }, []);
+
+  const isAllowed = user?.email && allowedEmails.includes(user.email.toLowerCase());
 
   // ── Access gate ──
-  if (loading) {
+  if (loading || loadingAllowlist) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#09090b]">
         <div className="text-center">

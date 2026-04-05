@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { collection, getDocs, limit, orderBy, query, doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, getDocs, limit, orderBy, query, doc, getDoc, setDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { useAuth } from "../../lib/hooks/useAuth";
 
@@ -32,6 +32,11 @@ export default function AdminDashboard() {
   // Dividend state
   const [globalPool, setGlobalPool] = useState("");
   const [dividendStats, setDividendStats] = useState<{ totalReviews: number; eligibleReviews: number; payoutsMade: number; uniqueReviewers: number; totalDistributed: number } | null>(null);
+
+  // Allowed emails
+  const [allowedEmails, setAllowedEmails] = useState<string[]>([]);
+  const [newEmail, setNewEmail] = useState("");
+  const [isLoadingEmails, setIsLoadingEmails] = useState(true);
 
   // AI moderation toggle
   const [aiCheckEnabled, setAiCheckEnabled] = useState(true);
@@ -87,6 +92,11 @@ export default function AdminDashboard() {
     getDoc(doc(db, "config", "moderation")).then((snap) => {
       if (snap.exists()) setAiCheckEnabled(snap.data().aiCheckEnabled !== false);
     }).catch(() => {});
+
+    // Load allowed emails
+    getDoc(doc(db, "config", "allowedEmails")).then((snap) => {
+      if (snap.exists()) setAllowedEmails(snap.data().emails || []);
+    }).catch(() => {}).finally(() => setIsLoadingEmails(false));
   }, [user]);
 
   if (isAuthLoading) return <div className="min-h-screen bg-slate-900 flex items-center justify-center text-slate-400 font-bold animate-pulse">Verifying Security Credentials...</div>;
@@ -104,6 +114,29 @@ export default function AdminDashboard() {
       alert("Failed to save setting.");
     } finally {
       setIsTogglingAi(false);
+    }
+  };
+
+  const handleAddEmail = async () => {
+    const email = newEmail.trim().toLowerCase();
+    if (!email || !email.includes("@")) return;
+    if (allowedEmails.map(e => e.toLowerCase()).includes(email)) { setNewEmail(""); return; }
+    try {
+      await setDoc(doc(db, "config", "allowedEmails"), { emails: arrayUnion(email) }, { merge: true });
+      setAllowedEmails((prev) => [...prev, email]);
+      setNewEmail("");
+    } catch (e) {
+      console.error("Failed to add email:", e);
+    }
+  };
+
+  const handleRemoveEmail = async (email: string) => {
+    if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) return;
+    try {
+      await setDoc(doc(db, "config", "allowedEmails"), { emails: arrayRemove(email) }, { merge: true });
+      setAllowedEmails((prev) => prev.filter((e) => e !== email));
+    } catch (e) {
+      console.error("Failed to remove email:", e);
     }
   };
 
@@ -140,6 +173,45 @@ export default function AdminDashboard() {
             <span className={`w-3 h-3 rounded-full ${aiCheckEnabled ? "bg-white" : "bg-slate-400"}`} />
             {isTogglingAi ? "Saving…" : aiCheckEnabled ? "AI Check: ON" : "AI Check: OFF"}
           </button>
+        </div>
+
+        {/* --- ALLOWED EMAILS --- */}
+        <div className="bg-slate-800 p-6 rounded-3xl border border-slate-700 mb-8 shadow-lg">
+          <h2 className="text-xl font-bold text-white mb-1">🔐 Site Access — Allowed Emails</h2>
+          <p className="text-slate-400 text-sm mb-4">Only these email addresses can access the site. Admin email is always allowed.</p>
+          <div className="flex gap-2 mb-4">
+            <input
+              type="email"
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleAddEmail()}
+              placeholder="email@example.com"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-slate-700 border border-slate-600 text-white text-sm placeholder-slate-400 outline-none focus:border-indigo-500"
+            />
+            <button onClick={handleAddEmail} className="bg-indigo-600 hover:bg-indigo-500 px-5 py-2.5 rounded-xl text-sm font-bold transition">
+              Add
+            </button>
+          </div>
+          {isLoadingEmails ? (
+            <p className="text-slate-500 text-sm">Loading...</p>
+          ) : (
+            <div className="space-y-2">
+              {/* Admin email — always shown, can't remove */}
+              <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-slate-700/50 border border-slate-600/50">
+                <span className="text-sm text-slate-300">{ADMIN_EMAIL}</span>
+                <span className="text-[11px] text-slate-500 font-medium">ADMIN</span>
+              </div>
+              {allowedEmails.filter(e => e.toLowerCase() !== ADMIN_EMAIL.toLowerCase()).map((email) => (
+                <div key={email} className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-slate-700/50 border border-slate-600/50">
+                  <span className="text-sm text-slate-300">{email}</span>
+                  <button onClick={() => handleRemoveEmail(email)} className="text-red-400 hover:text-red-300 text-sm font-bold transition">Remove</button>
+                </div>
+              ))}
+              {allowedEmails.filter(e => e.toLowerCase() !== ADMIN_EMAIL.toLowerCase()).length === 0 && (
+                <p className="text-slate-500 text-sm">No additional emails added yet.</p>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
