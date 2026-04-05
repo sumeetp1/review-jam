@@ -8,8 +8,9 @@ import {
   updateDoc, increment, arrayUnion, arrayRemove,
 } from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { signInWithPopup, signOut, onAuthStateChanged, User } from "firebase/auth";
+import { signInWithPopup, signOut } from "firebase/auth";
 import { db, auth, googleProvider, storage } from "../../lib/firebase";
+import { useAuth } from "../../lib/hooks/useAuth";
 import { updateUserBadges } from "../../lib/badges";
 import ReviewWizard, { ReviewFormData } from "../components/ReviewWizard";
 import { calculateDiscoveryRank } from "../../lib/discoveryRank";
@@ -20,13 +21,13 @@ import LeftSidebar from "../components/LeftSidebar";
 import Avatar from "../components/Avatar";
 import NotificationBell from "../components/NotificationBell";
 
-type FeedTab = "foryou" | "trending";
+import type { FeedTab } from "../../lib/types";
 
 export default function FeedPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [allReviews, setAllReviews] = useState<any[]>([]);
 
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAuth();
   const [userInterests, setUserInterests] = useState<string[]>([]);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -60,23 +61,21 @@ export default function FeedPage() {
       setIsDarkMode(false);
     }
 
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        const userRef = doc(db, "users", currentUser.uid);
-        const userSnap = await getDoc(userRef);
+    if (user) {
+      const userRef = doc(db, "users", user.uid);
+      getDoc(userRef).then((userSnap) => {
         if (userSnap.exists()) {
           setUserInterests(userSnap.data().interests || []);
         } else {
           setShowOnboarding(true);
         }
-      } else {
-        setUserInterests([]);
-      }
-      fetchInitialData();
-    });
-    return () => unsubscribe();
-  }, []);
+      });
+    } else {
+      setUserInterests([]);
+    }
+    fetchInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(Date.now()), 60000);

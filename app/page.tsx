@@ -4,14 +4,15 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { onAuthStateChanged, signInWithPopup, User } from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "../lib/firebase";
+import { useAuth } from "../lib/hooks/useAuth";
 import Avatar from "./components/Avatar";
 
 export default function LandingPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAuth();
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
@@ -26,9 +27,6 @@ export default function LandingPage() {
       document.documentElement.classList.remove("dark");
       setIsDarkMode(false);
     }
-
-    const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
-    return () => unsubscribe();
   }, []);
 
 

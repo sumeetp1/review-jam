@@ -11,19 +11,7 @@ import { db } from "../../lib/firebase";
 import type { User } from "firebase/auth";
 import CreateChannelModal from "./CreateChannelModal";
 
-type Product = {
-  id: string;
-  name: string;
-  brandName: string;
-};
-
-type Channel = {
-  id: string;
-  slug: string;
-  iconEmoji: string;
-  memberCount: number;
-  category: string;
-};
+import type { SidebarProduct as Product, Channel } from "../../lib/types";
 
 type Props = {
   user: User | null;

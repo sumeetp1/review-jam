@@ -1,18 +1,8 @@
-import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { collection, addDoc, doc, writeBatch } from "firebase/firestore";
+import { jsonError, jsonSuccess } from "../../../lib/api";
 import { db } from "../../../lib/firebase";
 import { slugify, categoryToSlug } from "../../../lib/slugify";
-
-// ─── Gemini setup (same pattern as /api/agent) ────────────────────────────────
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-const MODEL_CANDIDATES = [
-  process.env.GEMINI_MODEL,
-  "gemini-2.5-flash",
-  "gemini-2.5-flash-lite-preview-06-17",
-  "gemini-2.0-flash",
-].filter(Boolean) as string[];
+import { genAI, MODEL_CANDIDATES, tryParseJson } from "../../../lib/gemini";
 
 // Categories are open — any non-empty string is valid
 type Category = string;
@@ -26,22 +16,6 @@ type SeedResult = {
   verifiedSkus: string[];
 };
 
-// ─── JSON parse helper (same as agent route) ─────────────────────────────────
-
-function tryParseJson(text: string): unknown {
-  const trimmed = text.trim();
-  try { return JSON.parse(trimmed); } catch { /* fall through */ }
-  const fence = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  if (fence?.[1]) {
-    try { return JSON.parse(fence[1].trim()); } catch { /* fall through */ }
-  }
-  // last resort: find first {...}
-  const brace = trimmed.match(/\{[\s\S]*\}/);
-  if (brace) {
-    try { return JSON.parse(brace[0]); } catch { /* fall through */ }
-  }
-  return null;
-}
 
 function str(v: unknown): string {
   return typeof v === "string" ? v.trim() : v == null ? "" : String(v).trim();
@@ -127,15 +101,15 @@ export async function POST(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return jsonError("Invalid request body", 400);
   }
 
   const productName = body.productName?.trim();
   if (!productName || productName.length < 2) {
-    return NextResponse.json({ error: "Product name is required (min 2 characters)" }, { status: 400 });
+    return jsonError("Product name is required (min 2 characters)", 400);
   }
   if (productName.length > 120) {
-    return NextResponse.json({ error: "Product name is too long" }, { status: 400 });
+    return jsonError("Product name is too long", 400);
   }
 
   // ── Step 1: Call Gemini ───────────────────────────────────────────────────
@@ -195,8 +169,7 @@ export async function POST(request: Request) {
       await batch.commit();
     }
 
-    return NextResponse.json({
-      success: true,
+    return jsonSuccess({
       productId: productRef.id,
       slug: productSlug,
       communitySlug,
@@ -206,6 +179,6 @@ export async function POST(request: Request) {
     });
   } catch (err) {
     console.error("[seed-product] Firestore write failed:", err);
-    return NextResponse.json({ error: "Failed to create product. Please try again." }, { status: 500 });
+    return jsonError("Failed to create product. Please try again.", 500);
   }
 }

@@ -5,41 +5,15 @@ import Link from "next/link";
 import {
   collection, getDocs, query, where, doc, updateDoc,
 } from "firebase/firestore";
-import { onAuthStateChanged, signInWithPopup, User } from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
 import { db, auth, googleProvider } from "../../../lib/firebase";
+import { useAuth } from "../../../lib/hooks/useAuth";
 import Avatar from "../../components/Avatar";
 
-type Campaign = {
-  id: string;
-  name: string;
-  brandName: string;
-  brandEmail?: string;
-  category: string;
-  campaignId: string;
-  endDate: string;
-  budget?: number;
-  createdAt: string;
-};
-
-type Review = {
-  id: string;
-  reviewerName: string;
-  rating: number;
-  content: string;
-  summary?: string;
-  marketingQuote?: string;
-  likesCount: number;
-  helpfulCount?: number;
-  pros?: string[];
-  cons?: string[];
-  campaignId: string;
-  productName: string;
-  createdAt: string;
-  mediaUrls?: string[];
-};
+import type { BrandProduct as Campaign, BrandReview as Review } from "../../../lib/types";
 
 export default function BrandDashboardPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, loading: authLoading } = useAuth();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [allReviews, setAllReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -55,15 +29,14 @@ export default function BrandDashboardPage() {
   const [isDistributing, setIsDistributing] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (u) => {
-      setUser(u);
-      if (u?.email) {
-        await loadBrandData(u.email);
-      }
+    if (authLoading) return;
+    if (user?.email) {
+      loadBrandData(user.email).finally(() => setIsLoading(false));
+    } else {
       setIsLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading]);
 
   async function loadBrandData(email: string) {
     // Find campaigns belonging to this brand email

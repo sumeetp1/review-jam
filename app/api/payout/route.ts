@@ -1,10 +1,11 @@
-import { NextResponse } from "next/server";
 import {
   collection, getDocs, query, where,
   doc, updateDoc, increment, addDoc, getDoc,
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import { computeHealthScore } from "../../../lib/healthScore";
+import { jsonError, jsonSuccess } from "../../../lib/api";
+import type { ScoredReview } from "../../../lib/types";
 
 // ─── Global Dividend Payout ───────────────────────────────────────────────────
 //
@@ -21,10 +22,7 @@ export async function POST(req: Request) {
     const { globalPool } = body as { globalPool?: number };
 
     if (!globalPool || typeof globalPool !== "number" || globalPool <= 0) {
-      return NextResponse.json(
-        { success: false, error: "A positive globalPool amount (USD) is required." },
-        { status: 400 },
-      );
+      return jsonError("A positive globalPool amount (USD) is required.", 400);
     }
 
     // ── 1. Fetch all reviews; gate on isVerifiedPurchase ─────────────────────
@@ -36,10 +34,7 @@ export async function POST(req: Request) {
     );
 
     if (eligible.length === 0) {
-      return NextResponse.json({
-        success: false,
-        error: "No verified-purchase reviews found. Cannot distribute funds.",
-      });
+      return jsonError("No verified-purchase reviews found. Cannot distribute funds.");
     }
 
     // ── 2. Cache channel multipliers to minimise Firestore reads ─────────────
@@ -67,13 +62,6 @@ export async function POST(req: Request) {
     }
 
     // ── 3. Score every eligible review ────────────────────────────────────────
-    type ScoredReview = {
-      review: any;
-      healthScore: number;
-      categoryMultiplier: number;
-      weightedScore: number;
-    };
-
     const scoredReviews: ScoredReview[] = [];
 
     for (const review of eligible) {
@@ -106,13 +94,10 @@ export async function POST(req: Request) {
     }
 
     // ── 4. Sum denominator ────────────────────────────────────────────────────
-    const totalWeight = scoredReviews.reduce((sum, r) => sum + r.weightedScore, 0);
+    const totalWeight = scoredReviews.reduce((sum, r) => sum + (r.weightedScore ?? 0), 0);
 
     if (totalWeight === 0) {
-      return NextResponse.json({
-        success: false,
-        error: "All eligible reviews have a weighted score of 0. Cannot distribute funds.",
-      });
+      return jsonError("All eligible reviews have a weighted score of 0. Cannot distribute funds.");
     }
 
     // ── 5. Distribute ─────────────────────────────────────────────────────────
@@ -120,7 +105,7 @@ export async function POST(req: Request) {
     let payoutsMade = 0;
     let totalDistributed = 0;
 
-    for (const { review, healthScore, categoryMultiplier, weightedScore } of scoredReviews) {
+    for (const { review, healthScore, categoryMultiplier = 1, weightedScore = 0 } of scoredReviews) {
       if (weightedScore <= 0) continue;
 
       const share = globalPool * (weightedScore / totalWeight);
@@ -161,11 +146,10 @@ export async function POST(req: Request) {
     }
 
     const uniqueReviewers = new Set(
-      scoredReviews.filter((r) => r.weightedScore > 0).map((r) => r.review.reviewerId),
+      scoredReviews.filter((r) => (r.weightedScore ?? 0) > 0).map((r) => r.review.reviewerId),
     ).size;
 
-    return NextResponse.json({
-      success: true,
+    return jsonSuccess({
       message: `Distributed $${totalDistributed.toFixed(2)} across ${payoutsMade} review${payoutsMade !== 1 ? "s" : ""} from ${uniqueReviewers} reviewer${uniqueReviewers !== 1 ? "s" : ""}.`,
       stats: {
         totalReviews: allReviews.length,
@@ -178,9 +162,6 @@ export async function POST(req: Request) {
 
   } catch (error) {
     console.error("Payout API Error:", error);
-    return NextResponse.json(
-      { success: false, error: "Internal server error during dividend distribution." },
-      { status: 500 },
-    );
+    return jsonError("Internal server error during dividend distribution.", 500);
   }
 }

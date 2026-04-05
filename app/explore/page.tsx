@@ -14,33 +14,7 @@ function isBoosted(channel: { multiplier?: number; multiplierExpiresAt?: string 
   return true;
 }
 
-type ProductEntry = {
-  id: string;
-  name: string;
-  brandName: string;
-  category: string;
-  campaignId: string;
-  endDate: string;
-  communitySeeded?: boolean;
-  slug?: string;
-  communitySlug?: string;
-  coverImage?: string;
-  // Computed
-  reviewCount: number;
-  avgRating: number;
-  avgHealthScore: number;
-  topQuote: string;
-  totalLikes: number;
-  discoveryRank: number;
-  hasVerifiedOwner: boolean;
-  bountyPool: number;
-  bountyPoolRemaining: number;
-  bountyStatus: string;
-};
-
-// Categories are built dynamically from channel data — no hardcoded list
-
-type SortKey = "discovery" | "reviews" | "rating" | "likes" | "newest";
+import type { ProductEntry, SortKey } from "../../lib/types";
 
 const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: "discovery", label: "🔥 Discovery" },

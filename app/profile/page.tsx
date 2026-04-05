@@ -7,8 +7,9 @@ import {
   doc, getDoc, updateDoc,
   collection, query, where, getDocs, orderBy, limit,
 } from "firebase/firestore";
-import { onAuthStateChanged, User, signOut } from "firebase/auth";
+import { signOut, type User } from "firebase/auth";
 import { db, auth } from "../../lib/firebase";
+import { useAuth } from "../../lib/hooks/useAuth";
 import VersionUpdateWizard from "../components/VersionUpdateWizard";
 import { ALL_BADGES, getBadgeById } from "../../lib/badges";
 import Avatar from "../components/Avatar";
@@ -23,34 +24,10 @@ function getTierStyle(score: number): { bg: string; text: string; emoji: string 
 }
 
 
-type LedgerEntry = {
-  id: string;
-  campaignId: string;
-  productName: string;
-  amount: number;
-  rawLikes: number;
-  hasPhoto: boolean;
-  status: string;
-  paidAt: string;
-};
-
-type ReviewSummary = {
-  id: string;
-  productName: string;
-  category?: string;
-  rating: number;
-  likesCount: number;
-  summary?: string;
-  marketingQuote?: string;
-  createdAt: string;
-  campaignId: string;
-  versionCount?: number;
-  latestVersionLabel?: string;
-  healthScore?: number;
-};
+import type { LedgerEntry, ReviewSummary } from "../../lib/types";
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, loading: authLoading } = useAuth();
   const [walletBalance, setWalletBalance] = useState(0);
   const [totalEarned, setTotalEarned] = useState(0);
   const [trustScore, setTrustScore] = useState(0);
@@ -69,21 +46,20 @@ export default function ProfilePage() {
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        await Promise.all([
-          fetchUserData(currentUser),
-          fetchLedger(currentUser.uid),
-          fetchMyReviews(currentUser.uid),
-          fetchAnchorInvites(currentUser.uid),
-          fetchCategories(),
-        ]);
-      }
+    if (authLoading) return;
+    if (user) {
+      Promise.all([
+        fetchUserData(user),
+        fetchLedger(user.uid),
+        fetchMyReviews(user.uid),
+        fetchAnchorInvites(user.uid),
+        fetchCategories(),
+      ]).finally(() => setIsLoading(false));
+    } else {
       setIsLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading]);
 
   async function fetchUserData(currentUser: User) {
     const snap = await getDoc(doc(db, "users", currentUser.uid));

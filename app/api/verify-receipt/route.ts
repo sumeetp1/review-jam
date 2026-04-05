@@ -1,14 +1,5 @@
-import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-
-const MODEL_CANDIDATES = [
-  process.env.GEMINI_MODEL,
-  "gemini-2.5-flash",
-  "gemini-2.5-flash-lite-preview-06-17",
-  "gemini-2.0-flash",
-].filter(Boolean) as string[];
+import { tryParseJson, generateMultimodalWithFallback } from "../../../lib/gemini";
+import { jsonError, jsonSuccess } from "../../../lib/api";
 
 type ReceiptData = {
   storeName: string | null;
@@ -17,25 +8,6 @@ type ReceiptData = {
   isVerified: boolean;
   confidence: "high" | "medium" | "low" | "none";
 };
-
-function tryParseJson(text: string): unknown {
-  const trimmed = text.trim();
-  try {
-    return JSON.parse(trimmed);
-  } catch {
-    const fence = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
-    if (fence?.[1]) {
-      try { return JSON.parse(fence[1].trim()); } catch { /* fall through */ }
-    }
-    return null;
-  }
-}
-
-function isModelNotFoundError(error: unknown): boolean {
-  if (!error || typeof error !== "object") return false;
-  const e = error as { status?: number; message?: string };
-  return e.status === 404 || (typeof e.message === "string" && e.message.toLowerCase().includes("not found"));
-}
 
 async function parseReceiptWithGemini(
   imageBase64: string,
@@ -54,59 +26,32 @@ Extract the following fields:
 Return ONLY a JSON object with exactly these keys: storeName, purchaseDate, detectedProduct, isVerified, confidence.
 Do not include any explanation or markdown outside the JSON.`;
 
-  let lastError: unknown = null;
+  const text = await generateMultimodalWithFallback(
+    [prompt, { inlineData: { mimeType, data: imageBase64 } }],
+    { responseMimeType: "application/json" },
+  );
 
-  for (const modelName of MODEL_CANDIDATES) {
-    try {
-      const model = genAI.getGenerativeModel({
-        model: modelName,
-        generationConfig: { responseMimeType: "application/json" },
-      });
-
-      const result = await model.generateContent([
-        prompt,
-        {
-          inlineData: {
-            mimeType,
-            data: imageBase64,
-          },
-        },
-      ]);
-
-      const text = result.response.text().trim();
-      const parsed = tryParseJson(text);
-
-      if (!parsed || typeof parsed !== "object") {
-        throw new Error("Gemini returned non-JSON response");
-      }
-
-      const raw = parsed as Record<string, unknown>;
-      return {
-        storeName: typeof raw.storeName === "string" ? raw.storeName : null,
-        purchaseDate: typeof raw.purchaseDate === "string" ? raw.purchaseDate : null,
-        detectedProduct: typeof raw.detectedProduct === "string" ? raw.detectedProduct : null,
-        isVerified: raw.isVerified === true,
-        confidence: (["high", "medium", "low", "none"].includes(raw.confidence as string)
-          ? raw.confidence
-          : "none") as ReceiptData["confidence"],
-      };
-    } catch (error) {
-      lastError = error;
-      if (isModelNotFoundError(error)) continue;
-      throw error;
-    }
+  const parsed = tryParseJson(text);
+  if (!parsed || typeof parsed !== "object") {
+    throw new Error("Gemini returned non-JSON response");
   }
 
-  throw lastError ?? new Error("No Gemini models available.");
+  const raw = parsed as Record<string, unknown>;
+  return {
+    storeName: typeof raw.storeName === "string" ? raw.storeName : null,
+    purchaseDate: typeof raw.purchaseDate === "string" ? raw.purchaseDate : null,
+    detectedProduct: typeof raw.detectedProduct === "string" ? raw.detectedProduct : null,
+    isVerified: raw.isVerified === true,
+    confidence: (["high", "medium", "low", "none"].includes(raw.confidence as string)
+      ? raw.confidence
+      : "none") as ReceiptData["confidence"],
+  };
 }
 
 export async function POST(req: Request) {
   try {
     if (!process.env.GEMINI_API_KEY) {
-      return NextResponse.json(
-        { success: false, error: "Receipt verification is currently unavailable." },
-        { status: 503 },
-      );
+      return jsonError("Receipt verification is currently unavailable.", 503);
     }
 
     const body = await req.json();
@@ -117,26 +62,23 @@ export async function POST(req: Request) {
     };
 
     if (!imageBase64 || typeof imageBase64 !== "string") {
-      return NextResponse.json({ success: false, error: "imageBase64 is required." }, { status: 400 });
+      return jsonError("imageBase64 is required.");
     }
 
     if (!mimeType || !mimeType.startsWith("image/")) {
-      return NextResponse.json({ success: false, error: "A valid image mimeType is required." }, { status: 400 });
+      return jsonError("A valid image mimeType is required.");
     }
 
     // Safety: cap payload at ~8 MB of base64 (~6 MB actual image)
     if (imageBase64.length > 11_000_000) {
-      return NextResponse.json({ success: false, error: "Image is too large. Please use an image under 6 MB." }, { status: 413 });
+      return jsonError("Image is too large. Please use an image under 6 MB.", 413);
     }
 
     const result = await parseReceiptWithGemini(imageBase64, mimeType, productName ?? "");
 
-    return NextResponse.json({ success: true, ...result });
+    return jsonSuccess(result as unknown as Record<string, unknown>);
   } catch (error) {
     console.error("verify-receipt error:", error);
-    return NextResponse.json(
-      { success: false, error: "Failed to parse receipt. Please try again." },
-      { status: 500 },
-    );
+    return jsonError("Failed to parse receipt. Please try again.", 500);
   }
 }

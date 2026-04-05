@@ -3,20 +3,11 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { onAuthStateChanged, signInWithPopup, User } from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
 import { db, auth, googleProvider } from "../../../lib/firebase";
+import { useAuth } from "../../../lib/hooks/useAuth";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-type Product = {
-  id: string;
-  name: string;
-  brandName: string;
-  brandEmail?: string;
-  category: string;
-  campaignId: string;
-  endDate?: string;
-};
+import type { BrandProduct as Product } from "../../../lib/types";
 
 type Theme = "auto" | "light" | "dark";
 type SnippetTab = "iframe" | "react" | "html";
@@ -71,7 +62,7 @@ function htmlSnippet(productId: string, theme: Theme, baseUrl: string) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function BrandWidgetsPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, loading: authLoading } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -88,15 +79,14 @@ export default function BrandWidgetsPage() {
       : "https://reviewjam.com";
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (u) => {
-      setUser(u);
-      if (u?.email) {
-        await loadProducts(u.email);
-      }
+    if (authLoading) return;
+    if (user?.email) {
+      loadProducts(user.email).finally(() => setIsLoading(false));
+    } else {
       setIsLoading(false);
-    });
-    return () => unsub();
-  }, []);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading]);
 
   // Reload preview when theme changes
   useEffect(() => {

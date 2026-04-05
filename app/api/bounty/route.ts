@@ -1,10 +1,11 @@
-import { NextResponse } from "next/server";
 import {
   collection, getDocs, query, where,
   doc, updateDoc, increment, addDoc, getDoc,
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import { computeHealthScore } from "../../../lib/healthScore";
+import { jsonError, jsonSuccess } from "../../../lib/api";
+import type { ScoredReview } from "../../../lib/types";
 
 // ─── Review Bounty System ────────────────────────────────────────────────────
 //
@@ -29,13 +30,13 @@ export async function POST(req: Request) {
       const { productId, amount, maxPerReview, minHealthScore, durationDays } = body;
 
       if (!productId || !amount || amount <= 0) {
-        return NextResponse.json({ success: false, error: "productId and a positive amount are required." }, { status: 400 });
+        return jsonError("productId and a positive amount are required.", 400);
       }
 
       const productRef = doc(db, "products", productId);
       const productSnap = await getDoc(productRef);
       if (!productSnap.exists()) {
-        return NextResponse.json({ success: false, error: "Product not found." }, { status: 404 });
+        return jsonError("Product not found.", 404);
       }
 
       const now = new Date();
@@ -51,8 +52,7 @@ export async function POST(req: Request) {
         bountyStatus: "active",
       });
 
-      return NextResponse.json({
-        success: true,
+      return jsonSuccess({
         message: `Bounty of $${amount} funded on "${productSnap.data().name}" for ${durationDays || 30} days. Min health score: ${minHealthScore || 60}, max per review: $${maxPerReview || 25}.`,
       });
     }
@@ -62,13 +62,13 @@ export async function POST(req: Request) {
       const { productId } = body;
 
       if (!productId) {
-        return NextResponse.json({ success: false, error: "productId is required." }, { status: 400 });
+        return jsonError("productId is required.", 400);
       }
 
       const productRef = doc(db, "products", productId);
       const productSnap = await getDoc(productRef);
       if (!productSnap.exists()) {
-        return NextResponse.json({ success: false, error: "Product not found." }, { status: 404 });
+        return jsonError("Product not found.", 404);
       }
 
       const product = productSnap.data();
@@ -77,7 +77,7 @@ export async function POST(req: Request) {
       const minScore = product.bountyMinHealthScore ?? 60;
 
       if (pool <= 0) {
-        return NextResponse.json({ success: false, error: "No bounty funds remaining." });
+        return jsonError("No bounty funds remaining.");
       }
 
       // Fetch all reviews for this product
@@ -94,11 +94,10 @@ export async function POST(req: Request) {
       );
 
       if (eligible.length === 0) {
-        return NextResponse.json({ success: false, error: "No eligible unpaid reviews found." });
+        return jsonError("No eligible unpaid reviews found.");
       }
 
       // Recompute health scores and filter by minimum
-      type ScoredReview = { review: any; healthScore: number };
       const scored: ScoredReview[] = [];
 
       for (const review of eligible) {
@@ -127,10 +126,7 @@ export async function POST(req: Request) {
       }
 
       if (scored.length === 0) {
-        return NextResponse.json({
-          success: false,
-          error: `No reviews meet the minimum health score of ${minScore}.`,
-        });
+        return jsonError(`No reviews meet the minimum health score of ${minScore}.`);
       }
 
       // Distribute proportionally by health score, capped at maxPerReview
@@ -198,8 +194,7 @@ export async function POST(req: Request) {
         bountyLastDistributedAt: paidAt,
       });
 
-      return NextResponse.json({
-        success: true,
+      return jsonSuccess({
         message: `Distributed $${totalDistributed.toFixed(2)} across ${payoutsMade} reviews. $${remaining.toFixed(2)} remaining in pool.`,
         stats: {
           totalReviews: allReviews.length,
@@ -212,13 +207,10 @@ export async function POST(req: Request) {
       });
     }
 
-    return NextResponse.json({ success: false, error: "Invalid action. Use 'fund' or 'distribute'." }, { status: 400 });
+    return jsonError("Invalid action. Use 'fund' or 'distribute'.", 400);
 
   } catch (error) {
     console.error("Bounty API Error:", error);
-    return NextResponse.json(
-      { success: false, error: "Internal server error." },
-      { status: 500 },
-    );
+    return jsonError("Internal server error.", 500);
   }
 }

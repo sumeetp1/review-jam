@@ -1,22 +1,8 @@
-import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-const MODEL_CANDIDATES = [
-  process.env.GEMINI_MODEL,
-  "gemini-2.5-flash",
-  "gemini-2.5-flash-lite-preview-06-17",
-  "gemini-2.0-flash",
-].filter(Boolean) as string[];
-
-type ReviewAnalysis = {
-  isGenuine: boolean;
-  reason: string;
-  marketingQuote: string;
-  biasFlag: boolean;
-};
+import { tryParseJson, generateWithFallback } from "../../../lib/gemini";
+import { jsonError, jsonSuccess } from "../../../lib/api";
+import type { ReviewAnalysis } from "../../../lib/types";
 
 function reject(reason: string): ReviewAnalysis {
   return { isGenuine: false, reason, marketingQuote: "", biasFlag: false };
@@ -66,22 +52,6 @@ function normalizeAnalysis(raw: Record<string, unknown>): ReviewAnalysis | null 
   };
 }
 
-function tryParseJsonObject(text: string): unknown {
-  const trimmed = text.trim();
-  try {
-    return JSON.parse(trimmed);
-  } catch {
-    const fence = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
-    if (fence?.[1]) {
-      try {
-        return JSON.parse(fence[1].trim());
-      } catch {
-        return null;
-      }
-    }
-    return null;
-  }
-}
 
 async function logModerationEvent(args: {
   reviewerName?: string;
@@ -105,33 +75,6 @@ async function logModerationEvent(args: {
   }
 }
 
-function isModelNotFoundError(error: unknown): boolean {
-  if (!error || typeof error !== "object") return false;
-  const maybe = error as { status?: number; message?: string };
-  if (maybe.status === 404) return true;
-  return typeof maybe.message === "string" && maybe.message.toLowerCase().includes("not found");
-}
-
-async function generateWithFallbackModel(prompt: string) {
-  let lastError: unknown = null;
-
-  for (const modelName of MODEL_CANDIDATES) {
-    try {
-      const model = genAI.getGenerativeModel({
-        model: modelName,
-        generationConfig: { responseMimeType: "application/json" },
-      });
-      const result = await model.generateContent(prompt);
-      return result.response.text().trim();
-    } catch (error) {
-      lastError = error;
-      if (isModelNotFoundError(error)) continue;
-      throw error;
-    }
-  }
-
-  throw lastError ?? new Error("No Gemini models are available for this API key.");
-}
 
 export async function POST(req: Request) {
   try {
@@ -151,7 +94,7 @@ export async function POST(req: Request) {
     } = body;
 
     if (typeof reviewContent !== "string" || !reviewContent.trim()) {
-      return NextResponse.json({ error: "Review content is required" }, { status: 400 });
+      return jsonError("Review content is required");
     }
 
     // Check if AI moderation is disabled by admin
@@ -164,7 +107,7 @@ export async function POST(req: Request) {
           marketingQuote: summary?.trim() || reviewContent.slice(0, 80),
           biasFlag: false,
         };
-        return NextResponse.json({ success: true, analysis: bypassAnalysis });
+        return jsonSuccess({ analysis: bypassAnalysis });
       }
     } catch {
       // If config fetch fails, proceed normally
@@ -178,14 +121,11 @@ export async function POST(req: Request) {
         analysis: preCheckFailure,
         source: "deterministic",
       });
-      return NextResponse.json({ success: true, analysis: preCheckFailure }, { status: 200 });
+      return jsonSuccess({ analysis: preCheckFailure });
     }
 
     if (!process.env.GEMINI_API_KEY) {
-      return NextResponse.json(
-        { success: false, error: "AI moderation is unavailable. Try again later." },
-        { status: 503 }
-      );
+      return jsonError("AI moderation is unavailable. Try again later.", 503);
     }
 
     // Build structured context for AI from all review fields
@@ -240,22 +180,16 @@ Full Review: "${reviewContent}"
 Analyze and return JSON.
     `.trim();
 
-    const responseText = await generateWithFallbackModel(prompt);
+    const responseText = await generateWithFallback(prompt, { responseMimeType: "application/json" });
 
-    const parsedRaw = tryParseJsonObject(responseText);
+    const parsedRaw = tryParseJson(responseText);
     if (!parsedRaw || typeof parsedRaw !== "object") {
-      return NextResponse.json(
-        { success: false, error: "Invalid moderation response format from AI." },
-        { status: 502 }
-      );
+      return jsonError("Invalid moderation response format from AI.", 502);
     }
 
     const analysis = normalizeAnalysis(parsedRaw as Record<string, unknown>);
     if (!analysis) {
-      return NextResponse.json(
-        { success: false, error: "Incomplete moderation response from AI." },
-        { status: 502 }
-      );
+      return jsonError("Incomplete moderation response from AI.", 502);
     }
 
     // If summary was provided and review is genuine, use it as the marketing quote
@@ -270,13 +204,10 @@ Analyze and return JSON.
       source: "ai",
     });
 
-    return NextResponse.json({ success: true, analysis });
+    return jsonSuccess({ analysis });
 
   } catch (error) {
     console.error("AI Agent Error:", error);
-    return NextResponse.json(
-      { success: false, error: "Failed to process review with AI." },
-      { status: 500 }
-    );
+    return jsonError("Failed to process review with AI.", 500);
   }
 }

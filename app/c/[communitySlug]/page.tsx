@@ -9,43 +9,21 @@ import {
   increment, arrayUnion, arrayRemove, deleteDoc,
 } from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { onAuthStateChanged, User, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { db, auth, storage } from "../../../lib/firebase";
+import { useAuth } from "../../../lib/hooks/useAuth";
 import { updateUserBadges } from "../../../lib/badges";
 import { computeHealthScore } from "../../../lib/healthScore";
 import ReviewCard, { type ReviewData } from "../../components/ReviewCard";
 import ReviewWizard, { type ReviewFormData } from "../../components/ReviewWizard";
 import BottomNav from "../../components/BottomNav";
 
-type Community = {
-  id: string;
-  slug: string;
-  name: string;
-  description: string;
-  category: string;
-  iconEmoji: string;
-  memberCount: number;
-  reviewCount: number;
-  creatorName: string;
-};
-
-type ProductCard = {
-  id: string;
-  slug: string;
-  name: string;
-  brandName: string;
-  category: string;
-  communitySlug: string;
-  communityTags?: string[];
-  avgRating?: number;
-  reviewCount?: number;
-  communitySeeded?: boolean;
-};
+import type { Community, ProductCard } from "../../../lib/types";
 
 export default function CommunityPage({ params }: { params: Promise<{ communitySlug: string }> }) {
   const { communitySlug } = use(params);
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAuth();
   const [community, setCommunity] = useState<Community | null>(null);
   const [products, setProducts] = useState<ProductCard[]>([]);
   const [reviews, setReviews] = useState<ReviewData[]>([]);
@@ -54,11 +32,6 @@ export default function CommunityPage({ params }: { params: Promise<{ communityS
   const [showReviewWizard, setShowReviewWizard] = useState(false);
   const [sortBy, setSortBy] = useState<"newest" | "likes" | "score">("newest");
   const [activeTab, setActiveTab] = useState<"reviews" | "products">("products");
-
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => setUser(u));
-    return () => unsub();
-  }, []);
 
   // Load community + products + reviews
   useEffect(() => {

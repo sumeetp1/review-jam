@@ -1,471 +1,19 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { User } from "firebase/auth";
+import {
+  SUGGESTED_CATEGORIES,
+  USAGE_DURATIONS,
+  PURCHASE_CHANNELS,
+} from "../../../lib/constants";
+import { AVAILABLE_CATEGORIES } from "../../../lib/constants";
+import type { ReviewFormData, ProductVariant } from "./index";
+import StarPicker from "./StarPicker";
+import ChipInput from "./ChipInput";
+import OptionButton from "./OptionButton";
+import ModalShell from "./ModalShell";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export type ReviewFormData = {
-  productName: string;
-  category: string;
-  productSource: "brand_sent" | "purchased" | "gift";
-  usageDuration: "less_1_week" | "1_4_weeks" | "1_3_months" | "3_plus_months";
-  purchaseChannel: "amazon" | "brand_website" | "retail" | "other";
-  overallRating: number;
-  subRatings: Record<string, number>;
-  pros: string[];
-  cons: string[];
-  content: string;
-  summary: string;
-  bestFor: string[];
-  mediaFiles: File[];
-  isCampaignReview: boolean;
-  reviewType: "organic" | "verified" | "generic";
-  productCode?: string;
-  channelId?: string;
-  channelSlug?: string;
-  // SKU / variant
-  variantId?: string;
-  variantName?: string;
-  // Proof of purchase
-  isVerifiedPurchase?: boolean;
-  receiptVerification?: {
-    storeName?: string | null;
-    purchaseDate?: string | null;
-    detectedProduct?: string | null;
-    confidence?: string;
-  };
-};
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-export const SUGGESTED_CATEGORIES = [
-  "Tech", "Home", "SaaS", "Automotive", "Beauty",
-  "Gaming", "Fitness", "Travel", "Finance",
-  "Food & Drink", "Health", "Education", "Infrastructure", "Services",
-];
-
-// Legacy alias — some files still import this name
-export const AVAILABLE_CATEGORIES = SUGGESTED_CATEGORIES;
-
-const USAGE_DURATIONS = [
-  { value: "less_1_week"   as const, label: "< 1 week" },
-  { value: "1_4_weeks"     as const, label: "1–4 weeks" },
-  { value: "1_3_months"    as const, label: "1–3 months" },
-  { value: "3_plus_months" as const, label: "3+ months" },
-];
-
-const PURCHASE_CHANNELS = [
-  { value: "amazon"        as const, label: "Amazon" },
-  { value: "brand_website" as const, label: "Brand website" },
-  { value: "retail"        as const, label: "Retail store" },
-  { value: "other"         as const, label: "Other" },
-];
-
-// ─── Star Picker ──────────────────────────────────────────────────────────────
-
-function StarPicker({
-  value,
-  onChange,
-  size = "md",
-}: {
-  value: number;
-  onChange: (v: number) => void;
-  size?: "sm" | "md";
-}) {
-  const [hovered, setHovered] = useState(0);
-  const textSize = size === "sm" ? "text-base" : "text-xl";
-  return (
-    <div className="flex gap-0.5">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <button
-          key={star}
-          type="button"
-          onMouseEnter={() => setHovered(star)}
-          onMouseLeave={() => setHovered(0)}
-          onClick={() => onChange(star)}
-          className={`${textSize} transition-transform hover:scale-110 leading-none`}
-          aria-label={`${star} star`}
-        >
-          <span
-            className={
-              (hovered || value) >= star
-                ? "text-amber-400"
-                : "text-slate-200 dark:text-slate-700"
-            }
-          >
-            ★
-          </span>
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// ─── Chip Input ───────────────────────────────────────────────────────────────
-
-function ChipInput({
-  items,
-  onAdd,
-  onRemove,
-  placeholder,
-  maxItems = 10,
-}: {
-  items: string[];
-  onAdd: (item: string) => void;
-  onRemove: (idx: number) => void;
-  placeholder: string;
-  maxItems?: number;
-}) {
-  const [input, setInput] = useState("");
-
-  const handleAdd = () => {
-    const trimmed = input.trim();
-    if (trimmed && !items.includes(trimmed) && items.length < maxItems) {
-      onAdd(trimmed);
-      setInput("");
-    }
-  };
-
-  return (
-    <div>
-      <div className="flex gap-2 mb-2">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              handleAdd();
-            }
-          }}
-          placeholder={placeholder}
-          className="flex-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 dark:focus:ring-slate-600 dark:text-slate-100 dark:placeholder-slate-500"
-        />
-        <button
-          type="button"
-          onClick={handleAdd}
-          disabled={!input.trim() || items.length >= maxItems}
-          className="px-3 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-40 transition"
-        >
-          Add
-        </button>
-      </div>
-      {items.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {items.map((item, idx) => (
-            <span
-              key={idx}
-              className="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2.5 py-1 rounded-md text-xs font-medium"
-            >
-              {item}
-              <button
-                type="button"
-                onClick={() => onRemove(idx)}
-                className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-100 ml-0.5 leading-none text-sm"
-                aria-label="Remove"
-              >
-                ×
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Option Button ────────────────────────────────────────────────────────────
-
-function OptionButton({
-  selected,
-  onClick,
-  disabled,
-  children,
-}: {
-  selected: boolean;
-  onClick: () => void;
-  disabled?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
-        selected
-          ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100"
-          : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 disabled:opacity-40"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
-// ─── Shared modal shell ───────────────────────────────────────────────────────
-
-function ModalShell({
-  onClose,
-  children,
-}: {
-  onClose: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="fixed inset-0 bg-slate-900/50 dark:bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-[2px]">
-      <div className="bg-white dark:bg-slate-900 rounded-xl max-w-lg w-full shadow-lg border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh]">
-        {children}
-      </div>
-    </div>
-  );
-}
-
-// ─── Generic (quick / unpaid) Review Form ────────────────────────────────────
-
-function GenericReviewForm({
-  productInfo,
-  onSubmit,
-  onClose,
-}: {
-  productInfo?: { name: string; category: string };
-  onSubmit: (data: ReviewFormData) => Promise<void>;
-  onClose: () => void;
-}) {
-  const [productName, setProductName] = useState(productInfo?.name ?? "");
-  const [category, setCategory] = useState(productInfo?.category ?? AVAILABLE_CATEGORIES[0]);
-  const [overallRating, setOverallRating] = useState(0);
-  const [content, setContent] = useState("");
-  const [isHonest, setIsHonest] = useState(false);
-  const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = async () => {
-    setError("");
-    if (!productInfo && !productName.trim()) {
-      setError("Please enter the product name.");
-      return;
-    }
-    if (overallRating === 0) {
-      setError("Please select a rating.");
-      return;
-    }
-    if (content.trim().length < 20) {
-      setError(`Please write at least 20 characters (${content.trim().length} so far).`);
-      return;
-    }
-    if (!isHonest) {
-      setError("Please confirm this is your honest opinion.");
-      return;
-    }
-    setIsSubmitting(true);
-    try {
-      await onSubmit({
-        productName: productInfo?.name ?? productName,
-        category: productInfo?.category ?? category,
-        productSource: "purchased",
-        usageDuration: "1_4_weeks",
-        purchaseChannel: "other",
-        overallRating,
-        subRatings: {},
-        pros: [],
-        cons: [],
-        content,
-        summary: "",
-        bestFor: [],
-        mediaFiles: [],
-        isCampaignReview: false,
-        reviewType: "generic",
-      });
-      onClose();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to submit. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <ModalShell onClose={onClose}>
-      {/* Header */}
-      <div className="flex justify-between items-start px-5 pt-5 pb-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
-        <div>
-          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Quick review</h2>
-          <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-0.5">
-            Generic reviews are not eligible for payouts
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-sm shrink-0"
-        >
-          ✕
-        </button>
-      </div>
-
-      {/* Body */}
-      <div className="overflow-y-auto flex-1 px-5 py-4 space-y-4">
-        {!productInfo && (
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-              What are you reviewing? <span className="text-red-400">*</span>
-            </label>
-            <input
-              type="text"
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
-              placeholder="e.g. Sony WH-1000XM5"
-              className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-slate-100 dark:placeholder-slate-500"
-            />
-          </div>
-        )}
-
-        {!productInfo && (
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Category</label>
-            <input
-              type="text"
-              list="category-suggestions"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              placeholder="e.g. Tech, EV Charging, Construction..."
-              className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none dark:text-slate-100"
-            />
-            <datalist id="category-suggestions">
-              {SUGGESTED_CATEGORIES.map((cat) => (
-                <option key={cat} value={cat} />
-              ))}
-            </datalist>
-          </div>
-        )}
-
-        {productInfo && (
-          <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg px-3 py-2.5">
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-0.5">Reviewing</p>
-            <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{productInfo.name}</p>
-          </div>
-        )}
-
-        <div className="space-y-1.5">
-          <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-            Overall rating <span className="text-red-400">*</span>
-          </label>
-          <StarPicker value={overallRating} onChange={setOverallRating} />
-        </div>
-
-        <div className="space-y-1.5">
-          <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-            Your review <span className="text-red-400">*</span>
-          </label>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Share your experience with this product…"
-            className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm h-28 resize-y focus:outline-none focus:ring-1 focus:ring-slate-400 dark:focus:ring-slate-600 dark:text-slate-100 dark:placeholder-slate-500"
-          />
-          <p className={`text-right text-[11px] tabular-nums ${
-            content.trim().length >= 20 ? "text-emerald-500 dark:text-emerald-400" : "text-slate-400"
-          }`}>
-            {content.trim().length} chars
-          </p>
-        </div>
-
-        <label className="flex items-start gap-2.5 cursor-pointer pt-1">
-          <input
-            type="checkbox"
-            checked={isHonest}
-            onChange={(e) => setIsHonest(e.target.checked)}
-            className="mt-0.5 accent-slate-900 shrink-0"
-          />
-          <span className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-            I confirm this is my honest, independent opinion. <span className="text-red-400">*</span>
-          </span>
-        </label>
-
-        {error && (
-          <p className="text-xs text-red-500 dark:text-red-400 px-3 py-2 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-100 dark:border-red-900/40">
-            {error}
-          </p>
-        )}
-      </div>
-
-      {/* Footer */}
-      <div className="px-5 py-4 border-t border-slate-100 dark:border-slate-800 flex gap-2 shrink-0">
-        <button
-          type="button"
-          onClick={onClose}
-          className="flex-1 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-          className="flex-[1.4] bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50"
-        >
-          {isSubmitting ? "Posting…" : "Post review"}
-        </button>
-      </div>
-    </ModalShell>
-  );
-}
-
-// ─── Main Wizard (Verified / Organic / Generic) ─────────────────────────────
-
-export type ProductVariant = { id: string; name: string };
-
-type Props = {
-  user: User;
-  mode: "organic" | "verified" | "generic";
-  productInfo?: { name: string; category: string; variants?: ProductVariant[] };
-  channelId?: string;
-  channelSlug?: string;
-  onSubmit: (data: ReviewFormData) => Promise<void>;
-  onClose: () => void;
-};
-
-export default function ReviewWizard({
-  user: _user,
-  mode,
-  productInfo,
-  channelId,
-  channelSlug,
-  onSubmit,
-  onClose,
-}: Props) {
-  // Wrap onSubmit to inject channel metadata
-  const wrappedSubmit = async (data: ReviewFormData) => {
-    if (channelId) { data.channelId = channelId; }
-    if (channelSlug) { data.channelSlug = channelSlug; }
-    return onSubmit(data);
-  };
-
-  // Generic mode delegates to a simpler component
-  if (mode === "generic") {
-    return (
-      <GenericReviewForm
-        productInfo={productInfo}
-        onSubmit={wrappedSubmit}
-        onClose={onClose}
-      />
-    );
-  }
-
-  return (
-    <FullReviewWizard
-      mode={mode}
-      productInfo={productInfo}
-      onSubmit={wrappedSubmit}
-      onClose={onClose}
-    />
-  );
-}
-
-// ─── Full Wizard (Verified / Organic) ────────────────────────────────────────
+// ─── Types ──────────────────────────────────────────────────────────────────
 
 type ReceiptVerification = {
   status: "idle" | "checking" | "verified" | "failed";
@@ -475,12 +23,19 @@ type ReceiptVerification = {
   confidence?: string;
 };
 
-function FullReviewWizard({
+type Props = {
+  mode: "organic" | "verified" | "generic";
+  productInfo?: { name: string; category: string; variants?: ProductVariant[] };
+  onSubmit: (data: ReviewFormData) => Promise<void>;
+  onClose: () => void;
+};
+
+export default function FullReviewWizard({
   mode,
   productInfo,
   onSubmit,
   onClose,
-}: Omit<Props, "user">) {
+}: Props) {
   const STEP_LABELS = ["Context", "Your Review", "Proof of Purchase", "Finish"];
   const totalSteps = STEP_LABELS.length;
 
@@ -601,7 +156,7 @@ function FullReviewWizard({
         const reader = new FileReader();
         reader.onload = () => {
           const result = reader.result as string;
-          // strip data URL prefix → keep only base64 body
+          // strip data URL prefix -> keep only base64 body
           resolve(result.split(",")[1]);
         };
         reader.onerror = reject;
@@ -704,7 +259,7 @@ function FullReviewWizard({
     "Write a review";
 
   const headerSub =
-    mode === "verified" ? "Earns based on engagement · Verify with your product code" :
+    mode === "verified" ? "Earns based on engagement \u00b7 Verify with your product code" :
     null;
 
   return (
@@ -741,7 +296,7 @@ function FullReviewWizard({
                       : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600"
                   }`}
                 >
-                  {i + 1 < step ? "✓" : i + 1}
+                  {i + 1 < step ? "\u2713" : i + 1}
                 </div>
                 <span
                   className={`text-[11px] font-medium hidden sm:block ${
@@ -972,7 +527,7 @@ function FullReviewWizard({
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="Share your full experience — what worked, what surprised you, who this is ideal for…"
+                placeholder="Share your full experience — what worked, what surprised you, who this is ideal for..."
                 className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm h-32 resize-y focus:outline-none focus:ring-1 focus:ring-slate-400 dark:focus:ring-slate-600 dark:text-slate-100 dark:placeholder-slate-500"
               />
               <p
@@ -1041,7 +596,7 @@ function FullReviewWizard({
             {receiptVerification.status === "checking" && (
               <div className="flex flex-col items-center gap-3 py-8">
                 <div className="w-8 h-8 border-2 border-slate-300 border-t-emerald-500 rounded-full animate-spin" />
-                <p className="text-sm text-slate-500 dark:text-slate-400">Parsing receipt…</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Parsing receipt...</p>
               </div>
             )}
 
@@ -1130,7 +685,7 @@ function FullReviewWizard({
                 items={bestFor}
                 onAdd={(item) => setBestFor((p) => [...p, item])}
                 onRemove={(idx) => setBestFor((p) => p.filter((_, i) => i !== idx))}
-                placeholder="e.g. frequent travelers, home cooks…"
+                placeholder="e.g. frequent travelers, home cooks..."
                 maxItems={5}
               />
             </div>
@@ -1176,7 +731,7 @@ function FullReviewWizard({
                 )}
               </div>
               <p className="text-[11px] text-slate-400 dark:text-slate-500">
-                Reviews with photos get 1.5× engagement weight in payouts.
+                Reviews with photos get 1.5x engagement weight in payouts.
               </p>
             </div>
 
@@ -1239,7 +794,7 @@ function FullReviewWizard({
             disabled={receiptVerification.status === "checking"}
             className="flex-[1.4] bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 dark:hover:bg-slate-200 transition disabled:opacity-50"
           >
-            {receiptVerification.status === "checking" ? "Verifying…" : "Continue →"}
+            {receiptVerification.status === "checking" ? "Verifying..." : "Continue \u2192"}
           </button>
         ) : (
           <button
@@ -1248,7 +803,7 @@ function FullReviewWizard({
             disabled={isSubmitting}
             className="flex-[1.4] bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 dark:hover:bg-slate-200 transition disabled:opacity-50"
           >
-            {isSubmitting ? "Submitting…" : "Submit review"}
+            {isSubmitting ? "Submitting..." : "Submit review"}
           </button>
         )}
       </div>
