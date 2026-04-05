@@ -16,7 +16,6 @@ import { updateUserBadges } from "../../../lib/badges";
 import { computeHealthScore } from "../../../lib/healthScore";
 import ReviewCard, { type ReviewData } from "../../components/ReviewCard";
 import ReviewWizard, { type ReviewFormData } from "../../components/ReviewWizard";
-import BottomNav from "../../components/BottomNav";
 
 import type { Community, ProductCard } from "../../../lib/types";
 
@@ -215,7 +214,6 @@ export default function CommunityPage({ params }: { params: Promise<{ communityS
         <button type="button" onClick={() => router.push("/c")} className="text-sm text-slate-700 dark:text-zinc-300 underline">
           Browse communities
         </button>
-        <BottomNav />
       </div>
     );
   }
@@ -384,8 +382,6 @@ export default function CommunityPage({ params }: { params: Promise<{ communityS
           onClose={() => setShowReviewWizard(false)}
         />
       )}
-
-      <BottomNav />
     </div>
   );
 }

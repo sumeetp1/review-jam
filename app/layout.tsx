@@ -4,6 +4,7 @@ import "./globals.css";
 import VisitorCounter from "./components/VisitorCounter";
 import BottomNav from "./components/BottomNav";
 import ThemeProvider from "./components/ThemeProvider";
+import AppShell from "./components/AppShell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,11 +49,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col font-sans text-[15px] leading-normal text-slate-900 dark:text-slate-100 bg-white dark:bg-[#09090b]">
         <ThemeProvider />
-        <div className="flex min-h-full flex-1 flex-col">
-          <div className="flex-1 pb-[56px] md:pb-0">{children}</div>
-          <VisitorCounter />
-          <BottomNav />
-        </div>
+        <AppShell>{children}</AppShell>
+        <VisitorCounter />
+        <BottomNav />
       </body>
     </html>
   );

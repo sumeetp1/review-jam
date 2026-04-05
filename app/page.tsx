@@ -128,6 +128,10 @@ export default function LandingPage() {
 
         {/* Quick links */}
         <div className="flex flex-wrap items-center justify-center gap-4 text-sm mb-12">
+          <Link href="/feed" className="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200 font-medium transition">
+            Feed
+          </Link>
+          <span className="text-slate-300 dark:text-zinc-700">|</span>
           <Link href="/feed?compose=true" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-medium transition">
             Write a Review
           </Link>

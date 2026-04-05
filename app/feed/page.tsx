@@ -20,7 +20,6 @@ import { incrementTrustScore } from "../../lib/trustScore";
 import { slugify, categoryToSlug } from "../../lib/slugify";
 import ReviewCard, { type ReviewData } from "../components/ReviewCard";
 import RightSidebar from "../components/RightSidebar";
-import LeftSidebar from "../components/LeftSidebar";
 import Avatar from "../components/Avatar";
 import NotificationBell from "../components/NotificationBell";
 
@@ -577,22 +576,10 @@ function FeedPageInner() {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto flex justify-center">
-
-        {/* Left Sidebar */}
-        <LeftSidebar
-          user={user}
-          products={products}
-          isDarkMode={isDarkMode}
-          onToggleDark={toggleDarkMode}
-          onPostReview={() => setReviewMode("organic")}
-          onLogin={handleLogin}
-          activeCategoryFilter={activeCategoryFilter}
-          onClearFilter={() => setActiveCategoryFilter("All")}
-        />
+      <div className="max-w-[900px] mx-auto flex justify-center">
 
         {/* Center: Feed */}
-        <main className="w-full md:w-[600px] md:max-w-[600px] md:shrink-0 md:border-x border-white/[0.06] dark:border-white/[0.06] min-h-screen">
+        <main className="w-full md:w-[600px] md:max-w-[600px] md:shrink-0 md:border-r border-white/[0.06] dark:border-white/[0.06] min-h-screen">
 
           <div className="sticky top-12 md:top-0 z-30 bg-white/95 dark:bg-[#09090b]/90 backdrop-blur-sm border-b border-white/[0.06] dark:border-white/[0.06]">
             <div className="hidden md:flex items-center justify-between h-12 px-4 border-b border-white/[0.06] dark:border-white/[0.06]">
