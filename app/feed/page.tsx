@@ -359,7 +359,7 @@ export default function FeedPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-300 transition-colors duration-200">
+    <main className="min-h-screen bg-[#09090b] dark:bg-[#09090b] text-zinc-400 dark:text-zinc-300 transition-colors duration-200">
 
       {reviewMode && user && (
         <ReviewWizard
@@ -371,10 +371,10 @@ export default function FeedPage() {
       )}
 
       {showOnboarding && (
-        <div className="fixed inset-0 bg-slate-900/50 dark:bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-[2px]">
-          <div className="bg-white dark:bg-slate-900 rounded-xl p-5 max-w-md w-full shadow-lg border border-slate-200 dark:border-slate-800">
-            <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 mb-1">What are you into?</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-500 mb-4">Personalise your feed.</p>
+        <div className="fixed inset-0 bg-black/70 dark:bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-[2px]">
+          <div className="bg-zinc-900 dark:bg-zinc-900 rounded-xl p-5 max-w-md w-full shadow-lg border border-white/[0.06] dark:border-white/[0.06]">
+            <h2 className="text-base font-semibold text-zinc-100 dark:text-zinc-100 mb-1">What are you into?</h2>
+            <p className="text-sm text-zinc-500 dark:text-zinc-500 mb-4">Personalise your feed.</p>
             <div className="flex flex-wrap gap-2 mb-5">
               {dynamicCategories.map((cat) => (
                 <button
@@ -385,15 +385,15 @@ export default function FeedPage() {
                   )}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
                     selectedInterests.includes(cat)
-                      ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900"
-                      : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700"
+                      ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/30"
+                      : "bg-white/[0.03] text-zinc-400 dark:text-zinc-400 border-white/[0.06] dark:border-white/[0.06]"
                   }`}
                 >
                   {cat}
                 </button>
               ))}
             </div>
-            <button type="button" onClick={handleCompleteOnboarding} className="w-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 py-2.5 rounded-lg text-sm font-medium hover:opacity-90 transition">
+            <button type="button" onClick={handleCompleteOnboarding} className="w-full bg-indigo-600 dark:bg-indigo-600 text-white dark:text-white py-2.5 rounded-lg text-sm font-medium hover:opacity-90 transition">
               Continue
             </button>
           </div>
@@ -401,19 +401,19 @@ export default function FeedPage() {
       )}
 
       {/* Mobile Nav */}
-      <nav className="md:hidden bg-white/95 dark:bg-slate-950/95 backdrop-blur-sm border-b border-slate-200/80 dark:border-slate-800 sticky top-0 z-40">
+      <nav className="md:hidden bg-[#09090b]/95 dark:bg-[#09090b]/95 backdrop-blur-sm border-b border-white/[0.06] dark:border-white/[0.06] sticky top-0 z-40">
         {!showMobileSearch ? (
           <div className="px-3 h-12 flex justify-between items-center">
             <Link href="/" className="flex items-center">
-              <Image src="/logo.svg" alt="Review Jam" width={118} height={28} priority className="dark:hidden" />
-              <Image src="/logo-dark.svg" alt="Review Jam" width={118} height={28} priority className="hidden dark:block" />
+              <Image src="/logo-dark.svg" alt="Review Jam" width={118} height={28} priority className="" />
+              <Image src="/logo-dark.svg" alt="Review Jam" width={118} height={28} priority className="hidden" />
             </Link>
             <div className="flex items-center gap-1">
-              <button type="button" onClick={() => setShowMobileSearch(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition" aria-label="Search">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-600 dark:text-slate-400"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <button type="button" onClick={() => setShowMobileSearch(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/[0.04] dark:hover:bg-white/[0.04] transition" aria-label="Search">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400 dark:text-zinc-400"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
               </button>
-              <button type="button" onClick={() => setShowMobileMenu((v) => !v)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition" aria-label="Menu">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-slate-700 dark:text-slate-300"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+              <button type="button" onClick={() => setShowMobileMenu((v) => !v)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/[0.04] dark:hover:bg-white/[0.04] transition" aria-label="Menu">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-zinc-300 dark:text-zinc-300"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
               </button>
             </div>
           </div>
@@ -425,9 +425,9 @@ export default function FeedPage() {
               placeholder="Search reviews…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-slate-100 dark:bg-slate-900 rounded-full px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-600 dark:text-slate-100 dark:placeholder-slate-500"
+              className="flex-1 bg-white/[0.06] dark:bg-white/[0.06] rounded-full px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-indigo-500/30 dark:focus:ring-indigo-500/30 text-zinc-100 dark:text-zinc-100 placeholder-zinc-500 dark:placeholder-zinc-500"
             />
-            <button type="button" onClick={() => { setShowMobileSearch(false); setSearchQuery(""); }} className="w-10 h-10 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium shrink-0">
+            <button type="button" onClick={() => { setShowMobileSearch(false); setSearchQuery(""); }} className="w-10 h-10 flex items-center justify-center rounded-full text-zinc-500 hover:bg-white/[0.04] dark:hover:bg-white/[0.04] text-sm font-medium shrink-0">
               ✕
             </button>
           </div>
@@ -438,26 +438,26 @@ export default function FeedPage() {
       {showMobileMenu && (
         <div className="md:hidden fixed inset-0 z-50" onClick={() => setShowMobileMenu(false)}>
           <div className="absolute inset-0 bg-black/40 dark:bg-black/60" />
-          <div className="absolute top-0 right-0 w-72 bg-white dark:bg-slate-900 h-full shadow-xl border-l border-slate-200 dark:border-slate-800 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="absolute top-0 right-0 w-72 bg-zinc-900 dark:bg-zinc-900 h-full shadow-xl border-l border-white/[0.06] dark:border-white/[0.06] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             {/* Close button */}
             <div className="flex justify-end p-3">
-              <button type="button" onClick={() => setShowMobileMenu(false)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 text-lg">
+              <button type="button" onClick={() => setShowMobileMenu(false)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/[0.04] dark:hover:bg-white/[0.04] text-zinc-500 text-lg">
                 ✕
               </button>
             </div>
 
             {/* User section */}
-            <div className="px-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+            <div className="px-4 pb-4 border-b border-white/[0.06] dark:border-white/[0.06]">
               {user ? (
                 <div className="flex items-center gap-3">
                   <Avatar name={user.displayName} src={user.photoURL} size="lg" className="w-11 h-11" />
                   <div className="min-w-0">
-                    <p className="font-semibold text-base text-slate-900 dark:text-slate-100 truncate">{user.displayName}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
+                    <p className="font-semibold text-base text-zinc-100 dark:text-zinc-100 truncate">{user.displayName}</p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">{user.email}</p>
                   </div>
                 </div>
               ) : (
-                <button type="button" onClick={() => { handleLogin(); setShowMobileMenu(false); }} className="w-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-sm font-medium py-3 rounded-lg hover:opacity-90 transition">
+                <button type="button" onClick={() => { handleLogin(); setShowMobileMenu(false); }} className="w-full bg-indigo-600 dark:bg-indigo-600 text-white dark:text-white text-sm font-medium py-3 rounded-lg hover:opacity-90 transition">
                   Sign in with Google
                 </button>
               )}
@@ -476,20 +476,20 @@ export default function FeedPage() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setShowMobileMenu(false)}
-                  className="flex items-center gap-3 px-4 py-3.5 text-[15px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                  className="flex items-center gap-3 px-4 py-3.5 text-[15px] font-medium text-zinc-300 dark:text-zinc-300 hover:bg-white/[0.04] dark:hover:bg-white/[0.04] transition"
                 >
                   <span aria-hidden className="text-lg w-6 text-center">{item.icon}</span> {item.label}
                 </Link>
               ))}
-              <button type="button" onClick={() => { toggleDarkMode(); }} className="flex items-center gap-3 px-4 py-3.5 text-[15px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition w-full text-left">
+              <button type="button" onClick={() => { toggleDarkMode(); }} className="flex items-center gap-3 px-4 py-3.5 text-[15px] font-medium text-zinc-300 dark:text-zinc-300 hover:bg-white/[0.04] dark:hover:bg-white/[0.04] transition w-full text-left">
                 <span aria-hidden className="text-lg w-6 text-center">{isDarkMode ? "☀️" : "🌙"}</span> {isDarkMode ? "Light mode" : "Dark mode"}
               </button>
             </nav>
 
             {/* Logout */}
             {user && (
-              <div className="border-t border-slate-100 dark:border-slate-800 p-4">
-                <button type="button" onClick={() => { handleLogout(); setShowMobileMenu(false); }} className="text-sm text-red-600 dark:text-red-400 font-medium">
+              <div className="border-t border-white/[0.06] dark:border-white/[0.06] p-4">
+                <button type="button" onClick={() => { handleLogout(); setShowMobileMenu(false); }} className="text-sm text-rose-400 dark:text-rose-400 font-medium">
                   Log out
                 </button>
               </div>
@@ -514,16 +514,16 @@ export default function FeedPage() {
         />
 
         {/* Center: Feed */}
-        <main className="w-full md:w-[600px] md:max-w-[600px] md:shrink-0 md:border-x border-slate-200/80 dark:border-slate-800 min-h-screen">
+        <main className="w-full md:w-[600px] md:max-w-[600px] md:shrink-0 md:border-x border-white/[0.06] dark:border-white/[0.06] min-h-screen">
 
-          <div className="sticky top-12 md:top-0 z-30 bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm border-b border-slate-200/80 dark:border-slate-800">
-            <div className="hidden md:flex items-center justify-between h-12 px-4 border-b border-slate-100 dark:border-slate-800/80">
-              <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Home</h1>
+          <div className="sticky top-12 md:top-0 z-30 bg-[#09090b]/90 dark:bg-[#09090b]/90 backdrop-blur-sm border-b border-white/[0.06] dark:border-white/[0.06]">
+            <div className="hidden md:flex items-center justify-between h-12 px-4 border-b border-white/[0.06] dark:border-white/[0.06]">
+              <h1 className="text-lg font-semibold text-zinc-100 dark:text-zinc-100">Home</h1>
               {user && <NotificationBell userId={user.uid} />}
             </div>
 
             {/* Feed Tabs */}
-            <div className="flex border-b border-slate-100 dark:border-slate-800/80">
+            <div className="flex border-b border-white/[0.06] dark:border-white/[0.06]">
               {FEED_TABS.map((tab) => (
                 <button
                   key={tab.id}
@@ -531,8 +531,8 @@ export default function FeedPage() {
                   onClick={() => setFeedTab(tab.id)}
                   className={`flex-1 py-3.5 md:py-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
                     feedTab === tab.id
-                      ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
-                      : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+                      ? "border-indigo-500 text-indigo-400 dark:text-indigo-400"
+                      : "border-transparent text-zinc-500 dark:text-zinc-500 hover:text-zinc-300 dark:hover:text-zinc-300"
                   }`}
                 >
                   {tab.label}
@@ -547,14 +547,14 @@ export default function FeedPage() {
                 placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-100 dark:bg-slate-900/80 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-600 dark:text-slate-100 dark:placeholder-slate-500 border border-slate-200/80 dark:border-slate-800"
+                className="w-full bg-white/[0.06] dark:bg-white/[0.06] rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-indigo-500/30 dark:focus:ring-indigo-500/30 text-zinc-100 dark:text-zinc-100 placeholder-zinc-500 dark:placeholder-zinc-500 border border-white/[0.06] dark:border-white/[0.06]"
               />
               <div className="relative mt-2.5 flex items-center">
-                <button type="button" onClick={() => scrollCategories("left")} className="absolute left-0 z-10 p-1 bg-gradient-to-r from-white via-white to-transparent dark:from-slate-950 dark:via-slate-950 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition h-full flex items-center justify-start w-8" aria-label="Scroll left">
+                <button type="button" onClick={() => scrollCategories("left")} className="absolute left-0 z-10 p-1 bg-gradient-to-r from-[#09090b] via-[#09090b] to-transparent dark:from-[#09090b] dark:via-[#09090b] text-zinc-500 hover:text-zinc-300 dark:hover:text-zinc-300 transition h-full flex items-center justify-start w-8" aria-label="Scroll left">
                   <span className="text-lg leading-none">‹</span>
                 </button>
                 <div ref={categoriesRef} className="flex gap-1.5 overflow-x-auto snap-x scroll-smooth px-7 w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                  <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${activeCategoryFilter === "All" ? "bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-500/20" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-indigo-300 hover:text-indigo-600 dark:hover:border-indigo-700 dark:hover:text-indigo-400"}`}>
+                  <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${activeCategoryFilter === "All" ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/30 shadow-sm shadow-indigo-500/10" : "bg-white/[0.03] dark:bg-white/[0.03] text-zinc-400 dark:text-zinc-400 border-white/[0.06] dark:border-white/[0.06] hover:border-indigo-500/30 hover:text-indigo-400 dark:hover:border-indigo-500/30 dark:hover:text-indigo-400"}`}>
                     All
                   </button>
                   {dynamicCategories.map((cat) => {
@@ -567,10 +567,10 @@ export default function FeedPage() {
                         onClick={() => setActiveCategoryFilter(cat)}
                         className={`whitespace-nowrap flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${
                           isActive
-                            ? "bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-500/20"
+                            ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/30 shadow-sm shadow-indigo-500/10"
                             : isBoosted
-                            ? "bg-violet-50 dark:bg-violet-950/30 text-violet-700 dark:text-violet-400 border-violet-300 dark:border-violet-700 hover:bg-violet-100 dark:hover:bg-violet-900/30"
-                            : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-indigo-300 hover:text-indigo-600 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
+                            ? "bg-violet-500/10 dark:bg-violet-500/10 text-violet-400 dark:text-violet-400 border-violet-500/20 dark:border-violet-500/20 hover:bg-violet-500/20 dark:hover:bg-violet-500/20"
+                            : "bg-white/[0.03] dark:bg-white/[0.03] text-zinc-400 dark:text-zinc-400 border-white/[0.06] dark:border-white/[0.06] hover:border-indigo-500/30 hover:text-indigo-400 dark:hover:border-indigo-500/30 dark:hover:text-indigo-400"
                         }`}
                       >
                         {isBoosted && <span aria-hidden>🔥</span>}
@@ -579,7 +579,7 @@ export default function FeedPage() {
                     );
                   })}
                 </div>
-                <button type="button" onClick={() => scrollCategories("right")} className="absolute right-0 z-10 p-1 bg-gradient-to-l from-white via-white to-transparent dark:from-slate-950 dark:via-slate-950 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition h-full flex items-center justify-end w-8" aria-label="Scroll right">
+                <button type="button" onClick={() => scrollCategories("right")} className="absolute right-0 z-10 p-1 bg-gradient-to-l from-[#09090b] via-[#09090b] to-transparent dark:from-[#09090b] dark:via-[#09090b] text-zinc-500 hover:text-zinc-300 dark:hover:text-zinc-300 transition h-full flex items-center justify-end w-8" aria-label="Scroll right">
                   <span className="text-lg leading-none">›</span>
                 </button>
               </div>
@@ -588,7 +588,7 @@ export default function FeedPage() {
             {/* Mobile: horizontal category chips only (no search, no arrows) */}
             <div className="md:hidden px-3 py-2">
               <div className="flex gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3.5 py-2 rounded-full text-[13px] font-medium border transition shrink-0 ${activeCategoryFilter === "All" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100" : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"}`}>
+                <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3.5 py-2 rounded-full text-[13px] font-medium border transition shrink-0 ${activeCategoryFilter === "All" ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/30" : "bg-white/[0.03] dark:bg-white/[0.03] text-zinc-400 dark:text-zinc-400 border-white/[0.06] dark:border-white/[0.06]"}`}>
                   All
                 </button>
                 {dynamicCategories.map((cat) => {
@@ -601,10 +601,10 @@ export default function FeedPage() {
                       onClick={() => setActiveCategoryFilter(cat)}
                       className={`whitespace-nowrap flex items-center gap-1 px-3.5 py-2 rounded-full text-[13px] font-medium border transition shrink-0 ${
                         isActive
-                          ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100"
+                          ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/30"
                           : isBoosted
-                          ? "bg-violet-50 dark:bg-violet-950/30 text-violet-700 dark:text-violet-400 border-violet-300 dark:border-violet-700"
-                          : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
+                          ? "bg-violet-500/10 dark:bg-violet-500/10 text-violet-400 dark:text-violet-400 border-violet-500/20 dark:border-violet-500/20"
+                          : "bg-white/[0.03] dark:bg-white/[0.03] text-zinc-400 dark:text-zinc-400 border-white/[0.06] dark:border-white/[0.06]"
                       }`}
                     >
                       {isBoosted && <span aria-hidden>🔥</span>}
@@ -617,17 +617,17 @@ export default function FeedPage() {
           </div>
 
           {/* Feed */}
-          <div className="divide-y divide-slate-200/80 dark:divide-slate-800">
+          <div className="divide-y divide-white/[0.06] dark:divide-white/[0.06]">
             {isLoading ? (
-              <div className="py-12 text-center text-slate-400 text-sm animate-pulse">Loading…</div>
+              <div className="py-12 text-center text-zinc-600 text-sm animate-pulse">Loading…</div>
             ) : displayedReviews.length === 0 ? (
               <div className="py-14 px-6 text-center flex flex-col items-center max-w-sm mx-auto">
-                <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-sm mb-3 text-slate-400">📝</div>
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1">No posts yet</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-500 mb-5 leading-relaxed">
+                <div className="w-10 h-10 bg-white/[0.06] dark:bg-white/[0.06] rounded-full flex items-center justify-center text-sm mb-3 text-zinc-500">📝</div>
+                <h3 className="text-sm font-semibold text-zinc-100 dark:text-zinc-100 mb-1">No posts yet</h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-500 mb-5 leading-relaxed">
                   When people review in this view, they will show up here.
                 </p>
-                <button type="button" onClick={() => { if (!user) handleLogin(); else setReviewMode("verified"); }} className="text-sm font-medium bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-4 py-2 rounded-full hover:opacity-90 transition">
+                <button type="button" onClick={() => { if (!user) handleLogin(); else setReviewMode("verified"); }} className="text-sm font-medium bg-indigo-600 dark:bg-indigo-600 text-white dark:text-white px-4 py-2 rounded-full hover:opacity-90 transition">
                   Write a review
                 </button>
               </div>

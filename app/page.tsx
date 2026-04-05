@@ -13,22 +13,18 @@ export default function LandingPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuth();
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
   useEffect(() => {
-    if (
-      localStorage.theme === "dark" ||
-      (!("theme" in localStorage) &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches)
-    ) {
-      document.documentElement.classList.add("dark");
-      setIsDarkMode(true);
-    } else {
+    const saved = localStorage.getItem("theme");
+    if (saved === "light") {
       document.documentElement.classList.remove("dark");
       setIsDarkMode(false);
+    } else {
+      document.documentElement.classList.add("dark");
+      setIsDarkMode(true);
     }
   }, []);
-
 
   const toggleDarkMode = () => {
     if (isDarkMode) {
@@ -54,38 +50,41 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col transition-colors duration-200 bg-white md:bg-gradient-to-br md:from-white md:via-indigo-50/40 md:to-violet-50/30 dark:bg-slate-950 dark:md:bg-none relative overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-[#09090b] relative overflow-hidden">
+
+      {/* Glow effects */}
+      <div className="absolute top-[-200px] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(ellipse,rgba(99,102,241,0.12)_0%,transparent_70%)] pointer-events-none" aria-hidden="true" />
+      <div className="absolute top-[50px] right-[15%] w-[400px] h-[400px] bg-[radial-gradient(circle,rgba(168,85,247,0.08)_0%,transparent_70%)] pointer-events-none" aria-hidden="true" />
 
       {/* Top bar */}
-      <header className="flex items-center justify-between px-4 md:px-8 h-14 shrink-0 relative z-10">
+      <header className="flex items-center justify-between px-4 md:px-8 h-14 shrink-0 relative z-10 border-b border-white/[0.06]">
         <Link href="/" className="flex items-center">
-          <Image src="/logo.svg" alt="Review Jam" width={110} height={26} priority className="dark:hidden" />
-          <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} priority className="hidden dark:block" />
+          <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} priority />
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <Link href="/explore" className="text-sm font-medium text-zinc-400 hover:text-zinc-200 transition hidden md:inline-block">
+            Explore
+          </Link>
+          <Link href="/c" className="text-sm font-medium text-zinc-400 hover:text-zinc-200 transition hidden md:inline-block">
+            Communities
+          </Link>
           <button
             type="button"
             onClick={toggleDarkMode}
-            className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/60 dark:hover:bg-slate-800 transition text-slate-500 dark:text-slate-400 text-sm"
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/5 transition text-zinc-500 text-sm"
             aria-label="Toggle dark mode"
           >
             {isDarkMode ? "\u2600\uFE0F" : "\uD83C\uDF19"}
           </button>
           {user ? (
-            <div className="flex items-center gap-2">
-              <Link href="/feed" className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition px-3 py-1.5 rounded-lg hover:bg-white/60 dark:hover:bg-slate-800">
-                My Feed
-              </Link>
-              <Link href="/profile" className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-white/60 dark:hover:bg-slate-800 transition">
-                <Avatar name={user.displayName} src={user.photoURL} size="sm" className="w-8 h-8" />
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300 hidden md:inline max-w-[120px] truncate">{user.displayName}</span>
-              </Link>
-            </div>
+            <Link href="/profile" className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-white/5 transition">
+              <Avatar name={user.displayName} src={user.photoURL} size="sm" className="w-8 h-8" />
+            </Link>
           ) : (
             <button
               type="button"
               onClick={handleLogin}
-              className="text-sm font-medium bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-4 py-2 rounded-lg hover:opacity-90 transition"
+              className="text-sm font-medium bg-white text-zinc-900 px-4 py-2 rounded-lg hover:bg-zinc-200 transition"
             >
               Sign in
             </button>
@@ -96,23 +95,28 @@ export default function LandingPage() {
       {/* Hero — centered */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 pb-16 relative z-10">
 
-        {/* Logo mark — centered on all screens */}
-        <div className="mb-4 flex justify-center w-full">
-          <Image src="/logo.svg" alt="Review Jam" width={220} height={52} className="dark:hidden mx-auto" />
-          <Image src="/logo-dark.svg" alt="Review Jam" width={220} height={52} className="hidden dark:block mx-auto" />
+        {/* Status pill */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[13px] text-indigo-400 font-medium mb-8 animate-fade-in">
+          <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse-glow" />
+          2,400+ verified reviews and counting
         </div>
 
-        {/* Tagline */}
-        <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 text-center mb-8 max-w-lg font-medium">
-          Discover trusted reviews. Share your experience.
+        {/* Headline */}
+        <h1 className="text-4xl md:text-[56px] font-extrabold text-center leading-[1.05] tracking-[-2px] mb-4 animate-fade-in text-zinc-50">
+          The review platform<br />built on <span className="text-gradient">trust</span>
+        </h1>
+
+        {/* Subtitle */}
+        <p className="text-base md:text-lg text-zinc-500 text-center mb-10 max-w-[460px] leading-relaxed">
+          Quality-scored reviews from verified owners. No gaming the system — authentic experiences only.
         </p>
 
         {/* Search bar */}
-        <form onSubmit={handleSearch} className="w-full max-w-[580px] mb-8">
-          <div className="relative group">
+        <form onSubmit={handleSearch} className="w-full max-w-[520px] mb-10">
+          <div className="relative">
             <svg
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none"
-              width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none"
+              width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
             >
               <circle cx="11" cy="11" r="8" />
               <path d="M21 21l-4.35-4.35" />
@@ -121,46 +125,48 @@ export default function LandingPage() {
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for a product, brand, or category..."
-              className="w-full pl-12 pr-4 py-3.5 md:py-4 rounded-full border border-slate-200/80 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm text-base outline-none shadow-sm hover:shadow-md focus:shadow-lg focus:border-indigo-400 dark:focus:border-indigo-500 transition-all dark:text-slate-100 dark:placeholder-slate-500"
+              placeholder="Search products, brands, categories..."
+              className="w-full pl-12 pr-4 py-4 rounded-xl border border-white/10 bg-white/[0.04] backdrop-blur-sm text-[15px] outline-none text-zinc-100 placeholder-zinc-600 focus:border-indigo-500/50 focus:bg-white/[0.06] transition-all"
               autoComplete="off"
             />
           </div>
         </form>
 
-        {/* Quick action buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
-          <Link
-            href="/feed"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-indigo-200 dark:border-indigo-800 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
+        {/* Quick links */}
+        <div className="flex flex-wrap items-center justify-center gap-4 text-sm mb-12">
+          <Link href="/feed" className="text-indigo-400 hover:text-indigo-300 font-medium transition">
             Write a Review
           </Link>
-          <Link
-            href="/explore"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:text-indigo-600 dark:hover:border-indigo-600 dark:hover:text-indigo-400 transition bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
+          <span className="text-zinc-700">|</span>
+          <Link href="/explore" className="text-zinc-400 hover:text-zinc-200 font-medium transition">
             Explore Products
           </Link>
-          <Link
-            href="/c"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:text-indigo-600 dark:hover:border-indigo-600 dark:hover:text-indigo-400 transition bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87" /><path d="M16 3.13a4 4 0 010 7.75" /></svg>
+          <span className="text-zinc-700">|</span>
+          <Link href="/c" className="text-zinc-400 hover:text-zinc-200 font-medium transition">
             Browse Communities
           </Link>
         </div>
 
+        {/* Stats row */}
+        <div className="flex items-center gap-10 md:gap-14 pt-8 border-t border-white/[0.06]">
+          <div className="text-center">
+            <div className="text-2xl md:text-3xl font-extrabold text-emerald-400 tracking-tight">92</div>
+            <div className="text-[11px] text-zinc-600 font-medium mt-1">Avg Health Score</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl md:text-3xl font-extrabold text-zinc-100 tracking-tight">2.4K</div>
+            <div className="text-[11px] text-zinc-600 font-medium mt-1">Reviews</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl md:text-3xl font-extrabold text-zinc-100 tracking-tight">9</div>
+            <div className="text-[11px] text-zinc-600 font-medium mt-1">Communities</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl md:text-3xl font-extrabold text-zinc-100 tracking-tight">850+</div>
+            <div className="text-[11px] text-zinc-600 font-medium mt-1">Products</div>
+          </div>
+        </div>
       </main>
-
-      {/* Footer subtitle */}
-      <footer className="text-center px-4 pb-6 relative z-10">
-        <p className="text-sm text-slate-400 dark:text-slate-500 max-w-md mx-auto">
-          A community-driven marketplace where honest opinions are valued and rewarded.
-        </p>
-      </footer>
     </div>
   );
 }
