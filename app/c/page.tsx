@@ -56,7 +56,7 @@ export default function CommunitiesPage() {
     <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950 pb-20">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-6xl mx-auto px-4 md:px-8 py-3 flex items-center justify-between gap-4">
+        <div className="max-w-5xl mx-auto px-4 md:px-8 py-3 flex items-center justify-between gap-4">
           <Link href="/" className="shrink-0">
             <Image src="/logo.svg" alt="Review Jam" width={110} height={26} className="dark:hidden" />
             <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} className="hidden dark:block" />
@@ -74,7 +74,7 @@ export default function CommunitiesPage() {
         </div>
 
         {/* Search + filter */}
-        <div className="max-w-6xl mx-auto px-4 md:px-8 pb-3 flex gap-2">
+        <div className="max-w-5xl mx-auto px-4 md:px-8 pb-3 flex gap-2">
           <div className="relative flex-1">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
@@ -100,8 +100,8 @@ export default function CommunitiesPage() {
         </div>
       </header>
 
-      {/* Community list */}
-      <div className="max-w-3xl mx-auto px-4 md:px-6 py-3">
+      {/* Community grid (desktop) / list (mobile) */}
+      <div className="max-w-5xl mx-auto px-4 md:px-6 py-4">
         {loading ? (
           <p className="text-center text-sm text-slate-400 py-12 animate-pulse">Loading communities...</p>
         ) : filtered.length === 0 ? (
@@ -115,40 +115,69 @@ export default function CommunitiesPage() {
             )}
           </div>
         ) : (
-          <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
-            {filtered.map((c) => (
-              <Link
-                key={c.id}
-                href={`/c/${c.slug}`}
-                className="flex items-center gap-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors -mx-2 px-2 rounded-lg"
-              >
-                {/* Icon */}
-                <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-base shrink-0">
-                  {c.iconEmoji}
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 leading-tight">rj/{c.slug}</p>
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-medium">{c.category}</span>
+          <>
+            {/* Desktop: card grid */}
+            <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filtered.map((c) => (
+                <Link
+                  key={c.id}
+                  href={`/c/${c.slug}`}
+                  className="group rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-md transition-all"
+                >
+                  {/* Colored header band */}
+                  <div className="h-16 bg-gradient-to-r from-indigo-500 to-violet-500 relative">
+                    <div className="absolute -bottom-5 left-4 w-10 h-10 rounded-full bg-white dark:bg-slate-900 border-2 border-white dark:border-slate-900 flex items-center justify-center text-xl shadow-sm">
+                      {c.iconEmoji}
+                    </div>
                   </div>
-                  <p className="text-[12px] text-slate-500 dark:text-slate-400 truncate mt-0.5">{c.description}</p>
-                </div>
 
-                {/* Stats */}
-                <div className="flex items-center gap-3 shrink-0 text-[11px] text-slate-400 dark:text-slate-500">
-                  <span className="tabular-nums">{c.memberCount.toLocaleString()} members</span>
-                  <span className="hidden sm:inline tabular-nums">{c.reviewCount.toLocaleString()} reviews</span>
-                </div>
+                  {/* Card body */}
+                  <div className="px-4 pt-7 pb-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">rj/{c.slug}</h3>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-medium">{c.category}</span>
+                    </div>
+                    <p className="text-[12px] text-slate-500 dark:text-slate-400 line-clamp-2 mb-3 leading-relaxed">{c.description}</p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 text-[11px] text-slate-400 dark:text-slate-500">
+                        <span className="tabular-nums">{c.memberCount.toLocaleString()} members</span>
+                        <span className="tabular-nums">{c.reviewCount.toLocaleString()} reviews</span>
+                      </div>
+                      <span className="text-xs font-medium text-indigo-600 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                        Visit →
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
 
-                {/* Chevron */}
-                <svg className="w-4 h-4 text-slate-300 dark:text-slate-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 18l6-6-6-6" />
-                </svg>
-              </Link>
-            ))}
-          </div>
+            {/* Mobile: compact list */}
+            <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800/80">
+              {filtered.map((c) => (
+                <Link
+                  key={c.id}
+                  href={`/c/${c.slug}`}
+                  className="flex items-center gap-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors -mx-2 px-2 rounded-lg"
+                >
+                  <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-base shrink-0">
+                    {c.iconEmoji}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 leading-tight">rj/{c.slug}</p>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-medium">{c.category}</span>
+                    </div>
+                    <p className="text-[12px] text-slate-500 dark:text-slate-400 truncate mt-0.5">{c.description}</p>
+                  </div>
+                  <span className="shrink-0 text-[11px] text-slate-400 dark:text-slate-500 tabular-nums">{c.memberCount.toLocaleString()} members</span>
+                  <svg className="w-4 h-4 text-slate-300 dark:text-slate-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 18l6-6-6-6" />
+                  </svg>
+                </Link>
+              ))}
+            </div>
+          </>
         )}
       </div>
 
