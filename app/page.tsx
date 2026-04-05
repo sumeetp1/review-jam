@@ -65,6 +65,9 @@ export default function LandingPage() {
           <Link href="/explore" className="text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200 transition hidden md:inline-block">
             Products
           </Link>
+          <Link href="/compare" className="text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200 transition hidden md:inline-block">
+            Why Review Jam
+          </Link>
           <Link href="/brands" className="text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200 transition hidden md:inline-block">
             For Brands
           </Link>
