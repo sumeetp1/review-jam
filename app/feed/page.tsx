@@ -349,7 +349,7 @@ export default function FeedPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#09090b] dark:bg-[#09090b] text-zinc-400 dark:text-zinc-300 transition-colors duration-200">
+    <main className="min-h-screen bg-white dark:bg-[#09090b] text-slate-500 dark:text-zinc-300 transition-colors duration-200">
 
       {reviewMode && user && (
         <ReviewWizard
@@ -362,9 +362,9 @@ export default function FeedPage() {
 
       {showOnboarding && (
         <div className="fixed inset-0 bg-black/70 dark:bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-[2px]">
-          <div className="bg-zinc-900 dark:bg-zinc-900 rounded-xl p-5 max-w-md w-full shadow-lg border border-white/[0.06] dark:border-white/[0.06]">
-            <h2 className="text-base font-semibold text-zinc-100 dark:text-zinc-100 mb-1">What are you into?</h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-500 mb-4">Personalise your feed.</p>
+          <div className="bg-white dark:bg-zinc-900 rounded-xl p-5 max-w-md w-full shadow-lg border border-slate-200 dark:border-white/[0.06]">
+            <h2 className="text-base font-semibold text-slate-900 dark:text-zinc-100 mb-1">What are you into?</h2>
+            <p className="text-sm text-slate-500 dark:text-zinc-500 mb-4">Personalise your feed.</p>
             <div className="flex flex-wrap gap-2 mb-5">
               {dynamicCategories.map((cat) => (
                 <button
@@ -376,7 +376,7 @@ export default function FeedPage() {
                   className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
                     selectedInterests.includes(cat)
                       ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/30"
-                      : "bg-white/[0.03] text-zinc-400 dark:text-zinc-400 border-white/[0.06] dark:border-white/[0.06]"
+                      : "bg-white dark:bg-white/[0.03] text-slate-500 dark:text-zinc-400 border-slate-200 dark:border-white/[0.06]"
                   }`}
                 >
                   {cat}
@@ -391,19 +391,19 @@ export default function FeedPage() {
       )}
 
       {/* Mobile Nav */}
-      <nav className="md:hidden bg-[#09090b]/95 dark:bg-[#09090b]/95 backdrop-blur-sm border-b border-white/[0.06] dark:border-white/[0.06] sticky top-0 z-40">
+      <nav className="md:hidden bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-sm border-b border-slate-200 dark:border-white/[0.06] sticky top-0 z-40">
         {!showMobileSearch ? (
           <div className="px-3 h-12 flex justify-between items-center">
             <Link href="/" className="flex items-center">
-              <Image src="/logo-dark.svg" alt="Review Jam" width={118} height={28} priority className="" />
-              <Image src="/logo-dark.svg" alt="Review Jam" width={118} height={28} priority className="hidden" />
+              <Image src="/logo.svg" alt="Review Jam" width={118} height={28} priority className="dark:hidden" />
+              <Image src="/logo-dark.svg" alt="Review Jam" width={118} height={28} priority className="hidden dark:block" />
             </Link>
             <div className="flex items-center gap-1">
-              <button type="button" onClick={() => setShowMobileSearch(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/[0.04] dark:hover:bg-white/[0.04] transition" aria-label="Search">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400 dark:text-zinc-400"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <button type="button" onClick={() => setShowMobileSearch(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-50 dark:hover:bg-white/[0.04] transition" aria-label="Search">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-500 dark:text-zinc-400"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
               </button>
-              <button type="button" onClick={() => setShowMobileMenu((v) => !v)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/[0.04] dark:hover:bg-white/[0.04] transition" aria-label="Menu">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-zinc-300 dark:text-zinc-300"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+              <button type="button" onClick={() => setShowMobileMenu((v) => !v)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-50 dark:hover:bg-white/[0.04] transition" aria-label="Menu">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-slate-700 dark:text-zinc-300"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
               </button>
             </div>
           </div>
@@ -415,9 +415,9 @@ export default function FeedPage() {
               placeholder="Search reviews…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-white/[0.06] dark:bg-white/[0.06] rounded-full px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-indigo-500/30 dark:focus:ring-indigo-500/30 text-zinc-100 dark:text-zinc-100 placeholder-zinc-500 dark:placeholder-zinc-500"
+              className="flex-1 bg-slate-100 dark:bg-white/[0.06] rounded-full px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-indigo-500/30 dark:focus:ring-indigo-500/30 text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-500"
             />
-            <button type="button" onClick={() => { setShowMobileSearch(false); setSearchQuery(""); }} className="w-10 h-10 flex items-center justify-center rounded-full text-zinc-500 hover:bg-white/[0.04] dark:hover:bg-white/[0.04] text-sm font-medium shrink-0">
+            <button type="button" onClick={() => { setShowMobileSearch(false); setSearchQuery(""); }} className="w-10 h-10 flex items-center justify-center rounded-full text-slate-500 dark:text-zinc-500 hover:bg-slate-50 dark:hover:bg-white/[0.04] text-sm font-medium shrink-0">
               ✕
             </button>
           </div>
@@ -428,10 +428,10 @@ export default function FeedPage() {
       {showMobileMenu && (
         <div className="md:hidden fixed inset-0 z-50" onClick={() => setShowMobileMenu(false)}>
           <div className="absolute inset-0 bg-black/40 dark:bg-black/60" />
-          <div className="absolute top-0 right-0 w-72 bg-zinc-900 dark:bg-zinc-900 h-full shadow-xl border-l border-white/[0.06] dark:border-white/[0.06] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="absolute top-0 right-0 w-72 bg-white dark:bg-zinc-900 h-full shadow-xl border-l border-slate-200 dark:border-white/[0.06] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             {/* Close button */}
             <div className="flex justify-end p-3">
-              <button type="button" onClick={() => setShowMobileMenu(false)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/[0.04] dark:hover:bg-white/[0.04] text-zinc-500 text-lg">
+              <button type="button" onClick={() => setShowMobileMenu(false)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-50 dark:hover:bg-white/[0.04] text-slate-500 dark:text-zinc-500 text-lg">
                 ✕
               </button>
             </div>
@@ -506,7 +506,7 @@ export default function FeedPage() {
         {/* Center: Feed */}
         <main className="w-full md:w-[600px] md:max-w-[600px] md:shrink-0 md:border-x border-white/[0.06] dark:border-white/[0.06] min-h-screen">
 
-          <div className="sticky top-12 md:top-0 z-30 bg-[#09090b]/90 dark:bg-[#09090b]/90 backdrop-blur-sm border-b border-white/[0.06] dark:border-white/[0.06]">
+          <div className="sticky top-12 md:top-0 z-30 bg-white/95 dark:bg-[#09090b]/90 backdrop-blur-sm border-b border-white/[0.06] dark:border-white/[0.06]">
             <div className="hidden md:flex items-center justify-between h-12 px-4 border-b border-white/[0.06] dark:border-white/[0.06]">
               <h1 className="text-lg font-semibold text-zinc-100 dark:text-zinc-100">Home</h1>
               {user && <NotificationBell userId={user.uid} />}

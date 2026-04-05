@@ -129,7 +129,7 @@ export default function BrandWidgetsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#09090b] text-zinc-400 text-sm animate-pulse">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#09090b] text-slate-500 dark:text-zinc-400 text-sm animate-pulse">
         Loading…
       </div>
     );
@@ -137,22 +137,22 @@ export default function BrandWidgetsPage() {
 
   if (!user) {
     return (
-      <main className="min-h-screen bg-[#09090b] flex flex-col items-center justify-center gap-4 p-8">
+      <main className="min-h-screen bg-white dark:bg-[#09090b] flex flex-col items-center justify-center gap-4 p-8">
         <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mb-1">
           <span className="text-2xl">🔒</span>
         </div>
-        <h2 className="text-lg font-semibold text-white">Sign in to access your widgets</h2>
-        <p className="text-zinc-400 text-sm max-w-xs text-center">
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Sign in to access your widgets</h2>
+        <p className="text-slate-500 dark:text-zinc-400 text-sm max-w-xs text-center">
           Use the same email as your Review Jam brand account.
         </p>
         <button
           type="button"
           onClick={handleLogin}
-          className="bg-white text-[#09090b] px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-zinc-200 transition"
+          className="bg-slate-900 dark:bg-white text-white dark:text-[#09090b] px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-700 dark:hover:bg-zinc-200 transition"
         >
           Sign in with Google
         </button>
-        <Link href="/brands" className="text-sm text-zinc-500 hover:text-zinc-300 transition">
+        <Link href="/brands" className="text-sm text-slate-500 dark:text-zinc-500 hover:text-slate-700 dark:hover:text-zinc-300 transition">
           Don&apos;t have a product listed? →
         </Link>
       </main>
@@ -161,17 +161,17 @@ export default function BrandWidgetsPage() {
 
   if (!isAuthorized) {
     return (
-      <main className="min-h-screen bg-[#09090b] flex flex-col items-center justify-center gap-4 p-8 text-center">
-        <h2 className="text-lg font-semibold text-white">No products found</h2>
-        <p className="text-zinc-400 text-sm max-w-sm">
-          We couldn&apos;t find any products for <strong className="text-white">{user.email}</strong>.
+      <main className="min-h-screen bg-white dark:bg-[#09090b] flex flex-col items-center justify-center gap-4 p-8 text-center">
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">No products found</h2>
+        <p className="text-slate-500 dark:text-zinc-400 text-sm max-w-sm">
+          We couldn&apos;t find any products for <strong className="text-slate-900 dark:text-white">{user.email}</strong>.
           Widgets are available on the $500+ tier.
         </p>
         <div className="flex gap-3 mt-1">
-          <Link href="/brands" className="text-sm font-medium bg-white text-[#09090b] px-4 py-2 rounded-lg hover:bg-zinc-200 transition">
+          <Link href="/brands" className="text-sm font-medium bg-slate-900 dark:bg-white text-white dark:text-[#09090b] px-4 py-2 rounded-lg hover:bg-slate-700 dark:hover:bg-zinc-200 transition">
             List a product
           </Link>
-          <button type="button" onClick={() => auth.signOut()} className="text-sm text-zinc-400 hover:text-white transition">
+          <button type="button" onClick={() => auth.signOut()} className="text-sm text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition">
             Sign out
           </button>
         </div>
@@ -194,31 +194,31 @@ export default function BrandWidgetsPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#09090b] text-zinc-200">
+    <main className="min-h-screen bg-white dark:bg-[#09090b] text-slate-800 dark:text-zinc-200">
       {/* Header */}
-      <div className="border-b border-white/[0.06] bg-white/[0.02]">
+      <div className="border-b border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-white/[0.02]">
         <div className="max-w-6xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 mb-0.5">
-              <Link href="/brands" className="text-xs text-zinc-500 hover:text-zinc-300 transition">Brands</Link>
+              <Link href="/brands" className="text-xs text-slate-500 dark:text-zinc-500 hover:text-slate-700 dark:hover:text-zinc-300 transition">Brands</Link>
               <span className="text-zinc-700">/</span>
-              <span className="text-xs text-zinc-300 font-medium">Trust Widgets</span>
+              <span className="text-xs text-slate-700 dark:text-zinc-300 font-medium">Trust Widgets</span>
             </div>
-            <h1 className="text-lg font-semibold text-white flex items-center gap-2">
+            <h1 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
               <span className="text-xl">🧩</span> Brand Trust Widget Generator
             </h1>
           </div>
           <div className="flex items-center gap-3">
             <Link
               href="/brands/dashboard"
-              className="text-xs font-medium text-zinc-400 hover:text-white transition"
+              className="text-xs font-medium text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition"
             >
               ← Dashboard
             </Link>
             <button
               type="button"
               onClick={() => auth.signOut()}
-              className="text-xs text-zinc-500 hover:text-white transition"
+              className="text-xs text-slate-500 dark:text-zinc-500 hover:text-slate-900 dark:hover:text-white transition"
             >
               Sign out
             </button>

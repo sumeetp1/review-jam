@@ -49,7 +49,7 @@ function HealthCircle({ score }: { score: number }) {
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </svg>
-      <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-white">
+      <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-slate-900 dark:text-white">
         {score}
       </span>
     </div>
@@ -117,22 +117,22 @@ function CreateHubModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
-      <div className="bg-zinc-900 rounded-2xl w-full max-w-lg border border-zinc-800 shadow-2xl overflow-hidden">
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-lg border border-slate-200 dark:border-zinc-800 shadow-2xl overflow-hidden">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-white/[0.06]">
           <div>
-            <h2 className="text-[15px] font-semibold text-zinc-100">
+            <h2 className="text-[15px] font-semibold text-slate-900 dark:text-zinc-100">
               {step === "preview" ? "AI-Generated Preview" : "Create Product Hub"}
             </h2>
-            <p className="text-[11px] text-zinc-500 mt-0.5">
+            <p className="text-[11px] text-slate-500 dark:text-zinc-500 mt-0.5">
               {step === "preview"
                 ? "Review the details Gemini generated — then launch the hub."
                 : "Gemini will auto-fill specs, variants, and a description."}
             </p>
           </div>
           <button type="button" onClick={onClose}
-            className="text-zinc-500 hover:text-zinc-200 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white/[0.04] transition text-lg leading-none">
+            className="text-slate-500 dark:text-zinc-500 hover:text-slate-900 dark:hover:text-zinc-200 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-50 dark:hover:bg-white/[0.04] transition text-lg leading-none">
             ✕
           </button>
         </div>
@@ -143,7 +143,7 @@ function CreateHubModal({
           {step === "input" && (
             <>
               <div>
-                <label className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500 block mb-1.5">
+                <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-zinc-500 block mb-1.5">
                   Product Name
                 </label>
                 <input
@@ -152,9 +152,9 @@ function CreateHubModal({
                   onChange={(e) => setName(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") handleGenerate(); }}
                   placeholder="e.g. Sony WH-1000XM5, iPhone 16 Pro, Vitamix 5200…"
-                  className="w-full text-sm bg-white/[0.04] border border-white/10 rounded-lg px-3 py-2.5 outline-none focus:ring-1 focus:ring-violet-500/40 text-zinc-100 placeholder-zinc-600"
+                  className="w-full text-sm bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2.5 outline-none focus:ring-1 focus:ring-violet-500/40 text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-600"
                 />
-                <p className="text-[11px] text-zinc-600 mt-1.5">
+                <p className="text-[11px] text-slate-400 dark:text-zinc-600 mt-1.5">
                   Be specific — include the model number for best results.
                 </p>
               </div>
@@ -170,7 +170,7 @@ function CreateHubModal({
                     : <><span>✨</span> Generate with AI</>}
                 </button>
                 <button type="button" onClick={onClose}
-                  className="px-4 text-sm text-zinc-500 border border-zinc-800 rounded-xl hover:bg-white/[0.04] transition">
+                  className="px-4 text-sm text-slate-500 dark:text-zinc-500 border border-slate-200 dark:border-zinc-800 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition">
                   Cancel
                 </button>
               </div>
@@ -183,10 +183,10 @@ function CreateHubModal({
               {/* Identity row */}
               <div className="flex items-center gap-3">
                 <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-bold text-zinc-100 truncate">{name}</p>
-                  <p className="text-[12px] text-zinc-500">
+                  <p className="text-[15px] font-bold text-slate-900 dark:text-zinc-100 truncate">{name}</p>
+                  <p className="text-[12px] text-slate-500 dark:text-zinc-500">
                     {preview.brandName && <>{preview.brandName} · </>}
-                    <span className="font-medium text-zinc-300">{preview.category}</span>
+                    <span className="font-medium text-slate-700 dark:text-zinc-300">{preview.category}</span>
                   </p>
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-wide text-violet-400 bg-violet-950/40 border border-violet-800 px-2 py-1 rounded-full shrink-0">
@@ -196,7 +196,7 @@ function CreateHubModal({
 
               {/* Description */}
               {preview.description && (
-                <p className="text-[13px] text-zinc-400 leading-relaxed">
+                <p className="text-[13px] text-slate-500 dark:text-zinc-400 leading-relaxed">
                   {preview.description}
                 </p>
               )}
@@ -204,12 +204,12 @@ function CreateHubModal({
               {/* Specs */}
               {preview.specs.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 mb-2">Specs</p>
-                  <div className="rounded-lg border border-white/[0.06] overflow-hidden">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-600 mb-2">Specs</p>
+                  <div className="rounded-lg border border-slate-200 dark:border-white/[0.06] overflow-hidden">
                     {preview.specs.map((s, i) => (
-                      <div key={i} className={`flex gap-4 px-3 py-2 text-[12px] ${i % 2 === 0 ? "bg-white/[0.03]" : "bg-transparent"}`}>
-                        <span className="text-zinc-500 w-28 shrink-0">{s.label}</span>
-                        <span className="text-zinc-200 font-medium">{s.value}</span>
+                      <div key={i} className={`flex gap-4 px-3 py-2 text-[12px] ${i % 2 === 0 ? "bg-white dark:bg-white/[0.03]" : "bg-transparent"}`}>
+                        <span className="text-slate-500 dark:text-zinc-500 w-28 shrink-0">{s.label}</span>
+                        <span className="text-slate-800 dark:text-zinc-200 font-medium">{s.value}</span>
                       </div>
                     ))}
                   </div>
@@ -219,10 +219,10 @@ function CreateHubModal({
               {/* Variants */}
               {preview.variants.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 mb-2">Variants</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-600 mb-2">Variants</p>
                   <div className="flex flex-wrap gap-1.5">
                     {preview.variants.map((v, i) => (
-                      <span key={i} className="text-[11px] font-medium bg-white/[0.04] text-zinc-300 px-2.5 py-1 rounded-md border border-white/[0.06]">
+                      <span key={i} className="text-[11px] font-medium bg-slate-50 dark:bg-white/[0.04] text-slate-700 dark:text-zinc-300 px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/[0.06]">
                         {v}
                       </span>
                     ))}
@@ -233,10 +233,10 @@ function CreateHubModal({
               {/* SKUs */}
               {preview.verifiedSkus.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 mb-2">SKUs</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-600 mb-2">SKUs</p>
                   <div className="flex flex-wrap gap-1.5">
                     {preview.verifiedSkus.map((s, i) => (
-                      <span key={i} className="text-[11px] font-mono bg-white/[0.04] text-zinc-400 px-2 py-0.5 rounded border border-white/[0.06]">
+                      <span key={i} className="text-[11px] font-mono bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-zinc-400 px-2 py-0.5 rounded border border-slate-200 dark:border-white/[0.06]">
                         {s}
                       </span>
                     ))}
@@ -244,7 +244,7 @@ function CreateHubModal({
                 </div>
               )}
 
-              <div className="bg-indigo-950/30 border border-indigo-500/20 rounded-lg px-3 py-2.5 text-[11px] text-indigo-400">
+              <div className="bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-500/20 rounded-lg px-3 py-2.5 text-[11px] text-indigo-600 dark:text-indigo-400">
                 <span className="font-bold">Community Seeded</span> — this hub will be tagged until a verified owner posts a review.
               </div>
 
@@ -256,7 +256,7 @@ function CreateHubModal({
                   🚀 Launch Product Hub
                 </button>
                 <button type="button" onClick={() => setStep("input")}
-                  className="px-4 text-sm text-zinc-500 border border-zinc-800 rounded-xl hover:bg-white/[0.04] transition">
+                  className="px-4 text-sm text-slate-500 dark:text-zinc-500 border border-slate-200 dark:border-zinc-800 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition">
                   ← Edit
                 </button>
               </div>
@@ -272,7 +272,7 @@ function CreateHubModal({
 
 export default function ExplorePageWrapper() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#09090b] flex items-center justify-center text-zinc-500 text-sm animate-pulse">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-white dark:bg-[#09090b] flex items-center justify-center text-slate-500 dark:text-zinc-500 text-sm animate-pulse">Loading...</div>}>
       <ExplorePage />
     </Suspense>
   );
@@ -392,7 +392,7 @@ function ExplorePage() {
     });
 
   return (
-    <main className="min-h-screen bg-[#09090b] text-zinc-200">
+    <main className="min-h-screen bg-white dark:bg-[#09090b] text-slate-800 dark:text-zinc-200">
       {showCreateModal && (
         <CreateHubModal
           initialName={searchQuery.trim()}
@@ -408,14 +408,15 @@ function ExplorePage() {
         />
       )}
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-[#09090b]/95 backdrop-blur-md border-b border-white/[0.06]">
+      <div className="sticky top-0 z-40 bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/[0.06]">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-4">
           <Link href="/" className="shrink-0">
-            <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} />
+            <Image src="/logo.svg" alt="Review Jam" width={110} height={26} className="dark:hidden" />
+            <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} className="hidden dark:block" />
           </Link>
           <div className="flex-1 min-w-0">
-            <h1 className="text-base font-semibold text-zinc-100 leading-tight">Explore products</h1>
-            <p className="text-[12px] text-zinc-500 hidden sm:block">
+            <h1 className="text-base font-semibold text-slate-900 dark:text-zinc-100 leading-tight">Explore products</h1>
+            <p className="text-[12px] text-slate-500 dark:text-zinc-500 hidden sm:block">
               Authentic, engagement-ranked reviews
             </p>
           </div>
@@ -430,7 +431,7 @@ function ExplorePage() {
             placeholder="Search products or brands…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 bg-white/[0.04] border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-indigo-500/30 text-zinc-100 placeholder-zinc-600"
+            className="flex-1 bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-indigo-500/30 text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-600"
           />
           <div className="flex gap-1 shrink-0">
             {SORT_OPTIONS.map((opt) => (
@@ -440,8 +441,8 @@ function ExplorePage() {
                 onClick={() => setSortKey(opt.key)}
                 className={`px-2.5 py-1.5 rounded-md text-xs font-medium border transition ${
                   sortKey === opt.key
-                    ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/30"
-                    : "bg-white/[0.03] text-zinc-400 border-white/[0.06] hover:bg-white/[0.04]"
+                    ? "bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-500/30"
+                    : "bg-white dark:bg-white/[0.03] text-slate-500 dark:text-zinc-400 border-slate-200 dark:border-white/[0.06] hover:bg-slate-50 dark:hover:bg-white/[0.04]"
                 }`}
               >
                 {opt.label}
@@ -462,10 +463,10 @@ function ExplorePage() {
                 onClick={() => setCategoryFilter(cat)}
                 className={`whitespace-nowrap flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium border transition ${
                   active
-                    ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/30"
+                    ? "bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-500/30"
                     : boosted
-                    ? "bg-violet-950/30 text-violet-400 border-violet-700 hover:bg-violet-900/30"
-                    : "bg-white/[0.03] text-zinc-400 border-white/[0.06] hover:bg-white/[0.04]"
+                    ? "bg-violet-50 dark:bg-violet-950/30 text-violet-600 dark:text-violet-400 border-violet-300 dark:border-violet-700 hover:bg-violet-100 dark:hover:bg-violet-900/30"
+                    : "bg-white dark:bg-white/[0.03] text-slate-500 dark:text-zinc-400 border-slate-200 dark:border-white/[0.06] hover:bg-slate-50 dark:hover:bg-white/[0.04]"
                 }`}
               >
                 {boosted && <span aria-label="Boosted category">🔥</span>}
@@ -478,17 +479,17 @@ function ExplorePage() {
 
         {/* Results */}
         {isLoading ? (
-          <div className="py-12 text-center text-zinc-500 text-sm animate-pulse">Loading…</div>
+          <div className="py-12 text-center text-slate-500 dark:text-zinc-500 text-sm animate-pulse">Loading…</div>
         ) : filtered.length === 0 ? (
           <div className="py-12 flex flex-col items-center gap-4">
-            <p className="text-zinc-500 text-sm">
+            <p className="text-slate-500 dark:text-zinc-500 text-sm">
               {searchQuery.trim()
-                ? <>No results for <span className="font-semibold text-zinc-400">"{searchQuery}"</span></>
+                ? <>No results for <span className="font-semibold text-slate-600 dark:text-zinc-400">"{searchQuery}"</span></>
                 : "No products found."}
             </p>
             {searchQuery.trim().length >= 2 && (
               <div className="flex flex-col items-center gap-2 text-center max-w-sm">
-                <p className="text-[12px] text-zinc-500">
+                <p className="text-[12px] text-slate-500 dark:text-zinc-500">
                   This product doesn't have a hub yet. Create one and Gemini will auto-fill the specs, variants, and description.
                 </p>
                 <button
@@ -507,12 +508,12 @@ function ExplorePage() {
               <Link
                 key={p.id}
                 href={p.slug && p.communitySlug ? `/c/${p.communitySlug}/${p.slug}` : `/product/${p.id}`}
-                className="group glass-card flex flex-col overflow-hidden hover:border-white/10 hover:shadow-md hover:shadow-black/20 transition"
+                className="group glass-card flex flex-col overflow-hidden hover:border-slate-200 dark:hover:border-white/10 hover:shadow-md hover:shadow-slate-200/50 dark:hover:shadow-black/20 transition"
               >
                 {/* Cover image */}
                 <div className="relative">
                   {p.coverImage ? (
-                    <div className="relative w-full h-40 overflow-hidden bg-zinc-900 shrink-0">
+                    <div className="relative w-full h-40 overflow-hidden bg-slate-100 dark:bg-zinc-900 shrink-0">
                       <img
                         src={p.coverImage}
                         alt={p.name}
@@ -536,7 +537,7 @@ function ExplorePage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full h-40 bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center shrink-0">
+                    <div className="w-full h-40 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-zinc-800 dark:to-zinc-900 flex items-center justify-center shrink-0">
                       <span className="text-4xl opacity-30 select-none">📦</span>
                     </div>
                   )}
@@ -553,18 +554,18 @@ function ExplorePage() {
                 <div className="p-4 flex flex-col gap-2 flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-[14px] font-semibold text-zinc-100 group-hover:text-indigo-400 leading-snug transition-colors">
+                      <h3 className="text-[14px] font-semibold text-slate-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 leading-snug transition-colors">
                         {p.name}
                       </h3>
-                      <p className="text-[12px] text-zinc-500 mt-0.5">{p.brandName}</p>
+                      <p className="text-[12px] text-slate-500 dark:text-zinc-500 mt-0.5">{p.brandName}</p>
                     </div>
                     {!p.coverImage && p.avgRating > 0 && (
-                      <span className="text-[11px] text-amber-400 font-semibold shrink-0">★ {p.avgRating.toFixed(1)}</span>
+                      <span className="text-[11px] text-amber-500 dark:text-amber-400 font-semibold shrink-0">★ {p.avgRating.toFixed(1)}</span>
                     )}
                   </div>
 
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[11px] bg-white/[0.04] text-zinc-400 px-2 py-0.5 rounded-full font-medium border border-white/[0.06]">{p.category}</span>
+                    <span className="text-[11px] bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-zinc-400 px-2 py-0.5 rounded-full font-medium border border-slate-200 dark:border-white/[0.06]">{p.category}</span>
                     {p.communitySeeded && !p.hasVerifiedOwner && (
                       <span className="text-[10px] font-medium text-violet-400 bg-violet-950/40 px-1.5 py-0.5 rounded-full border border-violet-800">
                         🌱 Seeded
@@ -573,16 +574,16 @@ function ExplorePage() {
                   </div>
 
                   {p.topQuote && (
-                    <p className="text-[12px] text-zinc-500 leading-relaxed line-clamp-2 italic">
+                    <p className="text-[12px] text-slate-500 dark:text-zinc-500 leading-relaxed line-clamp-2 italic">
                       "{p.topQuote}"
                     </p>
                   )}
 
-                  <div className="flex items-center gap-3 text-[11px] text-zinc-500 mt-auto pt-2 border-t border-white/[0.06]">
+                  <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-zinc-500 mt-auto pt-2 border-t border-slate-200 dark:border-white/[0.06]">
                     <span>{p.reviewCount} review{p.reviewCount !== 1 ? "s" : ""}</span>
                     <span>👍 {p.totalLikes}</span>
                     {sortKey === "discovery" && p.discoveryRank > 0 && (
-                      <span className="ml-auto text-indigo-400 font-semibold">
+                      <span className="ml-auto text-indigo-600 dark:text-indigo-400 font-semibold">
                         🔥 {p.discoveryRank.toFixed(1)}
                       </span>
                     )}
