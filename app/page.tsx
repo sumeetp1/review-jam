@@ -56,12 +56,6 @@ export default function LandingPage() {
           <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} priority className="hidden dark:block" />
         </Link>
         <div className="flex items-center gap-3">
-          <Link href="/explore" className="text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200 transition hidden md:inline-block">
-            Explore
-          </Link>
-          <Link href="/c" className="text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200 transition hidden md:inline-block">
-            Communities
-          </Link>
           <button
             type="button"
             onClick={toggleDarkMode}
