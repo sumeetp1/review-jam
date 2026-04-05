@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { href: "/explore",  label: "Explore",  icon: ExploreIcon },
   { href: "/c", label: "Communities", icon: ChannelsIcon },
   { href: "/profile",  label: "Profile",  icon: ProfileIcon },
+  { href: "/admin",    label: "Admin",    icon: AdminIcon },
 ];
 
 export default function BottomNav() {
@@ -78,6 +79,15 @@ function ProfileIcon({ active }: { active: boolean }) {
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.2 : 1.8} strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="8" r="4" fill={active ? "currentColor" : "none"} fillOpacity={active ? 0.12 : 0} />
       <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+    </svg>
+  );
+}
+
+function AdminIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.2 : 1.8} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 15V3m0 12l-4-4m4 4l4-4" fill={active ? "currentColor" : "none"} fillOpacity={active ? 0.12 : 0} />
+      <path d="M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" />
     </svg>
   );
 }
