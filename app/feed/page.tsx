@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -40,7 +41,9 @@ export default function FeedPage() {
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const searchParams = useSearchParams();
   const [reviewMode, setReviewMode] = useState<"organic" | "verified" | "generic" | null>(null);
+  const composeHandled = useRef(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [currentTime, setCurrentTime] = useState(Date.now());
@@ -68,6 +71,14 @@ export default function FeedPage() {
     fetchInitialData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  // Auto-open compose modal when arriving via ?compose=true
+  useEffect(() => {
+    if (searchParams.get("compose") === "true" && user && !composeHandled.current) {
+      composeHandled.current = true;
+      setReviewMode("organic");
+    }
+  }, [searchParams, user]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(Date.now()), 60000);

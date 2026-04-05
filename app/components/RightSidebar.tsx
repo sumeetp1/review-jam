@@ -20,7 +20,7 @@ const SORT_LABELS: Record<SortMode, string> = {
 function ScorePip({ score }: { score: number }) {
   const cls =
     score >= 70 ? "bg-emerald-500" :
-    score >= 40 ? "bg-amber-500" : "bg-slate-400";
+    score >= 40 ? "bg-amber-500" : "bg-zinc-500";
   return (
     <span className={`inline-block w-1.5 h-1.5 rounded-full shrink-0 ${cls} mt-0.5`} />
   );
@@ -42,13 +42,13 @@ export default function RightSidebar({ allReviews }: Props) {
   }, [allReviews, sort]);
 
   return (
-    <aside className="hidden lg:flex flex-col w-[240px] xl:w-[256px] pl-0 pr-0 py-5 sticky top-0 h-screen overflow-y-auto border-l border-slate-200/80 dark:border-slate-800 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+    <aside className="hidden lg:flex flex-col w-[240px] xl:w-[256px] pl-0 pr-0 py-5 sticky top-0 h-screen overflow-y-auto border-l border-slate-200/80 dark:border-white/[0.06] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
 
       {/* Header */}
-      <div className="px-4 pb-3 border-b border-slate-100 dark:border-slate-800">
-        <h2 className="text-[13px] font-bold text-slate-800 dark:text-slate-200 mb-2">Top Reviews</h2>
+      <div className="px-4 pb-3 border-b border-slate-100 dark:border-white/[0.06]">
+        <h2 className="text-[13px] font-bold text-slate-800 dark:text-zinc-100 mb-2">Top Reviews</h2>
         {/* Sort tabs */}
-        <div className="flex gap-0.5">
+        <div className="flex gap-0.5 bg-slate-100 dark:bg-white/[0.04] rounded-lg p-0.5">
           {(Object.keys(SORT_LABELS) as SortMode[]).map((s) => (
             <button
               key={s}
@@ -56,8 +56,8 @@ export default function RightSidebar({ allReviews }: Props) {
               onClick={() => setSort(s)}
               className={`flex-1 py-1 text-[10px] font-semibold rounded-md transition ${
                 sort === s
-                  ? "bg-amber-500 text-white"
-                  : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  ? "bg-white dark:bg-white/[0.1] text-slate-900 dark:text-zinc-100 shadow-sm"
+                  : "text-slate-500 dark:text-zinc-500 hover:text-slate-700 dark:hover:text-zinc-300"
               }`}
             >
               {SORT_LABELS[s]}
@@ -67,35 +67,35 @@ export default function RightSidebar({ allReviews }: Props) {
       </div>
 
       {/* Review list */}
-      <div className="flex-1 divide-y divide-slate-100 dark:divide-slate-800/60">
+      <div className="flex-1 divide-y divide-slate-100 dark:divide-white/[0.04]">
         {sorted.length === 0 && (
-          <p className="px-4 py-6 text-[12px] text-slate-400 text-center">No reviews yet.</p>
+          <p className="px-4 py-6 text-[12px] text-slate-400 dark:text-zinc-600 text-center">No reviews yet.</p>
         )}
         {sorted.map((r, i) => {
           const snippet = r.summary || r.marketingQuote || r.content?.slice(0, 80);
           const score = r.healthScore ?? 0;
           return (
-            <div key={r.id} className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-900/40 transition group">
+            <div key={r.id} className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-white/[0.02] transition group">
               {/* Rank + product */}
               <div className="flex items-start gap-2 mb-1">
-                <span className="text-[11px] font-bold text-slate-300 dark:text-slate-600 tabular-nums w-5 shrink-0 mt-0.5">
+                <span className="text-[11px] font-bold text-slate-300 dark:text-zinc-700 tabular-nums w-5 shrink-0 mt-0.5">
                   {i + 1}
                 </span>
                 <div className="flex-1 min-w-0">
                   {r.productId && !r.productId.startsWith("organic_") ? (
-                    <Link href={`/product/${r.productId}`} className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition hover:underline block">
+                    <Link href={`/product/${r.productId}`} className="text-[12px] font-semibold text-slate-800 dark:text-zinc-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition hover:underline block">
                       {r.productName}
                     </Link>
                   ) : (
-                    <p className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">
+                    <p className="text-[12px] font-semibold text-slate-800 dark:text-zinc-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">
                       {r.productName}
                     </p>
                   )}
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <Avatar name={r.reviewerName} size="xs" />
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{r.reviewerName}</span>
+                    <span className="text-[10px] text-slate-500 dark:text-zinc-500 truncate">{r.reviewerName}</span>
                     {r.rating != null && (
-                      <span className="text-[10px] text-amber-500 tabular-nums shrink-0">★{r.rating}</span>
+                      <span className="text-[10px] text-amber-500 dark:text-amber-400 tabular-nums shrink-0">★{r.rating}</span>
                     )}
                   </div>
                 </div>
@@ -105,24 +105,24 @@ export default function RightSidebar({ allReviews }: Props) {
                   <span className={`text-[10px] font-bold tabular-nums ${
                     score >= 70 ? "text-emerald-600 dark:text-emerald-400"
                     : score >= 40 ? "text-amber-600 dark:text-amber-400"
-                    : "text-slate-400"
+                    : "text-zinc-400 dark:text-zinc-600"
                   }`}>{score > 0 ? score : ""}</span>
                 </div>
               </div>
 
               {/* Snippet */}
               {snippet && (
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 ml-7">
-                  "{snippet}"
+                <p className="text-[11px] text-slate-500 dark:text-zinc-500 leading-relaxed line-clamp-2 ml-7">
+                  &ldquo;{snippet}&rdquo;
                 </p>
               )}
 
               {/* Meta row */}
-              <div className="flex items-center gap-3 ml-7 mt-1.5 text-[10px] text-slate-400 dark:text-slate-500">
+              <div className="flex items-center gap-3 ml-7 mt-1.5 text-[10px] text-slate-400 dark:text-zinc-600">
                 {(r.likesCount ?? 0) > 0 && <span>👍 {r.likesCount}</span>}
                 {(r.helpfulCount ?? 0) > 0 && <span>✓ {r.helpfulCount}</span>}
                 {r.category && (
-                  <span className="ml-auto text-[9px] font-medium uppercase tracking-wide text-slate-300 dark:text-slate-600">
+                  <span className="ml-auto text-[9px] font-medium uppercase tracking-wide text-slate-300 dark:text-zinc-700">
                     {r.category}
                   </span>
                 )}
@@ -133,8 +133,8 @@ export default function RightSidebar({ allReviews }: Props) {
       </div>
 
       {/* Footer */}
-      <div className="px-4 pt-3 border-t border-slate-100 dark:border-slate-800">
-        <p className="text-[10px] text-slate-400 dark:text-slate-600">
+      <div className="px-4 pt-3 border-t border-slate-100 dark:border-white/[0.06]">
+        <p className="text-[10px] text-slate-400 dark:text-zinc-600">
           Rankings update in real-time based on score, likes and helpfulness.
         </p>
       </div>

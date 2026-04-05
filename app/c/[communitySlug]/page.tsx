@@ -156,6 +156,7 @@ export default function CommunityPage({ params }: { params: Promise<{ communityS
       campaignId: "organic", isCampaignReview: data.isCampaignReview,
       reviewType: data.reviewType, productSource: data.productSource,
       usageDuration: data.usageDuration, eligibleForPayout: data.reviewType !== "generic",
+      subjectType: data.subjectType ?? "product", location: data.location ?? null,
       biasFlag, channelId: community.id, channelSlug: community.slug,
       communitySlug, healthScore: score, healthScoreBreakdown: breakdown,
       createdAt: new Date().toISOString(),
@@ -376,8 +377,7 @@ export default function CommunityPage({ params }: { params: Promise<{ communityS
       {showReviewWizard && user && (
         <ReviewWizard
           user={user}
-          mode="verified"
-          productInfo={{ name: "", category: community.category }}
+          mode="organic"
           channelId={community.id}
           channelSlug={community.slug}
           onSubmit={handleReviewSubmit}
