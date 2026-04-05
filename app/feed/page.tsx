@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -27,6 +27,14 @@ import NotificationBell from "../components/NotificationBell";
 import type { FeedTab } from "../../lib/types";
 
 export default function FeedPage() {
+  return (
+    <Suspense>
+      <FeedPageInner />
+    </Suspense>
+  );
+}
+
+function FeedPageInner() {
   const [products, setProducts] = useState<any[]>([]);
   const [allReviews, setAllReviews] = useState<any[]>([]);
 
