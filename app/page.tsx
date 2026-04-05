@@ -54,14 +54,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col transition-colors duration-200 bg-gradient-to-br from-white via-indigo-50/40 to-violet-50/30 dark:bg-none dark:bg-slate-950 relative overflow-hidden">
-
-      {/* Trust background image */}
-      <div
-        className="absolute inset-0 opacity-[0.04] dark:opacity-[0.03] pointer-events-none bg-center bg-cover"
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1920&q=80&fit=crop')" }}
-        aria-hidden="true"
-      />
+    <div className="min-h-screen flex flex-col transition-colors duration-200 bg-white md:bg-gradient-to-br md:from-white md:via-indigo-50/40 md:to-violet-50/30 dark:bg-slate-950 dark:md:bg-none relative overflow-hidden">
 
       {/* Top bar */}
       <header className="flex items-center justify-between px-4 md:px-8 h-14 shrink-0 relative z-10">

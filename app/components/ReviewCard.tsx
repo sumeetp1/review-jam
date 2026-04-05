@@ -243,7 +243,7 @@ export default function ReviewCard({
           )}
 
           {/* Action bar */}
-          <div className="flex items-center gap-1 text-[13px] md:text-[13px] text-slate-500 dark:text-slate-500 mt-2 md:mt-1 -ml-2 md:-ml-1">
+          <div className="flex items-center gap-1 text-[13px] md:text-[13px] text-slate-500 dark:text-slate-500 mt-2 md:mt-1 -ml-2 md:-ml-1 flex-wrap">
             {/* Like */}
             <button
               type="button"
