@@ -566,8 +566,7 @@ export default function FeedPage() {
           products={products}
           isDarkMode={isDarkMode}
           onToggleDark={toggleDarkMode}
-          onPostReview={() => setReviewMode("verified")}
-          onQuickReview={() => setReviewMode("generic")}
+          onPostReview={() => setReviewMode("organic")}
           onLogin={handleLogin}
           activeCategoryFilter={activeCategoryFilter}
           onClearFilter={() => setActiveCategoryFilter("All")}
@@ -687,7 +686,7 @@ export default function FeedPage() {
                 <p className="text-sm text-zinc-500 dark:text-zinc-500 mb-5 leading-relaxed">
                   When people review in this view, they will show up here.
                 </p>
-                <button type="button" onClick={() => { if (!user) handleLogin(); else setReviewMode("verified"); }} className="text-sm font-medium bg-indigo-600 dark:bg-indigo-600 text-white dark:text-white px-4 py-2 rounded-full hover:opacity-90 transition">
+                <button type="button" onClick={() => { if (!user) handleLogin(); else setReviewMode("organic"); }} className="text-sm font-medium bg-indigo-600 dark:bg-indigo-600 text-white dark:text-white px-4 py-2 rounded-full hover:opacity-90 transition">
                   Write a review
                 </button>
               </div>
@@ -715,7 +714,7 @@ export default function FeedPage() {
       {/* Mobile FAB — Post a review */}
       <button
         type="button"
-        onClick={() => { if (!user) handleLogin(); else setReviewMode("verified"); }}
+        onClick={() => { if (!user) handleLogin(); else setReviewMode("organic"); }}
         className="md:hidden fixed right-4 z-40 w-14 h-14 rounded-full btn-brand flex items-center justify-center active:scale-95 transition"
         style={{ bottom: "calc(56px + env(safe-area-inset-bottom, 0px) + 16px)" }}
         aria-label="Post a review"

@@ -19,7 +19,7 @@ type Props = {
   isDarkMode: boolean;
   onToggleDark: () => void;
   onPostReview: () => void;
-  onQuickReview: () => void;
+  onQuickReview?: () => void;
   onLogin: () => void;
   activeCategoryFilter: string;
   onClearFilter: () => void;
@@ -144,15 +144,11 @@ export default function LeftSidebar({
           </Link>
         </div>
 
-        {/* Write buttons */}
-        <div className="px-2 pb-1 space-y-1 shrink-0">
+        {/* Write button */}
+        <div className="px-2 pb-1 shrink-0">
           <button type="button" onClick={user ? onPostReview : onLogin}
             className="btn-brand w-full text-sm font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-1.5">
             <span>✍️</span> Post a review
-          </button>
-          <button type="button" onClick={user ? onQuickReview : onLogin}
-            className="w-full text-[12px] text-slate-500 dark:text-zinc-400 py-1.5 px-4 rounded-lg border border-slate-200 dark:border-white/[0.06] hover:border-indigo-500/40 hover:text-indigo-600 dark:hover:border-indigo-500/40 dark:hover:text-indigo-400 transition">
-            Quick review (no payout)
           </button>
         </div>
 
