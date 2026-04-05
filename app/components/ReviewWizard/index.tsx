@@ -1,6 +1,7 @@
 "use client";
 
 import { User } from "firebase/auth";
+import type { SubjectType } from "../../../lib/types";
 import GenericReviewForm from "./GenericReviewForm";
 import FullReviewWizard from "./FullReviewWizard";
 
@@ -12,9 +13,9 @@ export { SUGGESTED_CATEGORIES, AVAILABLE_CATEGORIES } from "../../../lib/constan
 export type ReviewFormData = {
   productName: string;
   category: string;
-  productSource: "brand_sent" | "purchased" | "gift";
-  usageDuration: "less_1_week" | "1_4_weeks" | "1_3_months" | "3_plus_months";
-  purchaseChannel: "amazon" | "brand_website" | "retail" | "other";
+  productSource: string;
+  usageDuration: string;
+  purchaseChannel: string;
   overallRating: number;
   subRatings: Record<string, number>;
   pros: string[];
@@ -25,6 +26,8 @@ export type ReviewFormData = {
   mediaFiles: File[];
   isCampaignReview: boolean;
   reviewType: "organic" | "verified" | "generic";
+  subjectType: SubjectType;
+  location?: string;
   productCode?: string;
   channelId?: string;
   channelSlug?: string;
@@ -46,7 +49,7 @@ export type ProductVariant = { id: string; name: string };
 type Props = {
   user: User;
   mode: "organic" | "verified" | "generic";
-  productInfo?: { name: string; category: string; variants?: ProductVariant[] };
+  productInfo?: { name: string; category: string; variants?: ProductVariant[]; subjectType?: SubjectType };
   channelId?: string;
   channelSlug?: string;
   onSubmit: (data: ReviewFormData) => Promise<void>;
@@ -69,11 +72,14 @@ export default function ReviewWizard({
     return onSubmit(data);
   };
 
+  const subjectType = productInfo?.subjectType ?? "product";
+
   // Generic mode delegates to a simpler component
   if (mode === "generic") {
     return (
       <GenericReviewForm
         productInfo={productInfo}
+        subjectType={subjectType}
         onSubmit={wrappedSubmit}
         onClose={onClose}
       />
@@ -84,6 +90,7 @@ export default function ReviewWizard({
     <FullReviewWizard
       mode={mode}
       productInfo={productInfo}
+      subjectType={subjectType}
       onSubmit={wrappedSubmit}
       onClose={onClose}
     />

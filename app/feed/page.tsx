@@ -6,6 +6,7 @@ import Image from "next/image";
 import {
   collection, getDocs, doc, getDoc, setDoc, addDoc,
   updateDoc, increment, arrayUnion, arrayRemove,
+  query, where,
 } from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { signInWithPopup, signOut } from "firebase/auth";
@@ -15,6 +16,7 @@ import { updateUserBadges } from "../../lib/badges";
 import ReviewWizard, { ReviewFormData } from "../components/ReviewWizard";
 import { calculateDiscoveryRank } from "../../lib/discoveryRank";
 import { incrementTrustScore } from "../../lib/trustScore";
+import { slugify, categoryToSlug } from "../../lib/slugify";
 import ReviewCard, { type ReviewData } from "../components/ReviewCard";
 import RightSidebar from "../components/RightSidebar";
 import LeftSidebar from "../components/LeftSidebar";
@@ -211,13 +213,79 @@ export default function FeedPage() {
       biasFlag = agentData.analysis?.biasFlag ?? false;
     }
 
+    // Auto-create a hub entry so reviews are never orphaned.
+    // Look for an existing product/subject hub by slug, or create one.
+    const subjectSlug = slugify(data.productName);
+    const communitySlug = data.channelSlug || categoryToSlug(data.category);
+    let productId = `organic_${Date.now()}`;
+    let productSlug = subjectSlug;
+
+    try {
+      // Check if a hub already exists with this slug in the community
+      const existingSnap = await getDocs(
+        query(collection(db, "products"), where("slug", "==", subjectSlug), where("communitySlug", "==", communitySlug))
+      );
+      if (!existingSnap.empty) {
+        // Link to existing hub
+        productId = existingSnap.docs[0].id;
+        productSlug = existingSnap.docs[0].data().slug ?? subjectSlug;
+      } else {
+        // Create a minimal hub entry
+        const hubDoc = await addDoc(collection(db, "products"), {
+          name: data.productName,
+          slug: subjectSlug,
+          brandName: "",
+          category: data.category,
+          communitySlug,
+          communitySeeded: true,
+          subjectType: data.subjectType ?? "product",
+          campaignId: "organic",
+          endDate: "",
+          reviewCount: 0,
+          avgRating: 0,
+          avgHealthScore: 0,
+          topQuote: "",
+          totalLikes: 0,
+          discoveryRank: 0,
+          hasVerifiedOwner: false,
+          bountyPool: 0,
+          bountyPoolRemaining: 0,
+          bountyStatus: "inactive",
+          createdAt: new Date().toISOString(),
+        });
+        productId = hubDoc.id;
+
+        // Ensure the community channel exists
+        const channelSnap = await getDocs(
+          query(collection(db, "channels"), where("slug", "==", communitySlug))
+        );
+        if (channelSnap.empty) {
+          await addDoc(collection(db, "channels"), {
+            slug: communitySlug,
+            name: data.category,
+            description: `Reviews for ${data.category}`,
+            category: data.category,
+            iconEmoji: "📝",
+            memberCount: 0,
+            reviewCount: 0,
+            creatorName: "Review Jam",
+            createdAt: new Date().toISOString(),
+          });
+        }
+      }
+    } catch (err) {
+      console.warn("Hub auto-creation failed, using organic ID:", err);
+    }
+
     const newReview: Record<string, unknown> = {
       content: data.content,
       rating: data.overallRating,
       reviewerId: user.uid,
       reviewerName: user.displayName,
-      productId: `organic_${Date.now()}`,
+      productId,
       productName: data.productName,
+      productSlug,
+      communitySlug,
       category: data.category,
       campaignId: "organic",
       likesCount: 0,
@@ -239,6 +307,8 @@ export default function FeedPage() {
       bestFor: data.bestFor,
       mediaUrls,
       reviewType: data.reviewType,
+      subjectType: data.subjectType ?? "product",
+      location: data.location ?? null,
       productCode: data.productCode ?? null,
       isCampaignReview: false,
       eligibleForPayout: data.reviewType !== "generic",

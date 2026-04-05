@@ -3,6 +3,21 @@
 
 import type { HealthBreakdown } from "./healthScore";
 
+// ─── Subject Types ──────────────────────────────────────────────────────────
+
+export type SubjectType =
+  | "product"      // Physical/digital products
+  | "place"        // Parks, landmarks, buildings, neighborhoods
+  | "route"        // Roads, highways, trails, bike paths
+  | "service"      // Government services, utilities, contractors
+  | "business"     // Local businesses, restaurants, shops
+  | "event"        // Concerts, conferences, meetups
+  | "experience";  // Courses, classes, programs, subscriptions
+
+export const SUBJECT_TYPES: SubjectType[] = [
+  "product", "place", "route", "service", "business", "event", "experience",
+];
+
 // ─── Review ──────────────────────────────────────────────────────────────────
 
 export type ReviewData = {
@@ -46,6 +61,8 @@ export type ReviewData = {
   variantName?: string;
   isVerifiedPurchase?: boolean;
   isAnchorReview?: boolean;
+  subjectType?: SubjectType;
+  location?: string;
 };
 
 export type ReviewSummary = {

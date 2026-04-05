@@ -169,6 +169,8 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
       productSource: data.productSource, usageDuration: data.usageDuration,
       purchaseChannel: data.purchaseChannel, subRatings: data.subRatings,
       bestFor: data.bestFor, mediaUrls, reviewType: data.reviewType,
+      subjectType: data.subjectType ?? product.subjectType ?? "product",
+      location: data.location ?? null,
       productCode: data.productCode ?? null,
       isCampaignReview: false,
       eligibleForPayout: data.reviewType !== "generic",
@@ -273,7 +275,7 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
     <main className="min-h-screen bg-white dark:bg-[#09090b] text-slate-800 dark:text-zinc-200">
       {/* Review Wizard */}
       {reviewMode && user && (
-        <ReviewWizard user={user} mode={reviewMode} productInfo={{ name: product.name, category: product.category, variants }} onSubmit={handleReviewSubmit} onClose={() => setReviewMode(null)} />
+        <ReviewWizard user={user} mode={reviewMode} productInfo={{ name: product.name, category: product.category, variants, subjectType: product.subjectType ?? "product" }} onSubmit={handleReviewSubmit} onClose={() => setReviewMode(null)} />
       )}
 
       {/* Version Update Wizard */}

@@ -3,10 +3,12 @@
 import { useState, useRef } from "react";
 import {
   SUGGESTED_CATEGORIES,
-  USAGE_DURATIONS,
   PURCHASE_CHANNELS,
+  getSubjectConfig,
+  SUBJECT_TYPE_OPTIONS,
 } from "../../../lib/constants";
 import { AVAILABLE_CATEGORIES } from "../../../lib/constants";
+import type { SubjectType } from "../../../lib/types";
 import type { ReviewFormData, ProductVariant } from "./index";
 import StarPicker from "./StarPicker";
 import ChipInput from "./ChipInput";
@@ -25,6 +27,7 @@ type ReceiptVerification = {
 
 type Props = {
   mode: "organic" | "verified" | "generic";
+  subjectType?: SubjectType;
   productInfo?: { name: string; category: string; variants?: ProductVariant[] };
   onSubmit: (data: ReviewFormData) => Promise<void>;
   onClose: () => void;
@@ -32,11 +35,15 @@ type Props = {
 
 export default function FullReviewWizard({
   mode,
+  subjectType: initialSubjectType = "product",
   productInfo,
   onSubmit,
   onClose,
 }: Props) {
-  const STEP_LABELS = ["Context", "Your Review", "Proof of Purchase", "Finish"];
+  const [subjectType, setSubjectType] = useState<SubjectType>(initialSubjectType);
+  const cfg = getSubjectConfig(subjectType);
+
+  const STEP_LABELS = ["Context", "Your Review", subjectType === "product" ? "Proof of Purchase" : "Verification", "Finish"];
   const totalSteps = STEP_LABELS.length;
 
   const [step, setStep] = useState(1);
@@ -51,8 +58,10 @@ export default function FullReviewWizard({
   const [productCode, setProductCode] = useState("");
   const [variantId, setVariantId] = useState("");
   const [variantName, setVariantName] = useState("");
-  const [usageDuration, setUsageDuration] = useState<ReviewFormData["usageDuration"]>("1_4_weeks");
-  const [purchaseChannel, setPurchaseChannel] = useState<ReviewFormData["purchaseChannel"]>("amazon");
+  const [usageDuration, setUsageDuration] = useState(cfg.durationOptions[0]?.value ?? "1_4_weeks");
+  const [productSource, setProductSource] = useState(cfg.sourceOptions[0]?.value ?? "purchased");
+  const [purchaseChannel, setPurchaseChannel] = useState("amazon");
+  const [location, setLocation] = useState("");
   const [overallRating, setOverallRating] = useState(0);
   const [subRatings, setSubRatings] = useState<Record<string, number>>({});
 
@@ -220,9 +229,9 @@ export default function FullReviewWizard({
       await onSubmit({
         productName: productInfo?.name ?? productName,
         category: productInfo?.category ?? category,
-        productSource: "purchased",
+        productSource,
         usageDuration,
-        purchaseChannel,
+        purchaseChannel: cfg.showPurchaseChannel ? purchaseChannel : "other",
         overallRating,
         subRatings,
         pros,
@@ -233,6 +242,8 @@ export default function FullReviewWizard({
         mediaFiles,
         isCampaignReview: false,
         reviewType: mode === "verified" ? "verified" : "organic",
+        subjectType,
+        location: location || undefined,
         productCode: mode === "verified" ? productCode : undefined,
         variantId: variantId || undefined,
         variantName: variantName || undefined,
@@ -256,7 +267,7 @@ export default function FullReviewWizard({
 
   const headerLabel =
     mode === "verified" ? "Verified purchase review" :
-    "Write a review";
+    `Review a ${cfg.label.toLowerCase()}`;
 
   const headerSub =
     mode === "verified" ? "Earns based on engagement \u00b7 Verify with your product code" :
@@ -328,16 +339,44 @@ export default function FullReviewWizard({
         {/* ════ STEP 1: Context ════ */}
         {step === 1 && (
           <div className="space-y-4 py-2">
+            {/* Subject type picker — only in organic mode (user chooses what they're reviewing) */}
+            {mode === "organic" && !productInfo && (
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                  What type of thing are you reviewing?
+                </label>
+                <div className="flex gap-1.5 flex-wrap">
+                  {SUBJECT_TYPE_OPTIONS.map((opt) => (
+                    <OptionButton
+                      key={opt.value}
+                      selected={subjectType === opt.value}
+                      onClick={() => {
+                        setSubjectType(opt.value);
+                        setProductSource(
+                          (getSubjectConfig(opt.value)).sourceOptions[0]?.value ?? "purchased"
+                        );
+                        setUsageDuration(
+                          (getSubjectConfig(opt.value)).durationOptions[0]?.value ?? "1_4_weeks"
+                        );
+                      }}
+                    >
+                      {opt.icon} {opt.label}
+                    </OptionButton>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {mode === "organic" ? (
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                  What are you reviewing? <span className="text-red-400">*</span>
+                  {cfg.nameLabel} <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="text"
                   value={productName}
                   onChange={(e) => setProductName(e.target.value)}
-                  placeholder="e.g. Sony WH-1000XM5"
+                  placeholder={cfg.namePlaceholder}
                   className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-slate-100 dark:placeholder-slate-500"
                 />
               </div>
@@ -377,7 +416,7 @@ export default function FullReviewWizard({
                   list="category-suggestions-full"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  placeholder="e.g. Tech, EV Charging, Construction..."
+                  placeholder="e.g. Tech, Roads & Routes, Restaurants..."
                   className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none dark:text-slate-100"
                 />
                 <datalist id="category-suggestions-full">
@@ -407,6 +446,22 @@ export default function FullReviewWizard({
               </div>
             )}
 
+            {/* Location field — shown for places, routes, businesses, events */}
+            {cfg.showLocation && (
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                  {cfg.locationLabel}
+                </label>
+                <input
+                  type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder={cfg.locationPlaceholder}
+                  className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-slate-100 dark:placeholder-slate-500"
+                />
+              </div>
+            )}
+
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
                 Overall rating <span className="text-red-400">*</span>
@@ -429,7 +484,7 @@ export default function FullReviewWizard({
                         updated[idx] = e.target.value;
                         setCustomDimensions(updated);
                       }}
-                      placeholder={`Dimension ${idx + 1} (e.g. Quality, Value, Design)`}
+                      placeholder={cfg.suggestedDimensions[idx] ? `e.g. ${cfg.suggestedDimensions[idx]}` : `Dimension ${idx + 1}`}
                       className="flex-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs outline-none dark:text-slate-100 dark:placeholder-slate-500"
                     />
                     {dim.trim() && (
@@ -450,12 +505,31 @@ export default function FullReviewWizard({
               </div>
             </div>
 
+            {/* Source — adaptive per subject type */}
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                How long have you used it?
+                {cfg.sourceLabel}
               </label>
               <div className="flex gap-2 flex-wrap">
-                {USAGE_DURATIONS.map((opt) => (
+                {cfg.sourceOptions.map((opt) => (
+                  <OptionButton
+                    key={opt.value}
+                    selected={productSource === opt.value}
+                    onClick={() => setProductSource(opt.value)}
+                  >
+                    {opt.label}
+                  </OptionButton>
+                ))}
+              </div>
+            </div>
+
+            {/* Duration — adaptive per subject type */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                {cfg.durationLabel}
+              </label>
+              <div className="flex gap-2 flex-wrap">
+                {cfg.durationOptions.map((opt) => (
                   <OptionButton
                     key={opt.value}
                     selected={usageDuration === opt.value}
@@ -467,7 +541,8 @@ export default function FullReviewWizard({
               </div>
             </div>
 
-            {(
+            {/* Purchase channel — only for products */}
+            {cfg.showPurchaseChannel && (
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
                   Where did you buy it?
@@ -493,28 +568,28 @@ export default function FullReviewWizard({
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                What did you like? <span className="text-red-400">*</span>{" "}
+                {cfg.proLabel} <span className="text-red-400">*</span>{" "}
                 <span className="font-normal text-slate-400">(at least one)</span>
               </label>
               <ChipInput
                 items={pros}
                 onAdd={(item) => setPros((p) => [...p, item])}
                 onRemove={(idx) => setPros((p) => p.filter((_, i) => i !== idx))}
-                placeholder="e.g. Long battery life"
+                placeholder={cfg.proPlaceholder}
                 maxItems={8}
               />
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                What could be better?{" "}
+                {cfg.conLabel}{" "}
                 <span className="font-normal text-slate-400">(optional)</span>
               </label>
               <ChipInput
                 items={cons}
                 onAdd={(item) => setCons((p) => [...p, item])}
                 onRemove={(idx) => setCons((p) => p.filter((_, i) => i !== idx))}
-                placeholder="e.g. Expensive carrying case"
+                placeholder={cfg.conPlaceholder}
                 maxItems={8}
               />
             </div>
@@ -527,7 +602,7 @@ export default function FullReviewWizard({
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="Share your full experience — what worked, what surprised you, who this is ideal for..."
+                placeholder={cfg.reviewPlaceholder}
                 className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm h-32 resize-y focus:outline-none focus:ring-1 focus:ring-slate-400 dark:focus:ring-slate-600 dark:text-slate-100 dark:placeholder-slate-500"
               />
               <p

@@ -3,21 +3,29 @@
 import { useState } from "react";
 import {
   SUGGESTED_CATEGORIES,
+  getSubjectConfig,
+  SUBJECT_TYPE_OPTIONS,
 } from "../../../lib/constants";
 import { AVAILABLE_CATEGORIES } from "../../../lib/constants";
+import type { SubjectType } from "../../../lib/types";
 import type { ReviewFormData } from "./index";
 import StarPicker from "./StarPicker";
+import OptionButton from "./OptionButton";
 import ModalShell from "./ModalShell";
 
 export default function GenericReviewForm({
   productInfo,
+  subjectType: initialSubjectType = "product",
   onSubmit,
   onClose,
 }: {
   productInfo?: { name: string; category: string };
+  subjectType?: SubjectType;
   onSubmit: (data: ReviewFormData) => Promise<void>;
   onClose: () => void;
 }) {
+  const [subjectType, setSubjectType] = useState<SubjectType>(initialSubjectType);
+  const cfg = getSubjectConfig(subjectType);
   const [productName, setProductName] = useState(productInfo?.name ?? "");
   const [category, setCategory] = useState(productInfo?.category ?? AVAILABLE_CATEGORIES[0]);
   const [overallRating, setOverallRating] = useState(0);
@@ -29,7 +37,7 @@ export default function GenericReviewForm({
   const handleSubmit = async () => {
     setError("");
     if (!productInfo && !productName.trim()) {
-      setError("Please enter the product name.");
+      setError(`Please enter the ${cfg.label.toLowerCase()} name.`);
       return;
     }
     if (overallRating === 0) {
@@ -49,8 +57,8 @@ export default function GenericReviewForm({
       await onSubmit({
         productName: productInfo?.name ?? productName,
         category: productInfo?.category ?? category,
-        productSource: "purchased",
-        usageDuration: "1_4_weeks",
+        productSource: cfg.sourceOptions[0]?.value ?? "purchased",
+        usageDuration: cfg.durationOptions[0]?.value ?? "1_4_weeks",
         purchaseChannel: "other",
         overallRating,
         subRatings: {},
@@ -62,6 +70,7 @@ export default function GenericReviewForm({
         mediaFiles: [],
         isCampaignReview: false,
         reviewType: "generic",
+        subjectType,
       });
       onClose();
     } catch (err) {
@@ -92,16 +101,36 @@ export default function GenericReviewForm({
 
       {/* Body */}
       <div className="overflow-y-auto flex-1 px-5 py-4 space-y-4">
+        {/* Subject type picker */}
         {!productInfo && (
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-              What are you reviewing? <span className="text-red-400">*</span>
+              What type of thing are you reviewing?
+            </label>
+            <div className="flex gap-1.5 flex-wrap">
+              {SUBJECT_TYPE_OPTIONS.map((opt) => (
+                <OptionButton
+                  key={opt.value}
+                  selected={subjectType === opt.value}
+                  onClick={() => setSubjectType(opt.value)}
+                >
+                  {opt.icon} {opt.label}
+                </OptionButton>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!productInfo && (
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+              {cfg.nameLabel} <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
-              placeholder="e.g. Sony WH-1000XM5"
+              placeholder={cfg.namePlaceholder}
               className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-slate-100 dark:placeholder-slate-500"
             />
           </div>
@@ -115,7 +144,7 @@ export default function GenericReviewForm({
               list="category-suggestions"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              placeholder="e.g. Tech, EV Charging, Construction..."
+              placeholder="e.g. Tech, Roads & Routes, Restaurants..."
               className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none dark:text-slate-100"
             />
             <datalist id="category-suggestions">
@@ -147,7 +176,7 @@ export default function GenericReviewForm({
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="Share your experience with this product..."
+            placeholder={`Share your experience with this ${cfg.label.toLowerCase()}...`}
             className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm h-28 resize-y focus:outline-none focus:ring-1 focus:ring-slate-400 dark:focus:ring-slate-600 dark:text-slate-100 dark:placeholder-slate-500"
           />
           <p className={`text-right text-[11px] tabular-nums ${
