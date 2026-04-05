@@ -18,7 +18,25 @@ type Community = {
   memberCount: number;
   reviewCount: number;
   creatorName: string;
+  coverImage?: string;
 };
+
+// Default banner images per category (Unsplash, small & optimized)
+const CATEGORY_BANNERS: Record<string, string> = {
+  Tech:       "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=200&fit=crop&q=75",
+  Gaming:     "https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?w=600&h=200&fit=crop&q=75",
+  Beauty:     "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&h=200&fit=crop&q=75",
+  Home:       "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=200&fit=crop&q=75",
+  Fitness:    "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=200&fit=crop&q=75",
+  Automotive: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=600&h=200&fit=crop&q=75",
+  Finance:    "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&h=200&fit=crop&q=75",
+  Travel:     "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=200&fit=crop&q=75",
+  SaaS:       "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=200&fit=crop&q=75",
+};
+
+function getBannerImage(c: Community): string | null {
+  return c.coverImage || CATEGORY_BANNERS[c.category] || null;
+}
 
 export default function CommunitiesPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -124,8 +142,16 @@ export default function CommunitiesPage() {
                   href={`/c/${c.slug}`}
                   className="group rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-md transition-all"
                 >
-                  {/* Colored header band */}
-                  <div className="h-16 bg-gradient-to-r from-indigo-500 to-violet-500 relative">
+                  {/* Banner image */}
+                  <div className="h-20 bg-gradient-to-r from-indigo-500 to-violet-500 relative overflow-hidden">
+                    {getBannerImage(c) && (
+                      <img
+                        src={getBannerImage(c)!}
+                        alt=""
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                     <div className="absolute -bottom-5 left-4 w-10 h-10 rounded-full bg-white dark:bg-slate-900 border-2 border-white dark:border-slate-900 flex items-center justify-center text-xl shadow-sm">
                       {c.iconEmoji}
                     </div>
