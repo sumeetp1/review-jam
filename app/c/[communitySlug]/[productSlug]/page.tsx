@@ -286,7 +286,7 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
       {/* Header */}
       <div className="sticky top-0 z-30 bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/[0.06]">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
-          <Link href="/" className="shrink-0">
+          <Link href="/" className="shrink-0 md:hidden">
             <Image src="/logo.svg" alt="Review Jam" width={100} height={24} className="dark:hidden" />
             <Image src="/logo-dark.svg" alt="Review Jam" width={100} height={24} className="hidden dark:block" />
           </Link>

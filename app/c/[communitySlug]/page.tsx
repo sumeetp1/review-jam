@@ -224,7 +224,7 @@ export default function CommunityPage({ params }: { params: Promise<{ communityS
       <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/[0.06]">
         <div className="max-w-5xl mx-auto px-4 py-3">
           <div className="flex items-center gap-3">
-            <Link href="/" className="shrink-0 mr-1">
+            <Link href="/" className="shrink-0 mr-1 md:hidden">
               <Image src="/logo.svg" alt="Review Jam" width={90} height={22} className="dark:hidden" />
               <Image src="/logo-dark.svg" alt="Review Jam" width={90} height={22} className="hidden dark:block" />
             </Link>
