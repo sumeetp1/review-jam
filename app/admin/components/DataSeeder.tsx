@@ -25,7 +25,7 @@ export default function DataSeeder({ user }: DataSeederProps) {
       const day = 24 * 60 * 60 * 1000;
 
       // ── Clear existing data (all collections) ────────────────��───────────
-      const [prodSnap, revSnap, chSnap, cmSnap, rcSnap, discSnap, qaSnap, modSnap, paySnap, notifSnap] = await Promise.all([
+      const [prodSnap, revSnap, chSnap, cmSnap, rcSnap, discSnap, qaSnap, modSnap, paySnap, notifSnap, followSnap, refSnap, collSnap] = await Promise.all([
         getDocs(collection(db, "products")),
         getDocs(collection(db, "reviews")),
         getDocs(collection(db, "channels")),
@@ -36,6 +36,9 @@ export default function DataSeeder({ user }: DataSeederProps) {
         getDocs(collection(db, "moderationEvents")),
         getDocs(collection(db, "payoutLedger")),
         getDocs(collection(db, "notifications")),
+        getDocs(collection(db, "follows")),
+        getDocs(collection(db, "referralCodes")),
+        getDocs(collection(db, "collections")),
       ]);
       await Promise.all([
         ...prodSnap.docs.map((d) => deleteDoc(d.ref)),
@@ -48,6 +51,9 @@ export default function DataSeeder({ user }: DataSeederProps) {
         ...modSnap.docs.map((d) => deleteDoc(d.ref)),
         ...paySnap.docs.map((d) => deleteDoc(d.ref)),
         ...notifSnap.docs.map((d) => deleteDoc(d.ref)),
+        ...followSnap.docs.map((d) => deleteDoc(d.ref)),
+        ...refSnap.docs.map((d) => deleteDoc(d.ref)),
+        ...collSnap.docs.map((d) => deleteDoc(d.ref)),
       ]);
 
       setStatusMessage("Inserting campaigns & variants…");
@@ -56,7 +62,7 @@ export default function DataSeeder({ user }: DataSeederProps) {
       const campaigns = [
         {
           name: "Sony WH-1000XM6",
-          brandName: "Sony", brandEmail: "sony@brands.com", category: "Tech",
+          brandName: "Sony", brandEmail: "sumit.pandey75@gmail.com", category: "Tech",
           campaignId: "camp_sony",
           slug: "sony-wh-1000xm6", communitySlug: "tech", communityTags: [],
           coverImage: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80&fit=crop",
@@ -92,7 +98,7 @@ export default function DataSeeder({ user }: DataSeederProps) {
         },
         {
           name: "Linear — Project Management",
-          brandName: "Linear", brandEmail: "linear@brands.com", category: "SaaS",
+          brandName: "Linear", brandEmail: "sumit.pandey75@gmail.com", category: "SaaS",
           campaignId: "camp_linear",
           slug: "linear-project-management", communitySlug: "saas", communityTags: [],
           coverImage: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=800&q=80&fit=crop",
@@ -144,7 +150,7 @@ export default function DataSeeder({ user }: DataSeederProps) {
         },
         {
           name: "PlayStation 5 Pro",
-          brandName: "Sony", brandEmail: "sony@brands.com", category: "Gaming",
+          brandName: "Sony", brandEmail: "sumit.pandey75@gmail.com", category: "Gaming",
           campaignId: "camp_ps5pro",
           slug: "playstation-5-pro", communitySlug: "gaming", communityTags: [],
           coverImage: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?w=800&q=80&fit=crop",
@@ -162,7 +168,7 @@ export default function DataSeeder({ user }: DataSeederProps) {
         },
         {
           name: "Whoop 5.0 Band",
-          brandName: "Whoop", brandEmail: "whoop@brands.com", category: "Fitness",
+          brandName: "Whoop", brandEmail: "sumit.pandey75@gmail.com", category: "Fitness",
           campaignId: "camp_whoop",
           slug: "whoop-5-0-band", communitySlug: "fitness", communityTags: [],
           coverImage: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80&fit=crop",
@@ -1027,7 +1033,154 @@ export default function DataSeeder({ user }: DataSeederProps) {
         }, { merge: true });
       }
 
-      setStatusMessage(`Done! Seeded ${campaigns.length} products, ${reviews.length} reviews (${reviews.filter((r: any) => r.isVerifiedPurchase).length} verified, ${reviews.filter((r: any) => r.biasFlag).length} bias-flagged, ${reviews.filter((r: any) => r.reviewType === "generic").length} generic), ${sampleChannels.length} communities (${sampleChannels.filter(c => c.multiplier > 1).length} boosted), 3 ownership journeys, ${memberships.length} channel memberships, 2 moderation events, ${payouts.length} payouts, ${notifications.length} notifications, threaded comments, discussion posts, and Q&A answers.`);
+      // ── Brand Responses on admin-owned product reviews ─────────────────
+      setStatusMessage("Seeding brand responses…");
+      const brandResponses = [
+        { reviewIndex: 0, body: "Thank you for such a thorough review, Alex! We're glad the ANC continues to impress at the 14-month mark. The ear cushion wear you mentioned is something we're actively improving in our next revision. Your ownership journey is exactly the kind of long-term feedback we value." },
+        { reviewIndex: 1, body: "We appreciate the detailed comparison, Priya! Great to hear the multipoint pairing has been seamless. We've noted the microphone feedback for our next firmware update." },
+        { reviewIndex: 7, body: "David, this is the kind of review that makes our day. The Jira migration comparison is incredibly helpful for teams evaluating Linear. We're working on Gantt chart support — stay tuned!" },
+        { reviewIndex: 15, body: "Elena, catching that illness 48hrs early is exactly why we built Whoop 5.0. Stories like yours validate our entire approach to health monitoring. The 1-year accuracy data you shared is gold." },
+      ];
+      for (const br of brandResponses) {
+        if (reviewIds[br.reviewIndex]) {
+          await updateDoc(doc(db, "reviews", reviewIds[br.reviewIndex]), {
+            brandResponse: {
+              body: br.body,
+              respondedBy: "sumit.pandey75@gmail.com",
+              respondedAt: ago(Math.floor(Math.random() * 5 + 1)),
+            },
+          });
+        }
+      }
+
+      // ── Buy Links on products ──────────────────────────────────────────
+      setStatusMessage("Seeding buy links…");
+      const buyLinksMap: Record<string, Array<{ retailer: string; url: string; price?: string; updatedAt: string }>> = {
+        camp_sony: [ // Sony WH-1000XM6
+          { retailer: "Amazon", url: "https://www.amazon.com/dp/B0D1234567", price: "$298", updatedAt: ago(2) },
+          { retailer: "Best Buy", url: "https://www.bestbuy.com/site/sony-wh1000xm6", price: "$299.99", updatedAt: ago(2) },
+          { retailer: "Sony Store", url: "https://electronics.sony.com/wh-1000xm6", price: "$299.99", updatedAt: ago(2) },
+        ],
+        camp_rivian: [ // Rivian R2 SUV
+          { retailer: "Rivian.com", url: "https://rivian.com/r2", price: "From $45,000", updatedAt: ago(3) },
+        ],
+        camp_rhode: [ // Rhode Peptide Lip Treatment
+          { retailer: "Rhode Skin", url: "https://www.rhodeskin.com/products/peptide-lip-treatment", price: "$16", updatedAt: ago(1) },
+          { retailer: "Sephora", url: "https://www.sephora.com/product/rhode-peptide-lip-treatment", price: "$16", updatedAt: ago(1) },
+        ],
+        camp_ps5pro: [ // PlayStation 5 Pro
+          { retailer: "PlayStation Direct", url: "https://direct.playstation.com/ps5-pro", price: "$699.99", updatedAt: ago(2) },
+          { retailer: "Amazon", url: "https://www.amazon.com/dp/B0D9876543", price: "$699.99", updatedAt: ago(2) },
+          { retailer: "Best Buy", url: "https://www.bestbuy.com/site/playstation-5-pro", price: "$699.99", updatedAt: ago(2) },
+        ],
+        camp_whoop: [ // Whoop 5.0 Band
+          { retailer: "Whoop.com", url: "https://www.whoop.com/membership/strap", price: "$239 + membership", updatedAt: ago(4) },
+        ],
+      };
+      for (const [campId, links] of Object.entries(buyLinksMap)) {
+        if (campDocs[campId]) {
+          await updateDoc(doc(db, "products", campDocs[campId]), { buyLinks: links });
+        }
+      }
+
+      // ── Curated Collections ────────────────────────────────────────────
+      setStatusMessage("Seeding collections…");
+      const collectionsData = [
+        {
+          name: "Best Noise-Cancelling Headphones",
+          slug: "best-noise-cancelling-headphones",
+          description: "Top-rated noise-cancelling headphones based on verified owner reviews and Health Scores.",
+          emoji: "🎧",
+          productIds: [campDocs["camp_sony"]].filter(Boolean),
+          isOfficial: true,
+        },
+        {
+          name: "Work From Home Essentials",
+          slug: "work-from-home-essentials",
+          description: "Everything you need for a productive home office — desks, tools, and software rated by real users.",
+          emoji: "🏠",
+          productIds: [campDocs["camp_lumina"], campDocs["camp_linear"]].filter(Boolean),
+          isOfficial: true,
+        },
+        {
+          name: "Top Fitness Trackers 2025",
+          slug: "top-fitness-trackers-2025",
+          description: "The best wearables for health and fitness tracking, ranked by community Health Scores.",
+          emoji: "💪",
+          productIds: [campDocs["camp_whoop"]].filter(Boolean),
+          isOfficial: true,
+        },
+      ];
+      for (const c of collectionsData) {
+        await addDoc(collection(db, "collections"), {
+          ...c,
+          creatorId: user.uid,
+          creatorName: user.displayName || "Admin",
+          createdAt: ago(Math.floor(Math.random() * 10 + 1)),
+        });
+      }
+
+      // ── Follow relationships (admin follows 3 reviewers) ───────────────
+      setStatusMessage("Seeding follow relationships…");
+      const adminFollows = ["seed_u1", "seed_u10", "seed_u8"]; // Alex Chen, Chris Meyers, David Kim
+      for (const targetId of adminFollows) {
+        await addDoc(collection(db, "follows"), {
+          followerId: user.uid,
+          followingId: targetId,
+          createdAt: ago(Math.floor(Math.random() * 14 + 1)),
+        });
+      }
+      // Update follower/following counts
+      await updateDoc(doc(db, "users", user.uid), { followingCount: adminFollows.length });
+      for (const targetId of adminFollows) {
+        await updateDoc(doc(db, "users", targetId), { followerCount: 1 });
+      }
+      // A few seed-to-seed follows for realism
+      const seedFollows = [
+        { from: "seed_u2", to: "seed_u1" },
+        { from: "seed_u5", to: "seed_u1" },
+        { from: "seed_u9", to: "seed_u10" },
+        { from: "seed_u1", to: "seed_u10" },
+      ];
+      for (const sf of seedFollows) {
+        await addDoc(collection(db, "follows"), { followerId: sf.from, followingId: sf.to, createdAt: ago(Math.floor(Math.random() * 30 + 5)) });
+      }
+
+      // ── Referral Codes for admin ───────────────────────────────────────
+      setStatusMessage("Seeding referral codes…");
+      await setDoc(doc(db, "referralCodes", "RJ-DEMO01"), {
+        creatorId: user.uid,
+        creatorName: user.displayName || "Admin",
+        creatorEmail: user.email || "sumit.pandey75@gmail.com",
+        createdAt: ago(10),
+        status: "active",
+      });
+      await setDoc(doc(db, "referralCodes", "RJ-USED02"), {
+        creatorId: user.uid,
+        creatorName: user.displayName || "Admin",
+        creatorEmail: user.email || "sumit.pandey75@gmail.com",
+        createdAt: ago(20),
+        usedBy: "alex.chen@seed.reviewjam.com",
+        usedAt: ago(12),
+        status: "used",
+      });
+      // Update admin user doc with referral count
+      await setDoc(doc(db, "users", user.uid), {
+        referralCodesGenerated: 2,
+        displayName: user.displayName || "Sumeet Pandey",
+        email: user.email || "sumit.pandey75@gmail.com",
+        trustScore: 345,
+        badges: ["verified_buyer", "prolific_reviewer"],
+        interests: ["Tech", "SaaS", "Fitness", "Gaming"],
+        walletBalance: 47.50,
+        totalEarned: 127.80,
+        followerCount: 0,
+        followingCount: adminFollows.length,
+        bio: "",
+        createdAt: ago(60),
+      }, { merge: true });
+
+      setStatusMessage(`Done! Seeded ${campaigns.length} products, ${reviews.length} reviews, ${sampleChannels.length} communities, ${collectionsData.length} collections, ${brandResponses.length} brand responses, ${Object.keys(buyLinksMap).length} products with buy links, ${adminFollows.length} follow relationships, 2 referral codes, ${seedUsers.length} reviewer profiles, and all engagement data.`);
     } catch (error) {
       console.error(error);
       setStatusMessage("Error seeding data. Check console.");
