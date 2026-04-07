@@ -20,38 +20,12 @@ import DiscussionFeed from "../../../components/ProductHub/DiscussionFeed";
 import QAFeed from "../../../components/ProductHub/QAFeed";
 import OwnershipJourneyCard from "../../../components/ProductHub/OwnershipJourneyCard";
 import CommunityTagManager from "../../../components/ProductHub/CommunityTagManager";
+import BuyLinksCard from "../../../components/ProductHub/BuyLinksCard";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function topItems(reviews: any[], field: "pros" | "cons", n: number) {
-  const counts = new Map<string, number>();
-  for (const r of reviews) for (const item of (r[field] ?? [])) {
-    if (item?.trim()) counts.set(item.trim(), (counts.get(item.trim()) ?? 0) + 1);
-  }
-  return Array.from(counts.entries()).sort((a, b) => b[1] - a[1]).slice(0, n).map(([text, count]) => ({ text, count }));
-}
-
-function scoreColor(score: number) {
-  if (score >= 70) return { ring: "#10b981", text: "#059669", bg: "#d1fae5" };
-  if (score >= 40) return { ring: "#f59e0b", text: "#d97706", bg: "#fef3c7" };
-  return { ring: "#ef4444", text: "#dc2626", bg: "#fee2e2" };
-}
-
-function HealthRing({ score }: { score: number }) {
-  const r = 36; const circ = 2 * Math.PI * r; const fill = circ * (score / 100); const col = scoreColor(score);
-  return (
-    <div className="flex flex-col items-center gap-1">
-      <svg width="92" height="92" viewBox="0 0 92 92" className="-rotate-90">
-        <circle cx="46" cy="46" r={r} fill="none" stroke="#27272a" strokeWidth="7" />
-        <circle cx="46" cy="46" r={r} fill="none" stroke={col.ring} strokeWidth="7" strokeLinecap="round"
-          strokeDasharray={`${fill} ${circ}`} style={{ transition: "stroke-dasharray .6s ease" }} />
-        <text x="46" y="46" textAnchor="middle" dominantBaseline="central" fontSize="18" fontWeight="800"
-          fill={col.text} className="rotate-90" style={{ transformOrigin: "46px 46px" }}>{score}</text>
-      </svg>
-      <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: col.text }}>Neutral Score</span>
-    </div>
-  );
-}
+import { topItems, scoreColor } from "../../../../lib/reviewUtils";
+import HealthRing from "../../../components/HealthRing";
 
 
 // ─── Main page ────────────────────────────────────────────────────────────────
@@ -366,6 +340,11 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
                   {variants.map((v) => { const vc = reviews.filter((r) => r.variantId === v.id).length; const vavg = vc > 0 ? (reviews.filter((r) => r.variantId === v.id).reduce((s, r) => s + (r.rating || 0), 0) / vc).toFixed(1) : null; const sel = selectedVariantId === v.id; return <button key={v.id} type="button" onClick={() => setSelectedVariantId(v.id)} className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[12px] font-medium border transition ${sel ? "bg-violet-600 text-white border-violet-600" : "bg-white dark:bg-white/[0.03] text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.1]"}`}><span className="truncate">{v.name}</span><span className="flex items-center gap-1.5 shrink-0 ml-2">{vavg && <span className={sel ? "text-amber-200" : "text-amber-500"}>★ {vavg}</span>}<span className="opacity-60">({vc})</span></span></button>; })}
                 </div>
               </div>
+            )}
+
+            {/* Where to Buy */}
+            {product.buyLinks && product.buyLinks.length > 0 && (
+              <BuyLinksCard buyLinks={product.buyLinks} />
             )}
 
             {/* Write review CTA */}

@@ -10,12 +10,17 @@ import { db, auth, googleProvider } from "../../../lib/firebase";
 import { useAuth } from "../../../lib/hooks/useAuth";
 import Avatar from "../../components/Avatar";
 
-import type { BrandProduct as Campaign, BrandReview as Review } from "../../../lib/types";
+import type { BrandProduct as Campaign, BrandReview as Review, BrandResponse, BuyLink } from "../../../lib/types";
+
+type ReviewWithResponse = Review & {
+  brandResponse?: BrandResponse;
+  productId?: string;
+};
 
 export default function BrandDashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [allReviews, setAllReviews] = useState<Review[]>([]);
+  const [allReviews, setAllReviews] = useState<ReviewWithResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<string>("all");
@@ -30,6 +35,14 @@ export default function BrandDashboardPage() {
   const [respondingTo, setRespondingTo] = useState<string | null>(null);
   const [responseText, setResponseText] = useState("");
   const [isSubmittingResponse, setIsSubmittingResponse] = useState(false);
+
+  // Buy Links state
+  const [buyLinksMap, setBuyLinksMap] = useState<Record<string, BuyLink[]>>({});
+  const [buyLinkFormOpen, setBuyLinkFormOpen] = useState<string | null>(null);
+  const [newLinkRetailer, setNewLinkRetailer] = useState("");
+  const [newLinkUrl, setNewLinkUrl] = useState("");
+  const [newLinkPrice, setNewLinkPrice] = useState("");
+  const [isSavingBuyLink, setIsSavingBuyLink] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -55,6 +68,16 @@ export default function BrandDashboardPage() {
     const fetchedCampaigns: Campaign[] = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Campaign));
     setCampaigns(fetchedCampaigns);
 
+    // Load buy links from product docs
+    const linksMap: Record<string, BuyLink[]> = {};
+    for (const d of snap.docs) {
+      const data = d.data();
+      if (data.buyLinks && Array.isArray(data.buyLinks)) {
+        linksMap[d.id] = data.buyLinks as BuyLink[];
+      }
+    }
+    setBuyLinksMap(linksMap);
+
     // Fetch all reviews for these campaigns
     const campaignIds = fetchedCampaigns.map((c) => c.campaignId);
     // Map campaignId → productId for attaching productId to reviews
@@ -62,14 +85,14 @@ export default function BrandDashboardPage() {
     for (const c of fetchedCampaigns) {
       campaignToProduct[c.campaignId] = c.id;
     }
-    const reviews: Review[] = [];
+    const reviews: ReviewWithResponse[] = [];
 
     for (const cid of campaignIds) {
       const rq = query(collection(db, "reviews"), where("campaignId", "==", cid));
       const rsnap = await getDocs(rq);
       rsnap.forEach((d) => {
         const data = d.data();
-        reviews.push({ id: d.id, ...data, productId: data.productId || campaignToProduct[cid] } as Review);
+        reviews.push({ id: d.id, ...data, productId: data.productId || campaignToProduct[cid] } as ReviewWithResponse);
       });
     }
 
@@ -142,8 +165,8 @@ export default function BrandDashboardPage() {
       });
       if (res.ok) {
         // Update local state to reflect the response
-        setAllReviews((prev) =>
-          prev.map((r) =>
+        setAllReviews((prev: ReviewWithResponse[]) =>
+          prev.map((r: ReviewWithResponse) =>
             r.id === reviewId
               ? {
                   ...r,
@@ -163,6 +186,41 @@ export default function BrandDashboardPage() {
       // Silently fail — user can retry
     } finally {
       setIsSubmittingResponse(false);
+    }
+  }
+
+  async function handleAddBuyLink(productId: string) {
+    if (!newLinkRetailer.trim() || !newLinkUrl.trim()) return;
+    setIsSavingBuyLink(true);
+    try {
+      const newLink: BuyLink = {
+        retailer: newLinkRetailer.trim(),
+        url: newLinkUrl.trim(),
+        price: newLinkPrice.trim() || undefined,
+        updatedAt: new Date().toISOString(),
+      };
+      const updated = [...(buyLinksMap[productId] || []), newLink];
+      await updateDoc(doc(db, "products", productId), { buyLinks: updated });
+      setBuyLinksMap((prev) => ({ ...prev, [productId]: updated }));
+      setNewLinkRetailer("");
+      setNewLinkUrl("");
+      setNewLinkPrice("");
+      setBuyLinkFormOpen(null);
+    } catch (e) {
+      console.error("Failed to add buy link:", e);
+    } finally {
+      setIsSavingBuyLink(false);
+    }
+  }
+
+  async function handleRemoveBuyLink(productId: string, index: number) {
+    const current = buyLinksMap[productId] || [];
+    const updated = current.filter((_, i) => i !== index);
+    try {
+      await updateDoc(doc(db, "products", productId), { buyLinks: updated });
+      setBuyLinksMap((prev) => ({ ...prev, [productId]: updated }));
+    } catch (e) {
+      console.error("Failed to remove buy link:", e);
     }
   }
 
@@ -302,11 +360,12 @@ export default function BrandDashboardPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
           {[
             { label: "Reviews",     value: filteredReviews.length },
             { label: "Avg rating",  value: avgRating ? `★ ${avgRating}` : "—" },
             { label: "Total likes", value: totalLikes },
+            { label: "Responded",   value: filteredReviews.filter((r: ReviewWithResponse) => r.brandResponse).length },
             { label: "Quotes ready", value: filteredReviews.filter(r => r.summary || r.marketingQuote).length },
           ].map((s) => (
             <div key={s.label} className="bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-xl p-4">
@@ -426,6 +485,98 @@ export default function BrandDashboardPage() {
           )}
         </div>
 
+        {/* ── Buy Links Management ── */}
+        <div className="bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-1">
+            🛒 Retailer Buy Links
+          </h3>
+          <p className="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed mb-4">
+            Add links to where customers can purchase your products. These are displayed on each product&apos;s hub page.
+          </p>
+          <div className="space-y-4">
+            {campaigns.map((c) => {
+              const links = buyLinksMap[c.id] || [];
+              return (
+                <div key={c.id} className="bg-slate-50 dark:bg-white/[0.02] rounded-lg border border-slate-100 dark:border-white/[0.04] p-3">
+                  <p className="text-sm font-medium text-slate-900 dark:text-white mb-2">{c.name}</p>
+                  {links.length > 0 && (
+                    <div className="space-y-1.5 mb-2">
+                      {links.map((link, i) => (
+                        <div key={i} className="flex items-center justify-between bg-white dark:bg-white/[0.03] rounded-lg px-3 py-2 border border-slate-200 dark:border-white/[0.06]">
+                          <div className="min-w-0 flex-1">
+                            <span className="text-[12px] font-semibold text-slate-700 dark:text-zinc-300">{link.retailer}</span>
+                            {link.price && <span className="ml-2 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">{link.price}</span>}
+                            <p className="text-[10px] text-slate-400 dark:text-zinc-500 truncate">{link.url}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveBuyLink(c.id, i)}
+                            className="ml-2 text-[11px] text-red-500 hover:text-red-400 font-semibold transition shrink-0"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {buyLinkFormOpen === c.id ? (
+                    <div className="space-y-2 mt-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <input
+                          type="text"
+                          value={newLinkRetailer}
+                          onChange={(e) => setNewLinkRetailer(e.target.value)}
+                          placeholder="Retailer name"
+                          className="w-full bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-lg p-2 text-slate-900 dark:text-white text-[12px] outline-none focus:border-indigo-500 transition"
+                        />
+                        <input
+                          type="url"
+                          value={newLinkUrl}
+                          onChange={(e) => setNewLinkUrl(e.target.value)}
+                          placeholder="https://..."
+                          className="w-full bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-lg p-2 text-slate-900 dark:text-white text-[12px] outline-none focus:border-indigo-500 transition"
+                        />
+                        <input
+                          type="text"
+                          value={newLinkPrice}
+                          onChange={(e) => setNewLinkPrice(e.target.value)}
+                          placeholder="$29.99 (optional)"
+                          className="w-full bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-lg p-2 text-slate-900 dark:text-white text-[12px] outline-none focus:border-indigo-500 transition"
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleAddBuyLink(c.id)}
+                          disabled={isSavingBuyLink || !newLinkRetailer.trim() || !newLinkUrl.trim()}
+                          className="text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-200 dark:disabled:bg-zinc-800 disabled:text-slate-400 dark:disabled:text-zinc-500 text-white transition"
+                        >
+                          {isSavingBuyLink ? "Saving..." : "Save Link"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setBuyLinkFormOpen(null); setNewLinkRetailer(""); setNewLinkUrl(""); setNewLinkPrice(""); }}
+                          className="text-[11px] font-medium px-3 py-1.5 rounded-lg text-slate-500 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-white/[0.06] transition"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => { setBuyLinkFormOpen(c.id); setNewLinkRetailer(""); setNewLinkUrl(""); setNewLinkPrice(""); }}
+                      className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition"
+                    >
+                      + Add Link
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Top marketing quotes */}
         {filteredReviews.filter(r => r.summary || r.marketingQuote).length > 0 && (
           <div className="bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-xl p-5">
@@ -448,6 +599,88 @@ export default function BrandDashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Reviews Needing Response */}
+        {(() => {
+          const needingResponse = filteredReviews.filter((r: ReviewWithResponse) => !r.brandResponse);
+          if (needingResponse.length === 0) return null;
+          return (
+            <div className="bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-slate-200 dark:border-white/[0.06]">
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                  Reviews needing response
+                  <span className="text-[11px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-full">
+                    {needingResponse.length}
+                  </span>
+                </h3>
+              </div>
+              <div className="divide-y divide-slate-100 dark:divide-white/[0.06] max-h-[500px] overflow-y-auto">
+                {needingResponse.map((r) => (
+                  <div key={r.id} className="px-5 py-4">
+                    <div className="flex items-start justify-between gap-3 mb-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Avatar name={r.reviewerName} size="sm" />
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{r.reviewerName}</p>
+                          <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-zinc-400">
+                            <span className="text-amber-500 dark:text-amber-400">★ {r.rating}</span>
+                            <span>👍 {r.likesCount}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {(r.summary || r.marketingQuote) && (
+                      <p className="text-[13px] text-slate-700 dark:text-zinc-300 font-medium mb-1 line-clamp-2">
+                        {r.summary || r.marketingQuote}
+                      </p>
+                    )}
+                    {r.content && !(r.summary || r.marketingQuote) && (
+                      <p className="text-[13px] text-slate-500 dark:text-zinc-400 mb-1 line-clamp-2">
+                        {r.content}
+                      </p>
+                    )}
+                    {respondingTo === r.id ? (
+                      <div className="mt-2 space-y-2">
+                        <textarea
+                          value={responseText}
+                          onChange={(e) => setResponseText(e.target.value)}
+                          placeholder="Write your official response..."
+                          rows={3}
+                          className="w-full bg-white dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.1] rounded-lg p-2.5 text-[13px] text-slate-700 dark:text-zinc-300 outline-none focus:border-indigo-500 transition resize-none"
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => r.productId && handleBrandRespond(r.id, r.productId, responseText)}
+                            disabled={isSubmittingResponse || !responseText.trim()}
+                            className="text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-200 dark:disabled:bg-zinc-800 disabled:text-slate-400 dark:disabled:text-zinc-500 text-white transition"
+                          >
+                            {isSubmittingResponse ? "Submitting..." : "Submit Response"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setRespondingTo(null); setResponseText(""); }}
+                            className="text-[11px] font-medium px-3 py-1.5 rounded-lg text-slate-500 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-white/[0.06] transition"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => { setRespondingTo(r.id); setResponseText(""); }}
+                        className="mt-2 text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 transition"
+                      >
+                        Respond
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Reviews list */}
         <div className="bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-xl overflow-hidden">

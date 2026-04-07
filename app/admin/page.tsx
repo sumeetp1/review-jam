@@ -15,6 +15,7 @@ import DividendDistributor from "./components/DividendDistributor";
 import AnchorSeeding from "./components/AnchorSeeding";
 import ApplicationsManager from "./components/ApplicationsManager";
 import ModerationDashboard from "./components/ModerationDashboard";
+import BuyLinksManager from "./components/BuyLinksManager";
 
 export default function AdminDashboard() {
   const { user, loading: isAuthLoading } = useAuth();
@@ -279,6 +280,9 @@ export default function AdminDashboard() {
             setStatusMessage={setStatusMessage}
           />
         </div>
+
+        {/* ── Buy Links Manager ── */}
+        <BuyLinksManager />
 
         {/* ── Anchor Reviews ── */}
         <AnchorSeeding />
