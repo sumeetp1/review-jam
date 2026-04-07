@@ -8,6 +8,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { auth, googleProvider, db } from "../../lib/firebase";
 import { useAuth } from "../../lib/hooks/useAuth";
 import { ADMIN_EMAIL } from "../../lib/constants";
+import { redeemReferralCode } from "../../lib/referral";
 import GlobalSidebar from "./GlobalSidebar";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -17,6 +18,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   const [allowedEmails, setAllowedEmails] = useState<string[]>([]);
   const [loadingAllowlist, setLoadingAllowlist] = useState(true);
+  const [inviteCode, setInviteCode] = useState("");
+  const [isRedeeming, setIsRedeeming] = useState(false);
+  const [redeemError, setRedeemError] = useState("");
+  const [redeemSuccess, setRedeemSuccess] = useState(false);
 
   useEffect(() => {
     getDoc(doc(db, "config", "allowedEmails"))
@@ -66,6 +71,26 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   if (!isAllowed) {
+    const handleRedeem = async () => {
+      if (!inviteCode.trim() || !user?.email) return;
+      setIsRedeeming(true);
+      setRedeemError("");
+      setRedeemSuccess(false);
+      try {
+        await redeemReferralCode(inviteCode.trim(), user.email);
+        setRedeemSuccess(true);
+        // Re-fetch the allowlist to update state
+        const snap = await getDoc(doc(db, "config", "allowedEmails"));
+        const emails: string[] = snap.exists() ? (snap.data().emails || []) : [];
+        const combined = [...new Set([ADMIN_EMAIL.toLowerCase(), ...emails.map((e: string) => e.toLowerCase())])];
+        setAllowedEmails(combined);
+      } catch (err: any) {
+        setRedeemError(err.message || "Failed to redeem code.");
+      } finally {
+        setIsRedeeming(false);
+      }
+    };
+
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#09090b] px-4">
         <div className="text-center max-w-sm">
@@ -80,6 +105,44 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           >
             Sign out
           </button>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 my-6">
+            <div className="flex-1 h-px bg-slate-200 dark:bg-white/[0.06]" />
+            <span className="text-xs text-slate-400 dark:text-zinc-600">or</span>
+            <div className="flex-1 h-px bg-slate-200 dark:bg-white/[0.06]" />
+          </div>
+
+          {/* Invite code redemption */}
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-slate-700 dark:text-zinc-300">Have an invite code?</p>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={inviteCode}
+                onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                placeholder="RJ-XXXXXX"
+                maxLength={9}
+                className="flex-1 bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-600 outline-none focus:border-indigo-500 transition font-mono text-center tracking-wider"
+              />
+              <button
+                type="button"
+                onClick={handleRedeem}
+                disabled={isRedeeming || !inviteCode.trim()}
+                className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-200 dark:disabled:bg-zinc-800 disabled:text-slate-400 dark:disabled:text-zinc-500 text-white transition shrink-0"
+              >
+                {isRedeeming ? "..." : "Redeem"}
+              </button>
+            </div>
+            {redeemError && (
+              <p className="text-[12px] font-medium text-red-500 dark:text-red-400">{redeemError}</p>
+            )}
+            {redeemSuccess && (
+              <p className="text-[12px] font-medium text-emerald-600 dark:text-emerald-400">
+                Code redeemed! You now have access.
+              </p>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -105,6 +168,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
               <Link href="/explore" className={`text-sm font-medium transition ${pathname === "/explore" ? "text-indigo-600 dark:text-indigo-400" : "text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200"}`}>
                 Products
+              </Link>
+              <Link href="/collections" className={`text-sm font-medium transition ${pathname.startsWith("/collections") ? "text-indigo-600 dark:text-indigo-400" : "text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200"}`}>
+                Collections
               </Link>
             </nav>
           </div>

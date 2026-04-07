@@ -4,9 +4,10 @@ import { Suspense, useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { calculateDiscoveryRank } from "../../lib/discoveryRank";
+import type { Collection } from "../../lib/types";
 
 function isBoosted(channel: { multiplier?: number; multiplierExpiresAt?: string }): boolean {
   if (!channel.multiplier || channel.multiplier <= 1) return false;
@@ -289,14 +290,17 @@ function ExplorePage() {
   const [boostedCategories, setBoostedCategories] = useState<Set<string>>(new Set());
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [dynamicCategories, setDynamicCategories] = useState<string[]>([]);
+  const [featuredCollections, setFeaturedCollections] = useState<Collection[]>([]);
+  const [compareIds, setCompareIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     async function load() {
       try {
-        const [prodSnap, revSnap, channelSnap] = await Promise.all([
+        const [prodSnap, revSnap, channelSnap, collSnap] = await Promise.all([
           getDocs(collection(db, "products")),
           getDocs(collection(db, "reviews")),
           getDocs(collection(db, "channels")),
+          getDocs(collection(db, "collections")),
         ]);
 
         // Build the set of categories that have an active bounty multiplier
@@ -311,6 +315,13 @@ function ExplorePage() {
         const allCats = new Set<string>();
         channelSnap.docs.forEach((d) => { const cat = d.data().category; if (cat) allCats.add(cat as string); });
         setDynamicCategories([...allCats].sort());
+
+        // Featured collections (newest 6)
+        const colls: Collection[] = collSnap.docs
+          .map((d) => ({ id: d.id, ...d.data() } as Collection))
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .slice(0, 6);
+        setFeaturedCollections(colls);
 
         const reviews = revSnap.docs.map((d) => d.data());
 
@@ -420,6 +431,13 @@ function ExplorePage() {
               Authentic, engagement-ranked reviews
             </p>
           </div>
+          <Link
+            href="/collections"
+            className="flex items-center gap-1.5 text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition shrink-0"
+          >
+            <span>📚</span>
+            <span className="hidden sm:inline">Collections</span>
+          </Link>
         </div>
       </div>
 
@@ -477,6 +495,30 @@ function ExplorePage() {
           })}
         </div>
 
+        {/* Featured collections */}
+        {featuredCollections.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-600">Collections</p>
+              <Link href="/collections" className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                View all
+              </Link>
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden">
+              {featuredCollections.map((c) => (
+                <Link
+                  key={c.id}
+                  href={`/collections/${c.slug}`}
+                  className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.03] hover:bg-slate-50 dark:hover:bg-white/[0.05] hover:border-indigo-500/30 transition"
+                >
+                  <span className="text-lg leading-none">{c.emoji}</span>
+                  <span className="text-[12px] font-medium text-slate-700 dark:text-zinc-300 whitespace-nowrap">{c.name}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Results */}
         {isLoading ? (
           <div className="py-12 text-center text-slate-500 dark:text-zinc-500 text-sm animate-pulse">Loading…</div>
@@ -504,96 +546,152 @@ function ExplorePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((p) => (
-              <Link
-                key={p.id}
-                href={p.slug && p.communitySlug ? `/c/${p.communitySlug}/${p.slug}` : `/product/${p.id}`}
-                className="group glass-card flex flex-col overflow-hidden hover:border-slate-200 dark:hover:border-white/10 hover:shadow-md hover:shadow-slate-200/50 dark:hover:shadow-black/20 transition"
-              >
-                {/* Cover image */}
-                <div className="relative">
-                  {p.coverImage ? (
-                    <div className="relative w-full h-40 overflow-hidden bg-slate-100 dark:bg-zinc-900 shrink-0">
-                      <img
-                        src={p.coverImage}
-                        alt={p.name}
-                        className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-                      <div className="absolute bottom-2 left-3 flex items-center gap-1.5">
-                        {isActive(p) && (
-                          <span className="text-[10px] font-semibold text-white bg-emerald-500/90 px-1.5 py-0.5 rounded-full backdrop-blur-sm">Live</span>
+            {filtered.map((p) => {
+              const isCompareSelected = compareIds.has(p.id);
+              return (
+                <div key={p.id} className="relative">
+                  <Link
+                    href={p.slug && p.communitySlug ? `/c/${p.communitySlug}/${p.slug}` : `/product/${p.id}`}
+                    className={`group glass-card flex flex-col overflow-hidden hover:border-slate-200 dark:hover:border-white/10 hover:shadow-md hover:shadow-slate-200/50 dark:hover:shadow-black/20 transition ${
+                      isCompareSelected ? "ring-2 ring-indigo-500/50" : ""
+                    }`}
+                  >
+                    {/* Cover image */}
+                    <div className="relative">
+                      {p.coverImage ? (
+                        <div className="relative w-full h-40 overflow-hidden bg-slate-100 dark:bg-zinc-900 shrink-0">
+                          <img
+                            src={p.coverImage}
+                            alt={p.name}
+                            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                          <div className="absolute bottom-2 left-3 flex items-center gap-1.5">
+                            {isActive(p) && (
+                              <span className="text-[10px] font-semibold text-white bg-emerald-500/90 px-1.5 py-0.5 rounded-full backdrop-blur-sm">Live</span>
+                            )}
+                            {p.bountyStatus === "active" && p.bountyPoolRemaining > 0 && (
+                              <span className="text-[10px] font-semibold text-white bg-amber-500/90 px-1.5 py-0.5 rounded-full backdrop-blur-sm">
+                                &#128176; ${p.bountyPoolRemaining.toFixed(0)} bounty
+                              </span>
+                            )}
+                            {p.avgRating > 0 && (
+                              <span className="text-[11px] font-semibold text-white flex items-center gap-0.5">
+                                <span className="text-amber-400">&#9733;</span> {p.avgRating.toFixed(1)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="w-full h-40 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-zinc-800 dark:to-zinc-900 flex items-center justify-center shrink-0">
+                          <span className="text-4xl opacity-30 select-none">&#128230;</span>
+                        </div>
+                      )}
+
+                      {/* Health score circle — top right */}
+                      {p.avgHealthScore > 0 && (
+                        <div className="absolute top-2 right-2" title={`Health Score: ${p.avgHealthScore}/100`}>
+                          <HealthCircle score={p.avgHealthScore} />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Card body */}
+                    <div className="p-4 flex flex-col gap-2 flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-[14px] font-semibold text-slate-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 leading-snug transition-colors">
+                            {p.name}
+                          </h3>
+                          <p className="text-[12px] text-slate-500 dark:text-zinc-500 mt-0.5">{p.brandName}</p>
+                        </div>
+                        {!p.coverImage && p.avgRating > 0 && (
+                          <span className="text-[11px] text-amber-500 dark:text-amber-400 font-semibold shrink-0">&#9733; {p.avgRating.toFixed(1)}</span>
                         )}
-                        {p.bountyStatus === "active" && p.bountyPoolRemaining > 0 && (
-                          <span className="text-[10px] font-semibold text-white bg-amber-500/90 px-1.5 py-0.5 rounded-full backdrop-blur-sm">
-                            💰 ${p.bountyPoolRemaining.toFixed(0)} bounty
+                      </div>
+
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[11px] bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-zinc-400 px-2 py-0.5 rounded-full font-medium border border-slate-200 dark:border-white/[0.06]">{p.category}</span>
+                        {p.communitySeeded && !p.hasVerifiedOwner && (
+                          <span className="text-[10px] font-medium text-violet-400 bg-violet-950/40 px-1.5 py-0.5 rounded-full border border-violet-800">
+                            &#127793; Seeded
                           </span>
                         )}
-                        {p.avgRating > 0 && (
-                          <span className="text-[11px] font-semibold text-white flex items-center gap-0.5">
-                            <span className="text-amber-400">★</span> {p.avgRating.toFixed(1)}
+                      </div>
+
+                      {p.topQuote && (
+                        <p className="text-[12px] text-slate-500 dark:text-zinc-500 leading-relaxed line-clamp-2 italic">
+                          &ldquo;{p.topQuote}&rdquo;
+                        </p>
+                      )}
+
+                      <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-zinc-500 mt-auto pt-2 border-t border-slate-200 dark:border-white/[0.06]">
+                        <span>{p.reviewCount} review{p.reviewCount !== 1 ? "s" : ""}</span>
+                        <span>&#128077; {p.totalLikes}</span>
+                        {sortKey === "discovery" && p.discoveryRank > 0 && (
+                          <span className="ml-auto text-indigo-600 dark:text-indigo-400 font-semibold">
+                            &#128293; {p.discoveryRank.toFixed(1)}
                           </span>
                         )}
                       </div>
                     </div>
-                  ) : (
-                    <div className="w-full h-40 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-zinc-800 dark:to-zinc-900 flex items-center justify-center shrink-0">
-                      <span className="text-4xl opacity-30 select-none">📦</span>
-                    </div>
-                  )}
+                  </Link>
 
-                  {/* Health score circle — top right */}
-                  {p.avgHealthScore > 0 && (
-                    <div className="absolute top-2 right-2" title={`Health Score: ${p.avgHealthScore}/100`}>
-                      <HealthCircle score={p.avgHealthScore} />
-                    </div>
-                  )}
+                  {/* Compare checkbox */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setCompareIds((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(p.id)) {
+                          next.delete(p.id);
+                        } else if (next.size < 3) {
+                          next.add(p.id);
+                        }
+                        return next;
+                      });
+                    }}
+                    className={`absolute top-2 left-2 z-10 w-6 h-6 rounded-md border-2 flex items-center justify-center transition ${
+                      isCompareSelected
+                        ? "bg-indigo-600 border-indigo-600 text-white"
+                        : "bg-white/80 dark:bg-zinc-900/80 border-slate-300 dark:border-zinc-600 text-transparent hover:border-indigo-400 hover:text-indigo-400"
+                    }`}
+                    title={isCompareSelected ? "Remove from comparison" : "Add to comparison"}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="2 6 5 9 10 3" />
+                    </svg>
+                  </button>
                 </div>
-
-                {/* Card body */}
-                <div className="p-4 flex flex-col gap-2 flex-1">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-[14px] font-semibold text-slate-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 leading-snug transition-colors">
-                        {p.name}
-                      </h3>
-                      <p className="text-[12px] text-slate-500 dark:text-zinc-500 mt-0.5">{p.brandName}</p>
-                    </div>
-                    {!p.coverImage && p.avgRating > 0 && (
-                      <span className="text-[11px] text-amber-500 dark:text-amber-400 font-semibold shrink-0">★ {p.avgRating.toFixed(1)}</span>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[11px] bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-zinc-400 px-2 py-0.5 rounded-full font-medium border border-slate-200 dark:border-white/[0.06]">{p.category}</span>
-                    {p.communitySeeded && !p.hasVerifiedOwner && (
-                      <span className="text-[10px] font-medium text-violet-400 bg-violet-950/40 px-1.5 py-0.5 rounded-full border border-violet-800">
-                        🌱 Seeded
-                      </span>
-                    )}
-                  </div>
-
-                  {p.topQuote && (
-                    <p className="text-[12px] text-slate-500 dark:text-zinc-500 leading-relaxed line-clamp-2 italic">
-                      "{p.topQuote}"
-                    </p>
-                  )}
-
-                  <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-zinc-500 mt-auto pt-2 border-t border-slate-200 dark:border-white/[0.06]">
-                    <span>{p.reviewCount} review{p.reviewCount !== 1 ? "s" : ""}</span>
-                    <span>👍 {p.totalLikes}</span>
-                    {sortKey === "discovery" && p.discoveryRank > 0 && (
-                      <span className="ml-auto text-indigo-600 dark:text-indigo-400 font-semibold">
-                        🔥 {p.discoveryRank.toFixed(1)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Link>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
+
+      {/* Floating compare bar */}
+      {compareIds.size >= 2 && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-slate-900 dark:bg-zinc-800 text-white px-5 py-3 rounded-2xl shadow-2xl border border-slate-700 dark:border-zinc-700">
+          <span className="text-sm font-medium">
+            {compareIds.size} product{compareIds.size !== 1 ? "s" : ""} selected
+          </span>
+          <Link
+            href={`/compare/products?ids=${Array.from(compareIds).join(",")}`}
+            className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-1.5 rounded-lg transition"
+          >
+            Compare
+          </Link>
+          <button
+            type="button"
+            onClick={() => setCompareIds(new Set())}
+            className="text-sm text-slate-400 hover:text-white transition"
+          >
+            Clear
+          </button>
+        </div>
+      )}
     </main>
   );
 }

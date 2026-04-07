@@ -180,6 +180,7 @@ export default function GlobalSidebar() {
           <NavRow href="/feed" icon="🏠" label="Feed" active={pathname === "/feed"} collapsed={isCollapsed} />
           <NavRow href="/explore" icon="🔍" label="Explore" active={pathname === "/explore"} collapsed={isCollapsed} />
           <NavRow href="/c" icon="📡" label="Communities" active={pathname === "/c"} collapsed={isCollapsed} />
+          <NavRow href="/collections" icon="📚" label="Collections" active={pathname.startsWith("/collections")} collapsed={isCollapsed} />
           <NavRow href="/profile" icon="👤" label="Profile" active={pathname === "/profile"} collapsed={isCollapsed} />
           <NavRow href="/brands" icon="🏢" label="For brands" active={pathname.startsWith("/brands")} collapsed={isCollapsed} />
           <NavRow href="/admin" icon="⚡" label="Admin" active={pathname === "/admin"} collapsed={isCollapsed} />
