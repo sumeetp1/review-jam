@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, writeBatch, query, where } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, setDoc, updateDoc, deleteDoc, writeBatch, query, where } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import { computeHealthScore } from "../../../lib/healthScore";
 import type { User } from "firebase/auth";
@@ -983,6 +983,48 @@ export default function DataSeeder({ user }: DataSeederProps) {
       ];
       for (const n of notifications) {
         await addDoc(collection(db, "notifications"), n);
+      }
+
+      // ── Create user docs for seed reviewers so public profiles work ────
+      setStatusMessage("Creating seed reviewer profiles…");
+      const seedUsers = [
+        { id: "seed_u1", displayName: "Alex Chen", trustScore: 320, badges: ["verified_buyer", "prolific_reviewer", "photo_reviewer"] },
+        { id: "seed_u2", displayName: "Priya Singh", trustScore: 180, badges: ["verified_buyer", "prolific_reviewer"] },
+        { id: "seed_u3", displayName: "BrandPartner99", trustScore: 10, badges: [] },
+        { id: "seed_u4", displayName: "Sam Williams", trustScore: 95, badges: ["verified_buyer"] },
+        { id: "seed_u5", displayName: "Marcus Thompson", trustScore: 210, badges: ["verified_buyer", "prolific_reviewer"] },
+        { id: "seed_u6", displayName: "Sophie Kim", trustScore: 140, badges: ["verified_buyer", "photo_reviewer"] },
+        { id: "seed_u7", displayName: "Derek Liu", trustScore: 75, badges: ["verified_buyer"] },
+        { id: "seed_u8", displayName: "David Kim", trustScore: 280, badges: ["verified_buyer", "prolific_reviewer", "photo_reviewer"] },
+        { id: "seed_u9", displayName: "Anita Rao", trustScore: 160, badges: ["verified_buyer", "prolific_reviewer"] },
+        { id: "seed_u10", displayName: "Chris Meyers", trustScore: 520, badges: ["verified_buyer", "prolific_reviewer", "photo_reviewer"] },
+        { id: "seed_u11", displayName: "Olivia Park", trustScore: 90, badges: ["verified_buyer"] },
+        { id: "seed_u12", displayName: "Aisha Patel", trustScore: 110, badges: ["verified_buyer", "photo_reviewer"] },
+        { id: "seed_u13", displayName: "Zoe Taylor", trustScore: 65, badges: ["verified_buyer"] },
+        { id: "seed_u14", displayName: "Tom Harrison", trustScore: 350, badges: ["verified_buyer", "prolific_reviewer", "photo_reviewer"] },
+        { id: "seed_u15", displayName: "Leo Santos", trustScore: 45, badges: [] },
+        { id: "seed_u16", displayName: "Elena Rodriguez", trustScore: 260, badges: ["verified_buyer", "prolific_reviewer"] },
+        { id: "seed_u17", displayName: "James Okafor", trustScore: 130, badges: ["verified_buyer"] },
+        { id: "seed_u18", displayName: "Priya Nair", trustScore: 85, badges: ["verified_buyer"] },
+        { id: "seed_u19", displayName: "Rachel Torres", trustScore: 55, badges: ["verified_buyer"] },
+        { id: "seed_u20", displayName: "Nate Diaz", trustScore: 200, badges: ["verified_buyer", "prolific_reviewer"] },
+        { id: "seed_u21", displayName: "Kenji Tanaka", trustScore: 170, badges: ["verified_buyer", "photo_reviewer"] },
+        { id: "seed_u22", displayName: "Quick Reviewer", trustScore: 5, badges: [] },
+      ];
+      for (const su of seedUsers) {
+        await setDoc(doc(db, "users", su.id), {
+          displayName: su.displayName,
+          email: `${su.id}@seed.reviewjam.com`,
+          trustScore: su.trustScore,
+          badges: su.badges,
+          interests: [],
+          walletBalance: Math.round(Math.random() * 200 * 100) / 100,
+          totalEarned: Math.round(Math.random() * 500 * 100) / 100,
+          followerCount: Math.floor(Math.random() * 20),
+          followingCount: Math.floor(Math.random() * 10),
+          bio: "",
+          createdAt: ago(Math.floor(Math.random() * 90 + 30)),
+        }, { merge: true });
       }
 
       setStatusMessage(`Done! Seeded ${campaigns.length} products, ${reviews.length} reviews (${reviews.filter((r: any) => r.isVerifiedPurchase).length} verified, ${reviews.filter((r: any) => r.biasFlag).length} bias-flagged, ${reviews.filter((r: any) => r.reviewType === "generic").length} generic), ${sampleChannels.length} communities (${sampleChannels.filter(c => c.multiplier > 1).length} boosted), 3 ownership journeys, ${memberships.length} channel memberships, 2 moderation events, ${payouts.length} payouts, ${notifications.length} notifications, threaded comments, discussion posts, and Q&A answers.`);
