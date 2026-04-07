@@ -7,6 +7,7 @@ import HealthScoreBadge from "./HealthScoreBadge";
 import ReviewTimeline from "./ReviewTimeline";
 import Avatar from "./Avatar";
 import CommentThread from "./CommentThread";
+import BrandResponseCard from "./BrandResponseCard";
 import type { ReviewData } from "../../lib/types";
 import { USAGE_LABELS, SOURCE_LABELS } from "../../lib/constants";
 
@@ -358,6 +359,16 @@ export default function ReviewCard({
           </div>
 
           {/* Version timeline (shown inline above for versionCount > 1) */}
+
+          {/* Brand Response */}
+          {review.brandResponse && (
+            <BrandResponseCard
+              brandResponse={review.brandResponse}
+              productId={review.productId || ""}
+              reviewId={review.id}
+              currentUserEmail={undefined}
+            />
+          )}
 
           {/* Comments thread */}
           {showComments && (

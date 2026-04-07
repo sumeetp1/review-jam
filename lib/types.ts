@@ -63,6 +63,9 @@ export type ReviewData = {
   isAnchorReview?: boolean;
   subjectType?: SubjectType;
   location?: string;
+  brandResponse?: BrandResponse;
+  isImported?: boolean;
+  importSource?: string;
 };
 
 export type ReviewSummary = {
@@ -129,6 +132,7 @@ export type ProductEntry = {
   bountyPool: number;
   bountyPoolRemaining: number;
   bountyStatus: string;
+  buyLinks?: BuyLink[];
 };
 
 export type ProductCard = {
@@ -171,6 +175,8 @@ export type BrandReview = {
   productName: string;
   createdAt: string;
   mediaUrls?: string[];
+  productId?: string;
+  brandResponse?: BrandResponse;
 };
 
 export type SidebarProduct = {
@@ -273,4 +279,77 @@ export type SourceFilter = "all" | "deterministic" | "ai";
 // ─── UI ──────────────────────────────────────────────────────────────────────
 
 export type SortKey = "discovery" | "reviews" | "rating" | "likes" | "newest";
-export type FeedTab = "foryou" | "trending";
+export type FeedTab = "foryou" | "trending" | "following";
+
+// ─── Brand Response ─────────────────────────────────────────────────────────
+
+export type BrandResponse = {
+  body: string;
+  respondedBy: string;
+  respondedAt: string;
+  editedAt?: string;
+};
+
+// ─── User Profile (public view) ─────────────────────────────────────────────
+
+export type UserProfile = {
+  id: string;
+  displayName: string;
+  email: string;
+  photoURL?: string;
+  trustScore: number;
+  badges: string[];
+  interests: string[];
+  totalEarned: number;
+  walletBalance: number;
+  createdAt: string;
+  bio?: string;
+  followerCount?: number;
+  followingCount?: number;
+};
+
+// ─── Follow ─────────────────────────────────────────────────────────────────
+
+export type Follow = {
+  id: string;
+  followerId: string;
+  followingId: string;
+  createdAt: string;
+};
+
+// ─── Referral ───────────────────────────────────────────────────────────────
+
+export type ReferralCode = {
+  id: string;
+  creatorId: string;
+  creatorName: string;
+  creatorEmail: string;
+  createdAt: string;
+  usedBy?: string;
+  usedAt?: string;
+  status: "active" | "used" | "expired";
+};
+
+// ─── Collection ─────────────────────────────────────────────────────────────
+
+export type Collection = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  emoji: string;
+  productIds: string[];
+  creatorId: string;
+  creatorName: string;
+  isOfficial: boolean;
+  createdAt: string;
+};
+
+// ─── Buy Link ───────────────────────────────────────────────────────────────
+
+export type BuyLink = {
+  retailer: string;
+  url: string;
+  price?: string;
+  updatedAt: string;
+};

@@ -27,6 +27,9 @@ export default function BrandDashboardPage() {
   const [isBountyLoading, setIsBountyLoading] = useState(false);
   const [bountyMessage, setBountyMessage] = useState("");
   const [isDistributing, setIsDistributing] = useState<string | null>(null);
+  const [respondingTo, setRespondingTo] = useState<string | null>(null);
+  const [responseText, setResponseText] = useState("");
+  const [isSubmittingResponse, setIsSubmittingResponse] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -54,12 +57,20 @@ export default function BrandDashboardPage() {
 
     // Fetch all reviews for these campaigns
     const campaignIds = fetchedCampaigns.map((c) => c.campaignId);
+    // Map campaignId → productId for attaching productId to reviews
+    const campaignToProduct: Record<string, string> = {};
+    for (const c of fetchedCampaigns) {
+      campaignToProduct[c.campaignId] = c.id;
+    }
     const reviews: Review[] = [];
 
     for (const cid of campaignIds) {
       const rq = query(collection(db, "reviews"), where("campaignId", "==", cid));
       const rsnap = await getDocs(rq);
-      rsnap.forEach((d) => reviews.push({ id: d.id, ...d.data() } as Review));
+      rsnap.forEach((d) => {
+        const data = d.data();
+        reviews.push({ id: d.id, ...data, productId: data.productId || campaignToProduct[cid] } as Review);
+      });
     }
 
     reviews.sort((a, b) => (b.likesCount || 0) - (a.likesCount || 0));
@@ -112,6 +123,46 @@ export default function BrandDashboardPage() {
       alert("Failed to distribute bounty.");
     } finally {
       setIsDistributing(null);
+    }
+  }
+
+  async function handleBrandRespond(reviewId: string, productId: string, responseBody: string) {
+    setIsSubmittingResponse(true);
+    try {
+      const res = await fetch("/api/brand-response", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "submit",
+          reviewId,
+          productId,
+          brandEmail: user?.email,
+          body: responseBody,
+        }),
+      });
+      if (res.ok) {
+        // Update local state to reflect the response
+        setAllReviews((prev) =>
+          prev.map((r) =>
+            r.id === reviewId
+              ? {
+                  ...r,
+                  brandResponse: {
+                    body: responseBody,
+                    respondedBy: user?.email || "",
+                    respondedAt: new Date().toISOString(),
+                  },
+                }
+              : r,
+          ),
+        );
+        setRespondingTo(null);
+        setResponseText("");
+      }
+    } catch {
+      // Silently fail — user can retry
+    } finally {
+      setIsSubmittingResponse(false);
     }
   }
 
@@ -434,6 +485,55 @@ export default function BrandDashboardPage() {
                     {new Date(r.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                     {r.mediaUrls && r.mediaUrls.length > 0 && <span className="ml-2">📸 {r.mediaUrls.length} photo{r.mediaUrls.length > 1 ? "s" : ""}</span>}
                   </p>
+
+                  {/* Brand response section */}
+                  {r.brandResponse ? (
+                    <div className="mt-2 ml-4 pl-3 border-l-2 border-indigo-500/50">
+                      <div className="bg-indigo-50/50 dark:bg-indigo-950/20 rounded-lg p-2.5">
+                        <span className="text-[10px] font-semibold bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 px-1.5 py-0.5 rounded-full">
+                          Responded
+                        </span>
+                        <p className="text-[12px] text-slate-700 dark:text-zinc-300 leading-relaxed mt-1.5 whitespace-pre-wrap">
+                          {r.brandResponse.body}
+                        </p>
+                      </div>
+                    </div>
+                  ) : respondingTo === r.id ? (
+                    <div className="mt-2 space-y-2">
+                      <textarea
+                        value={responseText}
+                        onChange={(e) => setResponseText(e.target.value)}
+                        placeholder="Write your official response..."
+                        rows={3}
+                        className="w-full bg-white dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.1] rounded-lg p-2.5 text-[13px] text-slate-700 dark:text-zinc-300 outline-none focus:border-indigo-500 transition resize-none"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => r.productId && handleBrandRespond(r.id, r.productId, responseText)}
+                          disabled={isSubmittingResponse || !responseText.trim()}
+                          className="text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-200 dark:disabled:bg-zinc-800 disabled:text-slate-400 dark:disabled:text-zinc-500 text-white transition"
+                        >
+                          {isSubmittingResponse ? "Submitting..." : "Submit Response"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setRespondingTo(null); setResponseText(""); }}
+                          className="text-[11px] font-medium px-3 py-1.5 rounded-lg text-slate-500 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-white/[0.06] transition"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => { setRespondingTo(r.id); setResponseText(""); }}
+                      className="mt-2 text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-indigo-600/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600/20 transition"
+                    >
+                      Respond
+                    </button>
+                  )}
                 </div>
               ))
             )}
