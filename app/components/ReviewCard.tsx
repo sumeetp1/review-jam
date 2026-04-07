@@ -68,9 +68,15 @@ export default function ReviewCard({
           {/* Reviewer name + badges + category + rating */}
           <div className="flex items-start justify-between gap-2 mb-0.5">
             <div className="flex items-center gap-1.5 min-w-0 flex-wrap leading-tight">
-              <span className="font-medium text-[15px] text-slate-900 dark:text-zinc-100 truncate max-w-[10rem] sm:max-w-none">
-                {review.reviewerName || "Anonymous"}
-              </span>
+              {review.reviewerId ? (
+                <Link href={`/reviewer/${review.reviewerId}`} className="font-medium text-[15px] text-slate-900 dark:text-zinc-100 truncate max-w-[10rem] sm:max-w-none hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  {review.reviewerName || "Anonymous"}
+                </Link>
+              ) : (
+                <span className="font-medium text-[15px] text-slate-900 dark:text-zinc-100 truncate max-w-[10rem] sm:max-w-none">
+                  {review.reviewerName || "Anonymous"}
+                </span>
+              )}
               {reviewerBadges.length > 0 && (
                 <span className="flex gap-0.5">
                   {reviewerBadges.map((b) => (

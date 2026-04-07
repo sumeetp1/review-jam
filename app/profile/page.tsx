@@ -14,14 +14,7 @@ import VersionUpdateWizard from "../components/VersionUpdateWizard";
 import { ALL_BADGES, getBadgeById } from "../../lib/badges";
 import Avatar from "../components/Avatar";
 import { getTierLabel } from "../../lib/trustScore";
-
-function getTierStyle(score: number): { bg: string; text: string; emoji: string } {
-  if (score >= 500) return { bg: "bg-amber-900/40 border border-amber-700", text: "text-amber-300", emoji: "🏆" };
-  if (score >= 250) return { bg: "bg-violet-900/40 border border-violet-700", text: "text-violet-300", emoji: "⭐" };
-  if (score >= 100) return { bg: "bg-emerald-900/40 border border-emerald-700", text: "text-emerald-300", emoji: "✅" };
-  if (score >= 50)  return { bg: "bg-blue-900/40 border border-blue-700", text: "text-blue-300", emoji: "🔵" };
-  return { bg: "bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06]", text: "text-slate-500 dark:text-zinc-400", emoji: "🌱" };
-}
+import { getTierStyle } from "../../lib/trustTiers";
 
 
 import type { LedgerEntry, ReviewSummary } from "../../lib/types";
@@ -44,6 +37,8 @@ export default function ProfilePage() {
   const [anchorInvites, setAnchorInvites] = useState<any[]>([]);
   const [updatingInviteId, setUpdatingInviteId] = useState<string | null>(null);
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [bio, setBio] = useState("");
+  const [isSavingBio, setIsSavingBio] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -70,6 +65,7 @@ export default function ProfilePage() {
       setTrustScore(data.trustScore || 0);
       setInterests(data.interests || []);
       setBadges(data.badges || []);
+      setBio(data.bio || "");
     }
   }
 
@@ -150,6 +146,15 @@ export default function ProfilePage() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleSaveBio = async () => {
+    if (!user) return;
+    setIsSavingBio(true);
+    try {
+      await updateDoc(doc(db, "users", user.uid), { bio });
+    } catch {}
+    setIsSavingBio(false);
   };
 
   const handleLogout = async () => {
@@ -237,6 +242,9 @@ export default function ProfilePage() {
                 })}
               </div>
             )}
+            <Link href={`/reviewer/${user.uid}`} className="text-[11px] font-medium text-indigo-600 dark:text-indigo-400 hover:underline mt-1.5 inline-block">
+              View public profile &rarr;
+            </Link>
           </div>
         </div>
 
@@ -311,6 +319,28 @@ export default function ProfilePage() {
                       </div>
                     );
                   })}
+                </div>
+                <div className="pt-4 border-t border-slate-200 dark:border-white/[0.06]">
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-zinc-100 mb-2">Bio</h3>
+                  <textarea
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder="Write a short bio about yourself..."
+                    maxLength={280}
+                    rows={3}
+                    className="w-full text-sm bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-lg p-3 text-slate-800 dark:text-zinc-200 placeholder:text-slate-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none"
+                  />
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-[11px] text-slate-400 dark:text-zinc-600">{bio.length}/280</span>
+                    <button
+                      type="button"
+                      onClick={handleSaveBio}
+                      disabled={isSavingBio}
+                      className="text-xs font-medium bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-500 transition disabled:opacity-50"
+                    >
+                      {isSavingBio ? "Saving\u2026" : "Save bio"}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
