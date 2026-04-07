@@ -42,6 +42,10 @@ export default function AdminDashboard() {
   const [aiCheckEnabled, setAiCheckEnabled] = useState(true);
   const [isTogglingAi, setIsTogglingAi] = useState(false);
 
+  // Weekly digest
+  const [isSendingDigest, setIsSendingDigest] = useState(false);
+  const [digestResult, setDigestResult] = useState<string | null>(null);
+
   // Moderation events state
   const [moderationEvents, setModerationEvents] = useState<ModerationEvent[]>([]);
   const [isLoadingModeration, setIsLoadingModeration] = useState(true);
@@ -117,6 +121,29 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleSendDigest = async () => {
+    setIsSendingDigest(true);
+    setDigestResult(null);
+    try {
+      const res = await fetch("/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "send-digest" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setDigestResult(`Sent ${data.sent} digest email${data.sent !== 1 ? "s" : ""}.`);
+      } else {
+        setDigestResult(`Error: ${data.error || "Unknown error"}`);
+      }
+    } catch (e) {
+      console.error("Failed to send digest:", e);
+      setDigestResult("Failed to send digest emails.");
+    } finally {
+      setIsSendingDigest(false);
+    }
+  };
+
   const handleAddEmail = async () => {
     const email = newEmail.trim().toLowerCase();
     if (!email || !email.includes("@")) return;
@@ -172,6 +199,28 @@ export default function AdminDashboard() {
           >
             <span className={`w-3 h-3 rounded-full ${aiCheckEnabled ? "bg-white" : "bg-slate-400"}`} />
             {isTogglingAi ? "Saving…" : aiCheckEnabled ? "AI Check: ON" : "AI Check: OFF"}
+          </button>
+        </div>
+
+        {/* --- WEEKLY DIGEST --- */}
+        <div className="bg-slate-800 p-6 rounded-3xl border border-slate-700 mb-8 flex flex-col sm:flex-row justify-between sm:items-center gap-4 shadow-lg">
+          <div>
+            <h2 className="text-xl font-bold text-white mb-1">Weekly Digest Emails</h2>
+            <p className="text-slate-400 text-sm">
+              Send a personalised weekly digest to every user with new reviews, earnings, and trending categories.
+            </p>
+            {digestResult && (
+              <p className={`text-sm mt-2 font-medium ${digestResult.startsWith("Error") || digestResult.startsWith("Failed") ? "text-red-400" : "text-emerald-400"}`}>
+                {digestResult}
+              </p>
+            )}
+          </div>
+          <button
+            onClick={handleSendDigest}
+            disabled={isSendingDigest}
+            className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-xl transition whitespace-nowrap"
+          >
+            {isSendingDigest ? "Sending..." : "Send Weekly Digest"}
           </button>
         </div>
 

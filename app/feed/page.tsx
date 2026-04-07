@@ -39,7 +39,7 @@ function FeedPageInner() {
   const [allReviews, setAllReviews] = useState<any[]>([]);
 
   const { user } = useAuth();
-  const followingSet = useFollowing(user?.uid);
+  const { following: followingSet } = useFollowing(user?.uid);
   const [userInterests, setUserInterests] = useState<string[]>([]);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -181,6 +181,13 @@ function FeedPageInner() {
       });
       setUserInterests(selectedInterests);
       setShowOnboarding(false);
+
+      // Fire-and-forget welcome email
+      fetch("/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "send-welcome", userId: user.uid }),
+      }).catch(() => {});
     } catch {}
   };
 
