@@ -13,6 +13,7 @@ import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage
 import { signInWithPopup, signOut } from "firebase/auth";
 import { db, auth, googleProvider, storage } from "../../lib/firebase";
 import { useAuth } from "../../lib/hooks/useAuth";
+import { useFollowing } from "../../lib/hooks/useFollowing";
 import { updateUserBadges } from "../../lib/badges";
 import ReviewWizard, { ReviewFormData } from "../components/ReviewWizard";
 import { calculateDiscoveryRank } from "../../lib/discoveryRank";
@@ -38,6 +39,7 @@ function FeedPageInner() {
   const [allReviews, setAllReviews] = useState<any[]>([]);
 
   const { user } = useAuth();
+  const followingSet = useFollowing(user?.uid);
   const [userInterests, setUserInterests] = useState<string[]>([]);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -417,6 +419,9 @@ function FeedPageInner() {
   });
 
   const displayedReviews = (() => {
+    if (feedTab === "following") {
+      return baseFiltered.filter((r) => r.reviewerId && followingSet.has(r.reviewerId));
+    }
     if (feedTab === "trending") {
       return [...baseFiltered].sort((a, b) => trendingScore(b) - trendingScore(a));
     }
@@ -434,6 +439,7 @@ function FeedPageInner() {
   const FEED_TABS: { id: FeedTab; label: string }[] = [
     { id: "foryou",   label: "For you" },
     { id: "trending", label: "Trending" },
+    { id: "following", label: "Following" },
   ];
 
   return (
@@ -683,7 +689,14 @@ function FeedPageInner() {
           {/* Feed */}
           <div className="divide-y divide-white/[0.06] dark:divide-white/[0.06]">
             {isLoading ? (
-              <div className="py-12 text-center text-zinc-600 text-sm animate-pulse">Loading…</div>
+              <div className="py-12 text-center text-zinc-600 text-sm animate-pulse">Loading...</div>
+            ) : feedTab === "following" && followingSet.size === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-sm text-slate-500 dark:text-zinc-500">Follow reviewers to see their reviews here.</p>
+                <Link href="/explore" className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline mt-2 inline-block">
+                  Discover products &rarr;
+                </Link>
+              </div>
             ) : displayedReviews.length === 0 ? (
               <div className="py-14 px-6 text-center flex flex-col items-center max-w-sm mx-auto">
                 <div className="w-10 h-10 bg-white/[0.06] dark:bg-white/[0.06] rounded-full flex items-center justify-center text-sm mb-3 text-zinc-500">📝</div>
