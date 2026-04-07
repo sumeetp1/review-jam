@@ -87,10 +87,12 @@ export async function POST(req: Request) {
       const allReviews = reviewSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
       // Filter to eligible: verified purchase + not already paid from this bounty
+      // Imported reviews are never eligible for bounty payouts
       const eligible = allReviews.filter((r: any) =>
         r.isVerifiedPurchase === true &&
         r.reviewerId &&
-        !r.bountyPaid,
+        !r.bountyPaid &&
+        r.isImported !== true,
       );
 
       if (eligible.length === 0) {

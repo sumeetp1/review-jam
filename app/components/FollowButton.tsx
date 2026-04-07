@@ -13,6 +13,7 @@ import {
   increment,
 } from "firebase/firestore";
 import { db } from "../../lib/firebase";
+import { useAuth } from "../../lib/hooks/useAuth";
 
 type Props = {
   targetUserId: string;
@@ -20,7 +21,11 @@ type Props = {
   currentUserName?: string;
 };
 
-export default function FollowButton({ targetUserId, currentUserId, currentUserName }: Props) {
+export default function FollowButton({ targetUserId, currentUserId: propUserId, currentUserName: propUserName }: Props) {
+  const { user } = useAuth();
+  const currentUserId = propUserId || user?.uid;
+  const currentUserName = propUserName || user?.displayName || undefined;
+
   const [isFollowing, setIsFollowing] = useState(false);
   const [followDocId, setFollowDocId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);

@@ -29,8 +29,9 @@ export async function POST(req: Request) {
     const allSnap = await getDocs(collection(db, "reviews"));
     const allReviews: any[] = allSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
+    // Imported reviews are never eligible for global dividend distribution
     const eligible = allReviews.filter(
-      (r) => r.isVerifiedPurchase === true && r.reviewerId,
+      (r) => r.isVerifiedPurchase === true && r.reviewerId && r.isImported !== true,
     );
 
     if (eligible.length === 0) {

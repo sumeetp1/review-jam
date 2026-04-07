@@ -26,6 +26,7 @@ type ReviewInput = {
   commentCount?: number;
   productSource?: string;
   isVerifiedPurchase?: boolean;
+  isImported?: boolean;
   versionCount?: number;
   createdAt?: string;
 };
@@ -60,7 +61,9 @@ export function computeHealthScore(
   const reviewCtPts   = Math.min(reviewerReviewCount, 5);
   // isVerifiedPurchase (receipt-verified) is weighted much higher than a
   // self-declared "purchased" source signal (+20 vs +5)
-  const verifiedPts   = review.isVerifiedPurchase ? 20
+  // Imported reviews can never earn verified purchase points
+  const verifiedPts   = review.isImported ? 0
+                      : review.isVerifiedPurchase ? 20
                       : review.productSource === "purchased" ? 5
                       : 0;
   const credibility   = badgePts + reviewCtPts + verifiedPts;

@@ -3,6 +3,7 @@
 import type { SubjectType } from "./types";
 
 export const ADMIN_EMAIL = "sumit.pandey75@gmail.com";
+export const MAX_REFERRAL_CODES = 5;
 
 
 export const SUGGESTED_CATEGORIES = [

@@ -134,6 +134,12 @@ export default function ReviewCard({
                   🎯 Received for review
                 </span>
               )}
+              {/* Imported review badge */}
+              {review.isImported && (
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-medium bg-slate-100 dark:bg-white/[0.05] text-slate-500 dark:text-zinc-400 px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/[0.06]">
+                  Imported{review.importSource ? ` from ${review.importSource.charAt(0).toUpperCase() + review.importSource.slice(1)}` : ""}
+                </span>
+              )}
               {(review.communitySlug || review.channelSlug) && (
                 <a href={`/c/${review.communitySlug || review.channelSlug}`} className="text-[10px] font-medium bg-indigo-500/10 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-500/20 hover:underline">
                   rj/{review.communitySlug || review.channelSlug}

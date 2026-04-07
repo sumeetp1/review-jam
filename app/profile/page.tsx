@@ -11,8 +11,10 @@ import { signOut, type User } from "firebase/auth";
 import { db, auth } from "../../lib/firebase";
 import { useAuth } from "../../lib/hooks/useAuth";
 import VersionUpdateWizard from "../components/VersionUpdateWizard";
+import ReferralPanel from "../components/ReferralPanel";
 import { ALL_BADGES, getBadgeById } from "../../lib/badges";
 import Avatar from "../components/Avatar";
+import ReviewImportModal from "../components/ReviewImportModal";
 import { getTierLabel } from "../../lib/trustScore";
 import { getTierStyle } from "../../lib/trustTiers";
 
@@ -29,7 +31,7 @@ export default function ProfilePage() {
   const [ledger, setLedger] = useState<LedgerEntry[]>([]);
   const [myReviews, setMyReviews] = useState<ReviewSummary[]>([]);
 
-  const [activeTab, setActiveTab] = useState<"overview" | "reviews" | "earnings" | "interests" | "invites">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "reviews" | "earnings" | "interests" | "invites" | "referrals">("overview");
   const [updatingReview, setUpdatingReview] = useState<ReviewSummary | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
@@ -39,6 +41,7 @@ export default function ProfilePage() {
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const [bio, setBio] = useState("");
   const [isSavingBio, setIsSavingBio] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -185,11 +188,12 @@ export default function ProfilePage() {
 
   const pendingInvites = anchorInvites.filter((i) => i.status === "invited" || i.status === "accepted");
   const TABS = [
-    { id: "overview",  label: "Overview" },
-    { id: "reviews",   label: `Reviews (${myReviews.length})` },
-    { id: "invites",   label: `Invites${pendingInvites.length > 0 ? ` (${pendingInvites.length})` : ""}` },
-    { id: "earnings",  label: `Earnings (${ledger.length})` },
-    { id: "interests", label: "Interests" },
+    { id: "overview",   label: "Overview" },
+    { id: "reviews",    label: `Reviews (${myReviews.length})` },
+    { id: "invites",    label: `Invites${pendingInvites.length > 0 ? ` (${pendingInvites.length})` : ""}` },
+    { id: "referrals",  label: "Referrals" },
+    { id: "earnings",   label: `Earnings (${ledger.length})` },
+    { id: "interests",  label: "Interests" },
   ] as const;
 
   return (
@@ -348,6 +352,16 @@ export default function ProfilePage() {
             {/* ── My Reviews ── */}
             {activeTab === "reviews" && (
               <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-slate-700 dark:text-zinc-300">Your reviews</p>
+                  <button
+                    type="button"
+                    onClick={() => setShowImportModal(true)}
+                    className="text-[12px] font-medium text-indigo-600 dark:text-indigo-400 px-3 py-1.5 rounded-lg border border-indigo-500/20 hover:bg-indigo-500/10 transition"
+                  >
+                    Import Reviews
+                  </button>
+                </div>
                 {myReviews.length === 0 ? (
                   <p className="text-sm text-slate-500 dark:text-zinc-500">No reviews yet.</p>
                 ) : (
@@ -386,6 +400,18 @@ export default function ProfilePage() {
                 )}
               </div>
             )}
+
+            {/* Review Import Modal */}
+            <ReviewImportModal
+              isOpen={showImportModal}
+              onClose={() => {
+                setShowImportModal(false);
+                // Refresh reviews list after import
+                if (user) fetchMyReviews(user.uid);
+              }}
+              userId={user.uid}
+              userName={user.displayName || "Anonymous"}
+            />
 
             {/* Version Update Wizard */}
             {updatingReview && (
@@ -503,6 +529,15 @@ export default function ProfilePage() {
                   ))
                 )}
               </div>
+            )}
+
+            {/* ── Referrals ── */}
+            {activeTab === "referrals" && (
+              <ReferralPanel
+                userId={user.uid}
+                userName={user.displayName || "Anonymous"}
+                userEmail={user.email || ""}
+              />
             )}
 
             {activeTab === "interests" && (
