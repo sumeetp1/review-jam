@@ -185,3 +185,52 @@ export function newFollowerEmail(data: FollowerData): { subject: string; html: s
 
   return { subject: `${data.followerName} started following you`, html };
 }
+
+// ── Carousel Digest Email ───────────────────────────────────────────────────
+
+export function carouselDigestEmail(data: {
+  brandName: string;
+  products: Array<{
+    name: string;
+    downloadLinks: Array<{ label: string; url: string }>;
+  }>;
+  hubUrl: string;
+}): { subject: string; html: string } {
+  const productsHtml = data.products
+    .map(
+      (p) => `
+      <tr><td style="padding:16px;background-color:#f8fafc;border-radius:8px;margin-bottom:12px;">
+        <h3 style="margin:0 0 10px;font-size:16px;color:#1e293b;">${p.name}</h3>
+        ${p.downloadLinks
+          .map(
+            (dl) =>
+              `<a href="${dl.url}" style="display:inline-block;margin:0 8px 8px 0;padding:6px 14px;background-color:#eef2ff;color:#4f46e5;font-size:13px;font-weight:600;text-decoration:none;border-radius:6px;">${dl.label}</a>`,
+          )
+          .join("")}
+      </td></tr>
+      <tr><td style="height:12px;"></td></tr>`,
+    )
+    .join("");
+
+  const html = layout(`
+    <h2 style="margin:0 0 16px;font-size:20px;color:#1e293b;">Your Carousel Images Are Ready</h2>
+    <p style="margin:0 0 8px;font-size:15px;color:#475569;line-height:1.6;">
+      Hi ${data.brandName} team,
+    </p>
+    <p style="margin:0 0 20px;font-size:15px;color:#475569;line-height:1.6;">
+      Your Amazon carousel images have been refreshed with the latest review data.
+    </p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      ${productsHtml}
+    </table>
+
+    <p style="margin:0 0 20px;font-size:14px;color:#475569;line-height:1.6;">
+      Upload these to Amazon Seller Central &rarr; Edit Listing &rarr; Images (slots 2&ndash;9).
+    </p>
+
+    ${ctaButton("Go to Brand Hub", data.hubUrl)}
+  `);
+
+  return { subject: `${data.brandName} — Your Amazon Carousel Images Are Ready`, html };
+}

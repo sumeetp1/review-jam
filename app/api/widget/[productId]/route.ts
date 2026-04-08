@@ -49,10 +49,11 @@ function buildWidgetHtml(opts: {
   reviewCount: number;
   topPros: string[];
   topCons: string[];
+  buyLinks: Array<{ retailer: string; url: string; price?: string }>;
   theme: "light" | "dark" | "auto";
   baseUrl: string;
 }): string {
-  const { productId, productName, brandName, avgRating, avgHealthScore, reviewCount, topPros, topCons, theme, baseUrl } = opts;
+  const { productId, productName, brandName, avgRating, avgHealthScore, reviewCount, topPros, topCons, buyLinks, theme, baseUrl } = opts;
   const score = Math.round(avgHealthScore);
   const col = scoreColor(score);
 
@@ -87,6 +88,12 @@ function buildWidgetHtml(opts: {
     ? `<div class="section">
         <p class="sect-title cons">✗ Top Cons</p>
         ${topCons.map(c => `<div class="pill"><div class="dot con"></div><span>${esc(c)}</span></div>`).join("")}
+       </div>` : "";
+
+  const buyHtml = buyLinks.length
+    ? `<div class="section">
+        <p class="sect-title buy">🛒 Where to Buy</p>
+        ${buyLinks.map(l => `<a class="buy-link" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer"><span class="buy-retailer">${esc(l.retailer)}</span><span>${l.price ? `<span class="buy-price">${esc(l.price)}</span> ` : ""}<span class="buy-arrow">→</span></span></a>`).join("")}
        </div>` : "";
 
   return `<!DOCTYPE html>
@@ -136,6 +143,12 @@ body{
 .sect-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
 .sect-title.pros{color:#059669}
 .sect-title.cons{color:#dc2626}
+.sect-title.buy{color:#6366f1}
+.buy-link{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;margin-bottom:4px;border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);font-size:12px;transition:background .15s ease}
+.buy-link:hover{background:var(--card)}
+.buy-retailer{font-weight:600}
+.buy-price{color:#059669;font-weight:600;font-size:11px}
+.buy-arrow{color:var(--sub);font-size:11px}
 .pill{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text);margin-bottom:3px}
 .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .dot.pro{background:#10b981}
@@ -187,6 +200,7 @@ body{
 
     ${prosHtml}
     ${consHtml}
+    ${buyHtml}
 
     <a class="cta"
        href="${esc(baseUrl)}/product/${esc(productId)}"
@@ -232,6 +246,7 @@ export async function GET(
     }
 
     const product = productSnap.data();
+    const buyLinks = (product.buyLinks as Array<{ retailer: string; url: string; price?: string }>) || [];
 
     // ── Fetch reviews (by productId OR campaignId) ─────────────────────────
     const [byProductId, byCampaignId] = await Promise.all([
@@ -278,6 +293,7 @@ export async function GET(
       reviewCount,
       topPros,
       topCons,
+      buyLinks,
       theme,
       baseUrl,
     });
