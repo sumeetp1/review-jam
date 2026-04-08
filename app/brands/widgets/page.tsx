@@ -242,6 +242,25 @@ export default function BrandWidgetsPage() {
           </div>
         </div>
 
+        {/* Amazon Carousel CTA */}
+        <Link
+          href="/brands/carousel"
+          className="flex items-center justify-between bg-gradient-to-r from-indigo-950/40 to-violet-950/30 border border-indigo-800/40 rounded-xl p-5 mb-8 group hover:border-indigo-600/50 transition"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🛒</span>
+            <div>
+              <p className="text-sm font-semibold text-indigo-300">Selling on Amazon?</p>
+              <p className="text-xs text-zinc-400">
+                Generate review images for your Amazon product carousel &mdash; with QR codes linking back to ReviewJam.
+              </p>
+            </div>
+          </div>
+          <span className="text-indigo-400 group-hover:text-indigo-300 transition text-sm font-medium shrink-0 ml-4">
+            Create Images &rarr;
+          </span>
+        </Link>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
 
           {/* ── Left panel: settings ─────────────────────────────────────── */}
