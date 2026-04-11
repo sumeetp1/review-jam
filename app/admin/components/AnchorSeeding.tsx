@@ -97,57 +97,57 @@ export default function AnchorSeeding() {
   }
 
   return (
-    <div className="mt-8 bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl">
+    <div className="mt-8 bg-white p-8 rounded-3xl border border-[#f5ddc0] shadow-2xl">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-2xl font-bold">🎯 Anchor Reviews</h2>
-        <span className="text-xs px-3 py-1 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 font-semibold">
+        <h2 className="text-2xl font-bold text-[#4a3828]">🎯 Anchor Reviews</h2>
+        <span className="text-xs px-3 py-1 rounded-full bg-[#e65100]/20 text-[#e65100] border border-[#e65100]/30 font-semibold">
           Max 5 per product
         </span>
       </div>
-      <p className="text-slate-400 text-sm mb-6">
+      <p className="text-[#8b7560] text-sm mb-6">
         Select a product, then invite top reviewers (trust &gt; 250) to write anchor reviews. Review Jam pays reviewers directly. Reviewers must use the product for the minimum period before submitting.
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* LEFT: Product selection + config */}
         <div>
-          <h3 className="text-base font-bold text-slate-300 mb-4">Select product</h3>
+          <h3 className="text-base font-bold text-[#5c4a38] mb-4">Select product</h3>
           <div className="space-y-3">
             <div className="flex gap-2">
               <select
                 value={anchorProductId}
                 onChange={(e) => { setAnchorProductId(e.target.value); if (e.target.value) checkAnchorCount(e.target.value); }}
-                className="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none focus:border-violet-500 transition text-sm"
+                className="flex-1 bg-[#ffecd2] border border-[#f5ddc0] rounded-xl p-3 text-[#4a3828] outline-none focus:border-[#ff8a65] transition text-sm"
               >
                 <option value="">Select a product</option>
                 {allProducts.map((p) => (
                   <option key={p.id} value={p.id}>{p.name} ({p.category})</option>
                 ))}
               </select>
-              <button type="button" onClick={loadProductsForSeeding} className="bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold px-3 py-1.5 rounded-xl transition text-xs shrink-0">
+              <button type="button" onClick={loadProductsForSeeding} className="bg-[#ffecd2] hover:bg-[#ffe0b2] text-[#5c4a38] font-semibold px-3 py-1.5 rounded-xl transition text-xs shrink-0">
                 Refresh
               </button>
             </div>
 
             {anchorProductId && (
-              <div className="bg-slate-900 rounded-xl p-3 border border-slate-700 space-y-2">
+              <div className="bg-[#ffecd2] rounded-xl p-3 border border-[#f5ddc0] space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-400">Anchors used</span>
-                  <span className={`text-xs font-bold ${anchorExistingCount >= 5 ? "text-red-400" : "text-emerald-400"}`}>
+                  <span className="text-xs text-[#8b7560]">Anchors used</span>
+                  <span className={`text-xs font-bold ${anchorExistingCount >= 5 ? "text-[#e57373]" : "text-[#a5d6a7]"}`}>
                     {anchorExistingCount} / 5
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-400">Min usage period</span>
-                  <span className="text-xs font-semibold text-white">
+                  <span className="text-xs text-[#8b7560]">Min usage period</span>
+                  <span className="text-xs font-semibold text-[#4a3828]">
                     {MIN_USAGE_DAYS[allProducts.find((p) => p.id === anchorProductId)?.category ?? "Tech"] ?? 14} days
                   </span>
                 </div>
                 <div>
-                  <label className="text-xs text-slate-400">Payout per review ($)</label>
+                  <label className="text-xs text-[#8b7560]">Payout per review ($)</label>
                   <input
                     type="number" min="10" value={anchorPayout} onChange={(e) => setAnchorPayout(e.target.value)}
-                    className="w-full mt-1 bg-slate-800 border border-slate-600 rounded-lg p-2 text-white outline-none text-sm"
+                    className="w-full mt-1 bg-white border border-[#f5ddc0] rounded-lg p-2 text-[#4a3828] outline-none text-sm"
                   />
                 </div>
               </div>
@@ -158,35 +158,35 @@ export default function AnchorSeeding() {
         {/* RIGHT: Trusted reviewers */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-bold text-slate-300">Trusted reviewers</h3>
+            <h3 className="text-base font-bold text-[#5c4a38]">Trusted reviewers</h3>
             <button
               type="button"
               onClick={loadTrustedReviewers}
               disabled={isLoadingReviewers}
-              className="text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold px-3 py-1.5 rounded-lg transition disabled:opacity-50"
+              className="text-xs bg-[#ffecd2] hover:bg-[#ffe0b2] text-[#5c4a38] font-semibold px-3 py-1.5 rounded-lg transition disabled:opacity-50"
             >
               {isLoadingReviewers ? "Loading…" : "Load (trust > 250)"}
             </button>
           </div>
 
           {trustedReviewers.length === 0 && !isLoadingReviewers && (
-            <p className="text-sm text-slate-500 text-center py-8">
+            <p className="text-sm text-[#8b7560] text-center py-8">
               Click &quot;Load&quot; to fetch reviewers with trust score &gt; 250.
             </p>
           )}
 
           <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
             {trustedReviewers.map((r) => (
-              <div key={r.id} className="flex items-center justify-between bg-slate-900 border border-slate-700 rounded-xl p-3">
+              <div key={r.id} className="flex items-center justify-between bg-[#ffecd2] border border-[#f5ddc0] rounded-xl p-3">
                 <div>
-                  <p className="text-sm font-semibold text-white">{r.displayName || r.id}</p>
-                  <p className="text-[11px] text-slate-500">{r.email} · ⭐ {r.trustScore} trust</p>
+                  <p className="text-sm font-semibold text-[#4a3828]">{r.displayName || r.id}</p>
+                  <p className="text-[11px] text-[#8b7560]">{r.email} · ⭐ {r.trustScore} trust</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleInviteReviewer(r)}
                   disabled={invitingUserId === r.id || anchorExistingCount >= 5 || !anchorProductId}
-                  className="text-xs bg-violet-600 hover:bg-violet-500 text-white font-bold px-3 py-1.5 rounded-lg transition disabled:opacity-50 shrink-0 ml-3"
+                  className="text-xs bg-[#e65100] hover:bg-[#d84315] text-white font-bold px-3 py-1.5 rounded-lg transition disabled:opacity-50 shrink-0 ml-3"
                 >
                   {invitingUserId === r.id ? "Sending…" : "Invite"}
                 </button>
@@ -197,7 +197,7 @@ export default function AnchorSeeding() {
       </div>
 
       {seedingMessage && (
-        <div className={`mt-5 p-3 rounded-xl border text-sm font-bold font-mono ${seedingMessage.includes("❌") ? "bg-red-900/30 border-red-500/50 text-red-400" : "bg-green-900/30 border-green-500/50 text-green-400"}`}>
+        <div className={`mt-5 p-3 rounded-xl border text-sm font-bold font-mono ${seedingMessage.includes("❌") ? "bg-[#ef5350]/10 border-[#ef5350]/50 text-[#ef5350]" : "bg-[#66bb6a]/10 border-[#66bb6a]/50 text-[#66bb6a]"}`}>
           {seedingMessage}
         </div>
       )}

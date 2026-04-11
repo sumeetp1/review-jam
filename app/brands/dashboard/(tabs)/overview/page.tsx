@@ -68,14 +68,14 @@ export default function OverviewPage() {
         <button
           type="button"
           onClick={() => {/* handled at context level — no-op here, just display */}}
-          className="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-600 text-white"
+          className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#e65100] text-white"
         >
           All campaigns
         </button>
         {campaigns.map((c) => (
           <span
             key={c.id}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/[0.03] text-zinc-300"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white text-[#d4b896]"
           >
             {c.name}
           </span>
@@ -85,47 +85,47 @@ export default function OverviewPage() {
       {/* Stats row */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
         {stats.map((s) => (
-          <div key={s.label} className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4">
-            <p className="text-2xl font-bold text-white tabular-nums">{s.value}</p>
-            <p className="text-xs text-zinc-400 uppercase tracking-wide mt-0.5">{s.label}</p>
+          <div key={s.label} className="bg-white border border-[#f5ddc0] rounded-xl p-4">
+            <p className="text-2xl font-bold text-[#4a3828] tabular-nums">{s.value}</p>
+            <p className="text-xs text-[#8b7560] uppercase tracking-wide mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
 
       {/* Quick actions grid */}
       <div>
-        <h2 className="text-sm font-semibold text-white mb-3">Quick actions</h2>
+        <h2 className="text-sm font-semibold text-[#4a3828] mb-3">Quick actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {quickActions.map((action) => (
             <Link
               key={action.href}
               href={action.href}
-              className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 hover:border-white/[0.12] transition group"
+              className="bg-white border border-[#f5ddc0] rounded-xl p-5 hover:border-[#e6c9a0] transition group"
             >
               <span className="text-2xl">{action.icon}</span>
-              <h3 className="text-sm font-semibold text-white mt-2 group-hover:text-indigo-300 transition">
+              <h3 className="text-sm font-semibold text-[#4a3828] mt-2 group-hover:text-[#ff8a65] transition">
                 {action.title}
               </h3>
-              <p className="text-xs text-zinc-400 mt-1 leading-relaxed">{action.description}</p>
+              <p className="text-xs text-[#8b7560] mt-1 leading-relaxed">{action.description}</p>
             </Link>
           ))}
         </div>
       </div>
 
       {/* Recent reviews */}
-      <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-white">Recent reviews</h3>
+      <div className="bg-white border border-[#f5ddc0] rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-[#f5ddc0] flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-[#4a3828]">Recent reviews</h3>
           <Link
             href="/brands/dashboard/reviews"
-            className="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition"
+            className="text-xs text-[#ff8a65] hover:text-[#ffab91] font-medium transition"
           >
             View all &rarr;
           </Link>
         </div>
-        <div className="divide-y divide-white/[0.06]">
+        <div className="divide-y divide-[#f5ddc0]">
           {recentReviews.length === 0 ? (
-            <p className="px-5 py-8 text-sm text-zinc-400 text-center">
+            <p className="px-5 py-8 text-sm text-[#8b7560] text-center">
               No reviews yet.
             </p>
           ) : (
@@ -133,24 +133,24 @@ export default function OverviewPage() {
               <div key={r.id} className="px-5 py-4">
                 <div className="flex items-start justify-between gap-3 mb-1">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{r.reviewerName}</p>
-                    <p className="text-xs text-zinc-500 mt-0.5">{r.productName}</p>
+                    <p className="text-sm font-medium text-[#4a3828] truncate">{r.reviewerName}</p>
+                    <p className="text-xs text-[#8b7560] mt-0.5">{r.productName}</p>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0 text-xs text-zinc-400">
-                    <span className="text-amber-400">{"\u2605"} {r.rating}</span>
+                  <div className="flex items-center gap-2 shrink-0 text-xs text-[#8b7560]">
+                    <span className="text-[#ffcc80]">{"\u2605"} {r.rating}</span>
                     <span>{"\u{1F44D}"} {r.likesCount}</span>
                   </div>
                 </div>
                 {(r.summary || r.marketingQuote) && (
-                  <p className="text-[13px] text-indigo-300 font-medium mb-1 line-clamp-1">
+                  <p className="text-[13px] text-[#ff8a65] font-medium mb-1 line-clamp-1">
                     &ldquo;{r.summary || r.marketingQuote}&rdquo;
                   </p>
                 )}
-                <p className="text-[13px] text-zinc-300 leading-relaxed line-clamp-2">{r.content}</p>
-                <p className="text-[11px] text-zinc-500 mt-1">
+                <p className="text-[13px] text-[#5c4a38] leading-relaxed line-clamp-2">{r.content}</p>
+                <p className="text-[11px] text-[#8b7560] mt-1">
                   {new Date(r.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                   {r.brandResponse && (
-                    <span className="ml-2 text-indigo-400">Responded</span>
+                    <span className="ml-2 text-[#ff8a65]">Responded</span>
                   )}
                 </p>
               </div>

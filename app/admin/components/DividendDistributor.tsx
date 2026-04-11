@@ -31,7 +31,7 @@ export default function DividendDistributor({
 
     setIsProcessing(true);
     setDividendStats(null);
-    setStatusMessage("Scanning verified reviews and computing weighted scores…");
+    setStatusMessage("Scanning verified reviews and computing weighted scores\u2026");
 
     try {
       const response = await fetch("/api/payout", {
@@ -41,30 +41,30 @@ export default function DividendDistributor({
       });
       const data = await response.json();
       if (data.success) {
-        setStatusMessage(`✅ ${data.message}`);
+        setStatusMessage(`\u2705 ${data.message}`);
         setDividendStats(data.stats ?? null);
         setGlobalPool("");
       } else {
-        setStatusMessage(`❌ ${data.error}`);
+        setStatusMessage(`\u274C ${data.error}`);
       }
     } catch {
-      setStatusMessage("❌ Critical Error: Could not reach the payout service.");
+      setStatusMessage("\u274C Critical Error: Could not reach the payout service.");
     } finally {
       setIsProcessing(false);
     }
   }
 
   return (
-    <div className="bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl">
+    <div className="bg-white p-8 rounded-3xl border border-[#f5ddc0] shadow-2xl">
       <h2 className="text-2xl font-bold mb-1">💰 Monthly Dividend</h2>
-      <p className="text-sm text-slate-400 mb-6 leading-relaxed">
-        Platform-wide distribution. Only reviews with a <span className="text-green-400 font-semibold">verified purchase receipt</span> qualify.
-        Each reviewer&apos;s share = <code className="text-xs text-indigo-300 bg-slate-900 px-1 py-0.5 rounded">Pool × (score × multiplier) / Σ scores</code>
+      <p className="text-sm text-[#8b7560] mb-6 leading-relaxed">
+        Platform-wide distribution. Only reviews with a <span className="text-[#66bb6a] font-semibold">verified purchase receipt</span> qualify.
+        Each reviewer&apos;s share = <code className="text-xs text-[#e65100] bg-[#ffecd2] px-1 py-0.5 rounded">Pool &times; (score &times; multiplier) / &Sigma; scores</code>
       </p>
 
-      <div className="bg-slate-900 p-6 rounded-2xl border border-slate-700 mb-4 space-y-4">
+      <div className="bg-[#ffecd2] p-6 rounded-2xl border border-[#f5ddc0] mb-4 space-y-4">
         <div>
-          <label className="block text-sm font-bold text-slate-400 mb-1">Global Pool Amount ($)</label>
+          <label className="block text-sm font-bold text-[#8b7560] mb-1">Global Pool Amount ($)</label>
           <input
             type="number"
             min="1"
@@ -72,7 +72,7 @@ export default function DividendDistributor({
             value={globalPool}
             onChange={(e) => setGlobalPool(e.target.value)}
             placeholder="e.g. 5000"
-            className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white outline-none focus:border-green-500 transition"
+            className="w-full bg-white border border-[#f5ddc0] rounded-xl p-3 text-[#4a3828] outline-none focus:border-[#66bb6a] transition"
           />
         </div>
 
@@ -82,11 +82,11 @@ export default function DividendDistributor({
           disabled={isProcessing || !globalPool}
           className={`w-full py-4 mt-2 rounded-xl font-black shadow-lg transition-all text-base ${
             isProcessing || !globalPool
-              ? "bg-slate-700 text-slate-400 cursor-not-allowed"
-              : "bg-green-500 hover:bg-green-400 text-slate-900"
+              ? "bg-[#f5ddc0] text-[#8b7560] cursor-not-allowed"
+              : "bg-[#66bb6a] hover:bg-[#4caf50] text-white"
           }`}
         >
-          {isProcessing ? "Calculating & distributing…" : "🏦 Distribute Monthly Dividend"}
+          {isProcessing ? "Calculating & distributing\u2026" : "🏦 Distribute Monthly Dividend"}
         </button>
       </div>
 
@@ -98,16 +98,16 @@ export default function DividendDistributor({
             { label: "Payouts made", value: dividendStats.payoutsMade },
             { label: "Unique reviewers", value: dividendStats.uniqueReviewers },
           ].map((s) => (
-            <div key={s.label} className="bg-slate-900 rounded-xl border border-slate-700 p-3 text-center">
-              <p className="text-xl font-bold text-white tabular-nums">{s.value}</p>
-              <p className="text-[11px] text-slate-500 uppercase tracking-wide mt-0.5">{s.label}</p>
+            <div key={s.label} className="bg-[#ffecd2] rounded-xl border border-[#f5ddc0] p-3 text-center">
+              <p className="text-xl font-bold text-[#4a3828] tabular-nums">{s.value}</p>
+              <p className="text-[11px] text-[#8b7560] uppercase tracking-wide mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
       )}
 
       {statusMessage && (
-        <div className={`p-4 rounded-xl border font-mono text-sm font-bold ${statusMessage.includes("❌") ? "bg-red-900/30 border-red-500/50 text-red-400" : "bg-green-900/30 border-green-500/50 text-green-400"}`}>
+        <div className={`p-4 rounded-xl border font-mono text-sm font-bold ${statusMessage.includes("\u274C") ? "bg-[#ef5350]/10 border-[#ef5350]/50 text-[#ef5350]" : "bg-[#66bb6a]/10 border-[#66bb6a]/50 text-[#66bb6a]"}`}>
           {statusMessage}
         </div>
       )}

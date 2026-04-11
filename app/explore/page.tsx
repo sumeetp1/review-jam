@@ -50,7 +50,7 @@ function HealthCircle({ score }: { score: number }) {
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </svg>
-      <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-slate-900 dark:text-white">
+      <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-[#4a3828]">
         {score}
       </span>
     </div>
@@ -117,23 +117,23 @@ function CreateHubModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-lg border border-slate-200 dark:border-zinc-800 shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm justify-center p-4">
+      <div className="bg-white rounded-2xl w-full max-w-lg border border-[#f5ddc0] shadow-2xl overflow-hidden">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-white/[0.06]">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#f5ddc0]">
           <div>
-            <h2 className="text-[15px] font-semibold text-slate-900 dark:text-zinc-100">
+            <h2 className="text-[15px] font-semibold text-[#4a3828]">
               {step === "preview" ? "AI-Generated Preview" : "Create Product Hub"}
             </h2>
-            <p className="text-[11px] text-slate-500 dark:text-zinc-500 mt-0.5">
+            <p className="text-[11px] text-[#8b7560] mt-0.5">
               {step === "preview"
                 ? "Review the details Gemini generated — then launch the hub."
                 : "Gemini will auto-fill specs, variants, and a description."}
             </p>
           </div>
           <button type="button" onClick={onClose}
-            className="text-slate-500 dark:text-zinc-500 hover:text-slate-900 dark:hover:text-zinc-200 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-50 dark:hover:bg-white/[0.04] transition text-lg leading-none">
+            className="text-[#8b7560] hover:text-[#4a3828] w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#fff0e6] transition text-lg leading-none">
             ✕
           </button>
         </div>
@@ -144,7 +144,7 @@ function CreateHubModal({
           {step === "input" && (
             <>
               <div>
-                <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-zinc-500 block mb-1.5">
+                <label className="text-[11px] font-semibold uppercase tracking-wide text-[#8b7560] block mb-1.5">
                   Product Name
                 </label>
                 <input
@@ -153,14 +153,14 @@ function CreateHubModal({
                   onChange={(e) => setName(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") handleGenerate(); }}
                   placeholder="e.g. Sony WH-1000XM5, iPhone 16 Pro, Vitamix 5200…"
-                  className="w-full text-sm bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2.5 outline-none focus:ring-1 focus:ring-violet-500/40 text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-600"
+                  className="w-full text-sm bg-[#ffecd2] border border-[#f5ddc0] rounded-lg px-3 py-2.5 outline-none focus:ring-1 focus:ring-violet-500/40 text-[#4a3828] placeholder-[#b89878]"
                 />
-                <p className="text-[11px] text-slate-400 dark:text-zinc-600 mt-1.5">
+                <p className="text-[11px] text-[#8b7560] mt-1.5">
                   Be specific — include the model number for best results.
                 </p>
               </div>
 
-              {error && <p className="text-[12px] text-red-400">{error}</p>}
+              {error && <p className="text-[12px] text-[#e57373]">{error}</p>}
 
               <div className="flex gap-2 pt-1">
                 <button type="button" onClick={handleGenerate}
@@ -171,7 +171,7 @@ function CreateHubModal({
                     : <><span>✨</span> Generate with AI</>}
                 </button>
                 <button type="button" onClick={onClose}
-                  className="px-4 text-sm text-slate-500 dark:text-zinc-500 border border-slate-200 dark:border-zinc-800 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition">
+                  className="px-4 text-sm text-[#8b7560] border border-[#f5ddc0] rounded-xl hover:bg-[#fff0e6] transition">
                   Cancel
                 </button>
               </div>
@@ -184,10 +184,10 @@ function CreateHubModal({
               {/* Identity row */}
               <div className="flex items-center gap-3">
                 <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-bold text-slate-900 dark:text-zinc-100 truncate">{name}</p>
-                  <p className="text-[12px] text-slate-500 dark:text-zinc-500">
+                  <p className="text-[15px] font-bold text-[#4a3828] truncate">{name}</p>
+                  <p className="text-[12px] text-[#8b7560]">
                     {preview.brandName && <>{preview.brandName} · </>}
-                    <span className="font-medium text-slate-700 dark:text-zinc-300">{preview.category}</span>
+                    <span className="font-medium text-[#5c4a38]">{preview.category}</span>
                   </p>
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-wide text-violet-400 bg-violet-950/40 border border-violet-800 px-2 py-1 rounded-full shrink-0">
@@ -197,7 +197,7 @@ function CreateHubModal({
 
               {/* Description */}
               {preview.description && (
-                <p className="text-[13px] text-slate-500 dark:text-zinc-400 leading-relaxed">
+                <p className="text-[13px] text-[#8b7560] leading-relaxed">
                   {preview.description}
                 </p>
               )}
@@ -205,12 +205,12 @@ function CreateHubModal({
               {/* Specs */}
               {preview.specs.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-600 mb-2">Specs</p>
-                  <div className="rounded-lg border border-slate-200 dark:border-white/[0.06] overflow-hidden">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#8b7560] mb-2">Specs</p>
+                  <div className="rounded-lg border border-[#f5ddc0] overflow-hidden">
                     {preview.specs.map((s, i) => (
-                      <div key={i} className={`flex gap-4 px-3 py-2 text-[12px] ${i % 2 === 0 ? "bg-white dark:bg-white/[0.03]" : "bg-transparent"}`}>
-                        <span className="text-slate-500 dark:text-zinc-500 w-28 shrink-0">{s.label}</span>
-                        <span className="text-slate-800 dark:text-zinc-200 font-medium">{s.value}</span>
+                      <div key={i} className={`flex gap-4 px-3 py-2 text-[12px] ${i % 2 === 0 ? "bg-white" : "bg-transparent"}`}>
+                        <span className="text-[#8b7560] w-28 shrink-0">{s.label}</span>
+                        <span className="text-[#4a3828] font-medium">{s.value}</span>
                       </div>
                     ))}
                   </div>
@@ -220,10 +220,10 @@ function CreateHubModal({
               {/* Variants */}
               {preview.variants.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-600 mb-2">Variants</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#8b7560] mb-2">Variants</p>
                   <div className="flex flex-wrap gap-1.5">
                     {preview.variants.map((v, i) => (
-                      <span key={i} className="text-[11px] font-medium bg-slate-50 dark:bg-white/[0.04] text-slate-700 dark:text-zinc-300 px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/[0.06]">
+                      <span key={i} className="text-[11px] font-medium bg-[#ffecd2] text-[#5c4a38] px-2.5 py-1 rounded-md border border-[#f5ddc0]">
                         {v}
                       </span>
                     ))}
@@ -234,10 +234,10 @@ function CreateHubModal({
               {/* SKUs */}
               {preview.verifiedSkus.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-600 mb-2">SKUs</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#8b7560] mb-2">SKUs</p>
                   <div className="flex flex-wrap gap-1.5">
                     {preview.verifiedSkus.map((s, i) => (
-                      <span key={i} className="text-[11px] font-mono bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-zinc-400 px-2 py-0.5 rounded border border-slate-200 dark:border-white/[0.06]">
+                      <span key={i} className="text-[11px] font-mono bg-[#ffecd2] text-[#8b7560] px-2 py-0.5 rounded border border-[#f5ddc0]">
                         {s}
                       </span>
                     ))}
@@ -245,11 +245,11 @@ function CreateHubModal({
                 </div>
               )}
 
-              <div className="bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-500/20 rounded-lg px-3 py-2.5 text-[11px] text-indigo-600 dark:text-indigo-400">
+              <div className="bg-[#fff0e6] border border-[#e65100]/20 rounded-lg px-3 py-2.5 text-[11px] text-[#e65100]">
                 <span className="font-bold">Community Seeded</span> — this hub will be tagged until a verified owner posts a review.
               </div>
 
-              {error && <p className="text-[12px] text-red-400">{error}</p>}
+              {error && <p className="text-[12px] text-[#e57373]">{error}</p>}
 
               <div className="flex gap-2 pt-1">
                 <button type="button" onClick={() => onCreated(productId, productSlug, productCommunitySlug)}
@@ -257,7 +257,7 @@ function CreateHubModal({
                   🚀 Launch Product Hub
                 </button>
                 <button type="button" onClick={() => setStep("input")}
-                  className="px-4 text-sm text-slate-500 dark:text-zinc-500 border border-slate-200 dark:border-zinc-800 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition">
+                  className="px-4 text-sm text-[#8b7560] border border-[#f5ddc0] rounded-xl hover:bg-[#fff0e6] transition">
                   ← Edit
                 </button>
               </div>
@@ -273,7 +273,7 @@ function CreateHubModal({
 
 export default function ExplorePageWrapper() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-white dark:bg-[#09090b] flex items-center justify-center text-slate-500 dark:text-zinc-500 text-sm animate-pulse">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[#fff8f3] flex items-center justify-center text-[#8b7560] text-sm animate-pulse">Loading...</div>}>
       <ExplorePage />
     </Suspense>
   );
@@ -403,7 +403,7 @@ function ExplorePage() {
     });
 
   return (
-    <main className="min-h-screen bg-white dark:bg-[#09090b] text-slate-800 dark:text-zinc-200">
+    <main className="min-h-screen bg-[#fff8f3] text-[#4a3828]">
       {showCreateModal && (
         <CreateHubModal
           initialName={searchQuery.trim()}
@@ -419,37 +419,36 @@ function ExplorePage() {
         />
       )}
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/[0.06]">
+      <div className="sticky top-0 z-40 bg-[#fff8f3]/95 backdrop-blur-md border-b border-[#f5ddc0]">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-4">
-          <Link href="/" className="shrink-0 md:hidden">
-            <Image src="/logo.svg" alt="Review Jam" width={110} height={26} className="dark:hidden" />
-            <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} className="hidden dark:block" />
+          <Link href="/" className="shrink-0 md">
+            <Image src="/logo.svg" alt="Review Jam" width={110} height={26} />
           </Link>
           <div className="flex-1 min-w-0">
-            <h1 className="text-base font-semibold text-slate-900 dark:text-zinc-100 leading-tight">Explore products</h1>
-            <p className="text-[12px] text-slate-500 dark:text-zinc-500 hidden sm:block">
+            <h1 className="text-base font-semibold text-[#4a3828] leading-tight">Explore products</h1>
+            <p className="text-[12px] text-[#8b7560] hidden sm">
               Authentic, engagement-ranked reviews
             </p>
           </div>
           <Link
             href="/collections"
-            className="flex items-center gap-1.5 text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition shrink-0"
+            className="flex items-center gap-1.5 text-sm font-medium text-[#8b7560] hover:text-[#e65100] transition shrink-0"
           >
             <span>📚</span>
-            <span className="hidden sm:inline">Collections</span>
+            <span className="hidden sm">Collections</span>
           </Link>
         </div>
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-5 space-y-4">
         {/* Search + sort row */}
-        <div className="flex gap-3 flex-col sm:flex-row">
+        <div className="flex gap-3 flex-col sm">
           <input
             type="search"
             placeholder="Search products or brands…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-indigo-500/30 text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-600"
+            className="flex-1 bg-[#ffecd2] border border-[#f5ddc0] rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#e65100]/30 text-[#4a3828] placeholder-[#b89878]"
           />
           <div className="flex gap-1 shrink-0">
             {SORT_OPTIONS.map((opt) => (
@@ -459,8 +458,8 @@ function ExplorePage() {
                 onClick={() => setSortKey(opt.key)}
                 className={`px-2.5 py-1.5 rounded-md text-xs font-medium border transition ${
                   sortKey === opt.key
-                    ? "bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-500/30"
-                    : "bg-white dark:bg-white/[0.03] text-slate-500 dark:text-zinc-400 border-slate-200 dark:border-white/[0.06] hover:bg-slate-50 dark:hover:bg-white/[0.04]"
+                    ? "bg-[#e65100]/20 text-[#e65100] border-[#e65100]/30"
+                    : "bg-white text-[#8b7560] border-[#f5ddc0] hover:bg-[#fff0e6]"
                 }`}
               >
                 {opt.label}
@@ -481,10 +480,10 @@ function ExplorePage() {
                 onClick={() => setCategoryFilter(cat)}
                 className={`whitespace-nowrap flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium border transition ${
                   active
-                    ? "bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-500/30"
+                    ? "bg-[#e65100]/20 text-[#e65100] border-[#e65100]/30"
                     : boosted
-                    ? "bg-violet-50 dark:bg-violet-950/30 text-violet-600 dark:text-violet-400 border-violet-300 dark:border-violet-700 hover:bg-violet-100 dark:hover:bg-violet-900/30"
-                    : "bg-white dark:bg-white/[0.03] text-slate-500 dark:text-zinc-400 border-slate-200 dark:border-white/[0.06] hover:bg-slate-50 dark:hover:bg-white/[0.04]"
+                    ? "bg-violet-50 text-violet-600 border-violet-300 hover:bg-violet-100"
+                    : "bg-white text-[#8b7560] border-[#f5ddc0] hover:bg-[#fff0e6]"
                 }`}
               >
                 {boosted && <span aria-label="Boosted category">🔥</span>}
@@ -499,8 +498,8 @@ function ExplorePage() {
         {featuredCollections.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-600">Collections</p>
-              <Link href="/collections" className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#8b7560]">Collections</p>
+              <Link href="/collections" className="text-[11px] text-[#e65100] hover:underline font-medium">
                 View all
               </Link>
             </div>
@@ -509,10 +508,10 @@ function ExplorePage() {
                 <Link
                   key={c.id}
                   href={`/collections/${c.slug}`}
-                  className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.03] hover:bg-slate-50 dark:hover:bg-white/[0.05] hover:border-indigo-500/30 transition"
+                  className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-lg border border-[#f5ddc0] bg-white hover:bg-[#fff0e6] hover:border-[#e65100]/30 transition"
                 >
                   <span className="text-lg leading-none">{c.emoji}</span>
-                  <span className="text-[12px] font-medium text-slate-700 dark:text-zinc-300 whitespace-nowrap">{c.name}</span>
+                  <span className="text-[12px] font-medium text-[#5c4a38] whitespace-nowrap">{c.name}</span>
                 </Link>
               ))}
             </div>
@@ -521,17 +520,17 @@ function ExplorePage() {
 
         {/* Results */}
         {isLoading ? (
-          <div className="py-12 text-center text-slate-500 dark:text-zinc-500 text-sm animate-pulse">Loading…</div>
+          <div className="py-12 text-center text-[#8b7560] text-sm animate-pulse">Loading…</div>
         ) : filtered.length === 0 ? (
           <div className="py-12 flex flex-col items-center gap-4">
-            <p className="text-slate-500 dark:text-zinc-500 text-sm">
+            <p className="text-[#8b7560] text-sm">
               {searchQuery.trim()
-                ? <>No results for <span className="font-semibold text-slate-600 dark:text-zinc-400">"{searchQuery}"</span></>
+                ? <>No results for <span className="font-semibold text-[#5c4a38]">"{searchQuery}"</span></>
                 : "No products found."}
             </p>
             {searchQuery.trim().length >= 2 && (
               <div className="flex flex-col items-center gap-2 text-center max-w-sm">
-                <p className="text-[12px] text-slate-500 dark:text-zinc-500">
+                <p className="text-[12px] text-[#8b7560]">
                   This product doesn't have a hub yet. Create one and Gemini will auto-fill the specs, variants, and description.
                 </p>
                 <button
@@ -545,21 +544,21 @@ function ExplorePage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm lg gap-4">
             {filtered.map((p) => {
               const isCompareSelected = compareIds.has(p.id);
               return (
                 <div key={p.id} className="relative">
                   <Link
                     href={p.slug && p.communitySlug ? `/c/${p.communitySlug}/${p.slug}` : `/product/${p.id}`}
-                    className={`group glass-card flex flex-col overflow-hidden hover:border-slate-200 dark:hover:border-white/10 hover:shadow-md hover:shadow-slate-200/50 dark:hover:shadow-black/20 transition ${
-                      isCompareSelected ? "ring-2 ring-indigo-500/50" : ""
+                    className={`group glass-card flex flex-col overflow-hidden hover:border-[#f5ddc0] hover:shadow-md hover:shadow-[#f5ddc0]/50 transition ${
+                      isCompareSelected ? "ring-2 ring-[#e65100]/50" : ""
                     }`}
                   >
                     {/* Cover image */}
                     <div className="relative">
                       {p.coverImage ? (
-                        <div className="relative w-full h-40 overflow-hidden bg-slate-100 dark:bg-zinc-900 shrink-0">
+                        <div className="relative w-full h-40 overflow-hidden bg-[#ffecd2] shrink-0">
                           <img
                             src={p.coverImage}
                             alt={p.name}
@@ -568,22 +567,22 @@ function ExplorePage() {
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
                           <div className="absolute bottom-2 left-3 flex items-center gap-1.5">
                             {isActive(p) && (
-                              <span className="text-[10px] font-semibold text-white bg-emerald-500/90 px-1.5 py-0.5 rounded-full backdrop-blur-sm">Live</span>
+                              <span className="text-[10px] font-semibold text-white bg-[#66bb6a]/90 px-1.5 py-0.5 rounded-full backdrop-blur-sm">Live</span>
                             )}
                             {p.bountyStatus === "active" && p.bountyPoolRemaining > 0 && (
-                              <span className="text-[10px] font-semibold text-white bg-amber-500/90 px-1.5 py-0.5 rounded-full backdrop-blur-sm">
+                              <span className="text-[10px] font-semibold text-white bg-[#ffa726]/90 px-1.5 py-0.5 rounded-full backdrop-blur-sm">
                                 &#128176; ${p.bountyPoolRemaining.toFixed(0)} bounty
                               </span>
                             )}
                             {p.avgRating > 0 && (
                               <span className="text-[11px] font-semibold text-white flex items-center gap-0.5">
-                                <span className="text-amber-400">&#9733;</span> {p.avgRating.toFixed(1)}
+                                <span className="text-[#ffcc80]">&#9733;</span> {p.avgRating.toFixed(1)}
                               </span>
                             )}
                           </div>
                         </div>
                       ) : (
-                        <div className="w-full h-40 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-zinc-800 dark:to-zinc-900 flex items-center justify-center shrink-0">
+                        <div className="w-full h-40 bg-gradient-to-br from-[#ffecd2] to-[#f5ddc0] flex items-center justify-center shrink-0">
                           <span className="text-4xl opacity-30 select-none">&#128230;</span>
                         </div>
                       )}
@@ -600,18 +599,18 @@ function ExplorePage() {
                     <div className="p-4 flex flex-col gap-2 flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-[14px] font-semibold text-slate-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 leading-snug transition-colors">
+                          <h3 className="text-[14px] font-semibold text-[#4a3828] group-hover:text-[#e65100] leading-snug transition-colors">
                             {p.name}
                           </h3>
-                          <p className="text-[12px] text-slate-500 dark:text-zinc-500 mt-0.5">{p.brandName}</p>
+                          <p className="text-[12px] text-[#8b7560] mt-0.5">{p.brandName}</p>
                         </div>
                         {!p.coverImage && p.avgRating > 0 && (
-                          <span className="text-[11px] text-amber-500 dark:text-amber-400 font-semibold shrink-0">&#9733; {p.avgRating.toFixed(1)}</span>
+                          <span className="text-[11px] text-[#ffa726] font-semibold shrink-0">&#9733; {p.avgRating.toFixed(1)}</span>
                         )}
                       </div>
 
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[11px] bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-zinc-400 px-2 py-0.5 rounded-full font-medium border border-slate-200 dark:border-white/[0.06]">{p.category}</span>
+                        <span className="text-[11px] bg-[#ffecd2] text-[#8b7560] px-2 py-0.5 rounded-full font-medium border border-[#f5ddc0]">{p.category}</span>
                         {p.communitySeeded && !p.hasVerifiedOwner && (
                           <span className="text-[10px] font-medium text-violet-400 bg-violet-950/40 px-1.5 py-0.5 rounded-full border border-violet-800">
                             &#127793; Seeded
@@ -620,16 +619,16 @@ function ExplorePage() {
                       </div>
 
                       {p.topQuote && (
-                        <p className="text-[12px] text-slate-500 dark:text-zinc-500 leading-relaxed line-clamp-2 italic">
+                        <p className="text-[12px] text-[#8b7560] leading-relaxed line-clamp-2 italic">
                           &ldquo;{p.topQuote}&rdquo;
                         </p>
                       )}
 
-                      <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-zinc-500 mt-auto pt-2 border-t border-slate-200 dark:border-white/[0.06]">
+                      <div className="flex items-center gap-3 text-[11px] text-[#8b7560] mt-auto pt-2 border-t border-[#f5ddc0]">
                         <span>{p.reviewCount} review{p.reviewCount !== 1 ? "s" : ""}</span>
                         <span>&#128077; {p.totalLikes}</span>
                         {sortKey === "discovery" && p.discoveryRank > 0 && (
-                          <span className="ml-auto text-indigo-600 dark:text-indigo-400 font-semibold">
+                          <span className="ml-auto text-[#e65100] font-semibold">
                             &#128293; {p.discoveryRank.toFixed(1)}
                           </span>
                         )}
@@ -655,8 +654,8 @@ function ExplorePage() {
                     }}
                     className={`absolute top-2 left-2 z-10 w-6 h-6 rounded-md border-2 flex items-center justify-center transition ${
                       isCompareSelected
-                        ? "bg-indigo-600 border-indigo-600 text-white"
-                        : "bg-white/80 dark:bg-zinc-900/80 border-slate-300 dark:border-zinc-600 text-transparent hover:border-indigo-400 hover:text-indigo-400"
+                        ? "bg-[#e65100] border-[#e65100] text-white"
+                        : "bg-white/80 border-[#f5ddc0] text-transparent hover:border-[#ff8a65] hover:text-[#ff8a65]"
                     }`}
                     title={isCompareSelected ? "Remove from comparison" : "Add to comparison"}
                   >
@@ -673,20 +672,20 @@ function ExplorePage() {
 
       {/* Floating compare bar */}
       {compareIds.size >= 2 && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-slate-900 dark:bg-zinc-800 text-white px-5 py-3 rounded-2xl shadow-2xl border border-slate-700 dark:border-zinc-700">
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-[#4a3828] text-white px-5 py-3 rounded-2xl shadow-2xl border border-[#5c4a38]">
           <span className="text-sm font-medium">
             {compareIds.size} product{compareIds.size !== 1 ? "s" : ""} selected
           </span>
           <Link
             href={`/compare/products?ids=${Array.from(compareIds).join(",")}`}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-1.5 rounded-lg transition"
+            className="bg-[#e65100] hover:bg-[#e65100] text-white text-sm font-semibold px-4 py-1.5 rounded-lg transition"
           >
             Compare
           </Link>
           <button
             type="button"
             onClick={() => setCompareIds(new Set())}
-            className="text-sm text-slate-400 hover:text-white transition"
+            className="text-sm text-[#8b7560] hover:text-white transition"
           >
             Clear
           </button>

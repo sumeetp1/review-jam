@@ -15,7 +15,7 @@ export default function TabNav() {
   const pathname = usePathname();
 
   return (
-    <div className="border-b border-white/[0.06] bg-white/[0.02]">
+    <div className="border-b border-[#f5ddc0] bg-[#fff0e6]">
       <div className="max-w-6xl mx-auto px-4 sm:px-8">
         <nav className="flex gap-1 overflow-x-auto scrollbar-hide py-2 -mb-px">
           {TABS.map((tab) => {
@@ -26,8 +26,8 @@ export default function TabNav() {
                 href={tab.href}
                 className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition ${
                   isActive
-                    ? "bg-indigo-600 text-white"
-                    : "bg-white/[0.03] text-zinc-300 hover:bg-white/[0.06]"
+                    ? "bg-[#e65100] text-white"
+                    : "bg-white text-[#d4b896] hover:bg-[#fff0e6]"
                 }`}
               >
                 <span>{tab.icon}</span>

@@ -33,7 +33,7 @@ export default function ProductIdRedirect({ params }: { params: Promise<{ produc
   }, [productId, router]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 flex items-center justify-center text-sm text-slate-400">
+    <div className="min-h-screen bg-[#fff8f3] flex items-center justify-center text-sm text-[#8b7560]">
       Loading product…
     </div>
   );

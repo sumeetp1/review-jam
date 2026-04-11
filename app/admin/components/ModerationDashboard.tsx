@@ -92,16 +92,16 @@ export default function ModerationDashboard({
   };
 
   return (
-    <div className="mt-8 bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl">
+    <div className="mt-8 bg-white p-8 rounded-3xl border border-[#f5ddc0] shadow-2xl">
       <div className="flex justify-between items-start mb-6">
         <div>
           <h2 className="text-2xl font-bold mb-1">🛡️ Moderation Reason Dashboard</h2>
-          <p className="text-slate-400 text-sm">
+          <p className="text-[#8b7560] text-sm">
             Recent moderation outcomes from the `moderationEvents` stream.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+          <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#e65100]/20 text-[#e65100] border border-[#e65100]/30">
             Loaded {moderationEvents.length}
           </span>
         </div>
@@ -109,11 +109,11 @@ export default function ModerationDashboard({
 
       <div className="flex flex-col md:flex-row md:items-end gap-3 mb-6">
         <div>
-          <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Date Range</label>
+          <label className="block text-xs font-bold text-[#8b7560] uppercase mb-1">Date Range</label>
           <select
             value={dateRangeFilter}
             onChange={(e) => setDateRangeFilter(e.target.value as DateRangeFilter)}
-            className="bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white outline-none"
+            className="bg-[#ffecd2] border border-[#f5ddc0] rounded-xl p-2.5 text-sm text-[#4a3828] outline-none"
           >
             <option value="24h">Last 24 hours</option>
             <option value="7d">Last 7 days</option>
@@ -122,11 +122,11 @@ export default function ModerationDashboard({
           </select>
         </div>
         <div>
-          <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Source</label>
+          <label className="block text-xs font-bold text-[#8b7560] uppercase mb-1">Source</label>
           <select
             value={sourceFilter}
             onChange={(e) => setSourceFilter(e.target.value as SourceFilter)}
-            className="bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white outline-none"
+            className="bg-[#ffecd2] border border-[#f5ddc0] rounded-xl p-2.5 text-sm text-[#4a3828] outline-none"
           >
             <option value="all">All sources</option>
             <option value="deterministic">Deterministic checks</option>
@@ -135,55 +135,55 @@ export default function ModerationDashboard({
         </div>
         <button
           onClick={handleExportModerationCsv}
-          className="md:ml-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2.5 rounded-xl transition"
+          className="md:ml-auto bg-[#e65100] hover:bg-[#d84315] text-white font-bold px-4 py-2.5 rounded-xl transition"
         >
           Export CSV
         </button>
       </div>
 
       {isLoadingModeration ? (
-        <div className="text-slate-400 font-semibold animate-pulse">Loading moderation analytics...</div>
+        <div className="text-[#8b7560] font-semibold animate-pulse">Loading moderation analytics...</div>
       ) : moderationEvents.length === 0 ? (
-        <div className="text-slate-400">No moderation events yet. Submit some reviews to populate this dashboard.</div>
+        <div className="text-[#8b7560]">No moderation events yet. Submit some reviews to populate this dashboard.</div>
       ) : filteredEvents.length === 0 ? (
-        <div className="text-slate-400">No events match the current date/source filters.</div>
+        <div className="text-[#8b7560]">No events match the current date/source filters.</div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-slate-900 border border-slate-700 rounded-2xl p-4">
-              <p className="text-slate-400 text-xs font-bold uppercase">Total Checked</p>
-              <p className="text-2xl font-black text-white mt-1">{filteredEvents.length}</p>
+            <div className="bg-[#ffecd2] border border-[#f5ddc0] rounded-2xl p-4">
+              <p className="text-[#8b7560] text-xs font-bold uppercase">Total Checked</p>
+              <p className="text-2xl font-black text-[#4a3828] mt-1">{filteredEvents.length}</p>
             </div>
-            <div className="bg-slate-900 border border-slate-700 rounded-2xl p-4">
-              <p className="text-slate-400 text-xs font-bold uppercase">Blocked</p>
-              <p className="text-2xl font-black text-red-400 mt-1">{blockedEvents.length}</p>
+            <div className="bg-[#ffecd2] border border-[#f5ddc0] rounded-2xl p-4">
+              <p className="text-[#8b7560] text-xs font-bold uppercase">Blocked</p>
+              <p className="text-2xl font-black text-[#ef5350] mt-1">{blockedEvents.length}</p>
             </div>
-            <div className="bg-slate-900 border border-slate-700 rounded-2xl p-4">
-              <p className="text-slate-400 text-xs font-bold uppercase">Approved</p>
-              <p className="text-2xl font-black text-green-400 mt-1">{filteredEvents.length - blockedEvents.length}</p>
+            <div className="bg-[#ffecd2] border border-[#f5ddc0] rounded-2xl p-4">
+              <p className="text-[#8b7560] text-xs font-bold uppercase">Approved</p>
+              <p className="text-2xl font-black text-[#66bb6a] mt-1">{filteredEvents.length - blockedEvents.length}</p>
             </div>
-            <div className="bg-slate-900 border border-slate-700 rounded-2xl p-4">
-              <p className="text-slate-400 text-xs font-bold uppercase">Approval Rate</p>
-              <p className="text-2xl font-black text-indigo-300 mt-1">{approvalRate}%</p>
+            <div className="bg-[#ffecd2] border border-[#f5ddc0] rounded-2xl p-4">
+              <p className="text-[#8b7560] text-xs font-bold uppercase">Approval Rate</p>
+              <p className="text-2xl font-black text-[#e65100] mt-1">{approvalRate}%</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-slate-900 border border-slate-700 rounded-2xl p-5">
+            <div className="bg-[#ffecd2] border border-[#f5ddc0] rounded-2xl p-5">
               <h3 className="font-bold text-lg mb-4">Top Rejection Reasons</h3>
               {topReasons.length === 0 ? (
-                <p className="text-slate-400 text-sm">No blocked reviews in this sample window.</p>
+                <p className="text-[#8b7560] text-sm">No blocked reviews in this sample window.</p>
               ) : (
                 <div className="space-y-3">
                   {topReasons.map(([reason, count]) => (
                     <div key={reason}>
                       <div className="flex items-center justify-between text-sm mb-1">
-                        <p className="text-slate-300 font-medium truncate pr-3">{reason}</p>
-                        <p className="text-indigo-300 font-bold">{count}</p>
+                        <p className="text-[#5c4a38] font-medium truncate pr-3">{reason}</p>
+                        <p className="text-[#e65100] font-bold">{count}</p>
                       </div>
-                      <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                      <div className="h-2 w-full bg-[#fff8f3] rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-indigo-500 rounded-full"
+                          className="h-full bg-[#e65100] rounded-full"
                           style={{ width: `${Math.max(8, (count / blockedEvents.length) * 100)}%` }}
                         />
                       </div>
@@ -193,20 +193,20 @@ export default function ModerationDashboard({
               )}
             </div>
 
-            <div className="bg-slate-900 border border-slate-700 rounded-2xl p-5">
+            <div className="bg-[#ffecd2] border border-[#f5ddc0] rounded-2xl p-5">
               <h3 className="font-bold text-lg mb-4">Recent Blocked Reviews</h3>
               {blockedEvents.length === 0 ? (
-                <p className="text-slate-400 text-sm">No blocked reviews yet.</p>
+                <p className="text-[#8b7560] text-sm">No blocked reviews yet.</p>
               ) : (
                 <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
                   {blockedEvents.slice(0, 12).map((event) => (
-                    <div key={event.id} className="border border-red-500/20 bg-red-900/10 rounded-xl p-3">
+                    <div key={event.id} className="border border-[#ef5350]/20 bg-[#ef5350]/5 rounded-xl p-3">
                       <div className="flex items-center justify-between mb-1">
-                        <p className="text-sm font-bold text-red-300">{event.reviewerName || "Anonymous"}</p>
-                        <p className="text-[11px] text-slate-500">{event.source}</p>
+                        <p className="text-sm font-bold text-[#ef5350]">{event.reviewerName || "Anonymous"}</p>
+                        <p className="text-[11px] text-[#8b7560]">{event.source}</p>
                       </div>
-                      <p className="text-[13px] text-slate-300 mb-2 line-clamp-2">{event.reviewPreview}</p>
-                      <p className="text-[12px] font-semibold text-red-400">Reason: {event.reason}</p>
+                      <p className="text-[13px] text-[#5c4a38] mb-2 line-clamp-2">{event.reviewPreview}</p>
+                      <p className="text-[12px] font-semibold text-[#ef5350]">Reason: {event.reason}</p>
                     </div>
                   ))}
                 </div>

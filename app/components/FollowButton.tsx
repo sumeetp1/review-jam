@@ -124,7 +124,7 @@ export default function FollowButton({ targetUserId, currentUserId: propUserId, 
         type="button"
         onClick={handleUnfollow}
         disabled={busy}
-        className="text-xs font-semibold px-4 py-1.5 rounded-lg transition border border-slate-200 dark:border-white/[0.06] text-slate-700 dark:text-zinc-300 hover:border-red-300 dark:hover:border-red-800 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 group"
+        className="text-xs font-semibold px-4 py-1.5 rounded-lg transition border border-[#f5ddc0] text-[#5c4a38] hover:border-[#e57373] hover:text-[#ef5350] hover:bg-red-50 group"
       >
         <span className="group-hover:hidden">Following</span>
         <span className="hidden group-hover:inline">Unfollow</span>
@@ -137,7 +137,7 @@ export default function FollowButton({ targetUserId, currentUserId: propUserId, 
       type="button"
       onClick={handleFollow}
       disabled={busy}
-      className="text-xs font-semibold px-4 py-1.5 rounded-lg transition bg-indigo-600 text-white hover:bg-indigo-500"
+      className="text-xs font-semibold px-4 py-1.5 rounded-lg transition bg-[#e65100] text-white hover:bg-[#e65100]/90"
     >
       Follow
     </button>

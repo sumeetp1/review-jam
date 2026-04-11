@@ -41,16 +41,16 @@ export default function CommunityTagManager({ product, currentUserEmail, onTagsU
   }
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-indigo-200 dark:border-indigo-800/50 p-4">
-      <p className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-2">⚡ Admin — Community Tags</p>
+    <div className="bg-white rounded-xl border border-[#ffab91] p-4">
+      <p className="text-[10px] font-bold uppercase tracking-widest text-[#e65100] mb-2">⚡ Admin — Community Tags</p>
       <div className="flex flex-wrap gap-1.5 mb-3">
-        <span className="text-[11px] font-semibold bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-2 py-0.5 rounded-full">
+        <span className="text-[11px] font-semibold bg-[#4a3828] text-white px-2 py-0.5 rounded-full">
           #{product.communitySlug} <span className="opacity-60 font-normal">home</span>
         </span>
         {tags.map((t) => (
-          <span key={t} className="inline-flex items-center gap-1 text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700 px-2 py-0.5 rounded-full">
+          <span key={t} className="inline-flex items-center gap-1 text-[11px] font-semibold bg-[#fff0e6] text-[#e65100] border border-[#ffab91] px-2 py-0.5 rounded-full">
             #{t}
-            <button type="button" onClick={() => removeTag(t)} disabled={busy} className="text-indigo-400 hover:text-red-500 transition leading-none">×</button>
+            <button type="button" onClick={() => removeTag(t)} disabled={busy} className="text-[#ff8a65] hover:text-[#ef5350] transition leading-none">×</button>
           </span>
         ))}
       </div>
@@ -61,9 +61,9 @@ export default function CommunityTagManager({ product, currentUserEmail, onTagsU
           onChange={(e) => setNewTag(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && addTag()}
           placeholder="community-slug"
-          className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-[12px] outline-none focus:ring-1 focus:ring-indigo-400 dark:text-slate-100 dark:placeholder-slate-500"
+          className="flex-1 bg-[#ffecd2] border border-[#f5ddc0] rounded-lg px-3 py-1.5 text-[12px] outline-none focus:ring-1 focus:ring-[#ff8a65] text-[#4a3828] placeholder:text-[#b89878]"
         />
-        <button type="button" onClick={addTag} disabled={busy || !newTag.trim()} className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-[12px] font-semibold rounded-lg disabled:opacity-50 transition">
+        <button type="button" onClick={addTag} disabled={busy || !newTag.trim()} className="px-3 py-1.5 bg-[#e65100] hover:bg-[#e65100]/90 text-white text-[12px] font-semibold rounded-lg disabled:opacity-50 transition">
           + Tag
         </button>
       </div>

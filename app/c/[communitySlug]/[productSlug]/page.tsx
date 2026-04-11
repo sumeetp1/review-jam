@@ -234,11 +234,11 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
     await updateDoc(doc(db, "productDiscussionAnswers", answerId), { upvotes: increment(has ? -1 : 1), upvotedBy: has ? arrayRemove(user.uid) : arrayUnion(user.uid) });
   };
 
-  if (isLoading) return <div className="min-h-[40vh] flex items-center justify-center text-sm text-slate-500 dark:text-zinc-500 bg-white dark:bg-[#09090b]">Loading…</div>;
+  if (isLoading) return <div className="min-h-[40vh] flex items-center justify-center text-sm text-[#8b7560] bg-[#fff8f3]">Loading…</div>;
   if (!product) return (
-    <div className="min-h-screen bg-white dark:bg-[#09090b] flex flex-col items-center justify-center gap-3 px-4">
-      <p className="text-slate-500 dark:text-zinc-400">Product not found</p>
-      <button type="button" onClick={() => router.push(`/c/${communitySlug}`)} className="text-sm text-slate-700 dark:text-zinc-300 underline">← Back to community</button>
+    <div className="min-h-screen bg-[#fff8f3] flex flex-col items-center justify-center gap-3 px-4">
+      <p className="text-[#8b7560]">Product not found</p>
+      <button type="button" onClick={() => router.push(`/c/${communitySlug}`)} className="text-sm text-[#5c4a38] underline">← Back to community</button>
     </div>
   );
 
@@ -246,7 +246,7 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
   const currentUserName = user?.displayName ?? undefined;
 
   return (
-    <main className="min-h-screen bg-white dark:bg-[#09090b] text-slate-800 dark:text-zinc-200">
+    <main className="min-h-screen bg-[#fff8f3] text-[#4a3828]">
       {/* Review Wizard */}
       {reviewMode && user && (
         <ReviewWizard user={user} mode={reviewMode} productInfo={{ name: product.name, category: product.category, variants, subjectType: product.subjectType ?? "product" }} onSubmit={handleReviewSubmit} onClose={() => setReviewMode(null)} />
@@ -258,86 +258,85 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
       )}
 
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/[0.06]">
+      <div className="sticky top-0 z-30 bg-[#fff8f3]/95 backdrop-blur-md border-b border-[#f5ddc0]">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
-          <Link href="/" className="shrink-0 md:hidden">
-            <Image src="/logo.svg" alt="Review Jam" width={100} height={24} className="dark:hidden" />
-            <Image src="/logo-dark.svg" alt="Review Jam" width={100} height={24} className="hidden dark:block" />
+          <Link href="/" className="shrink-0 md">
+            <Image src="/logo.svg" alt="Review Jam" width={100} height={24} />
           </Link>
-          <Link href={`/c/${communitySlug}`} className="text-sm text-slate-500 dark:text-zinc-400 hover:underline ml-2 flex items-center gap-1">
+          <Link href={`/c/${communitySlug}`} className="text-sm text-[#8b7560] hover:underline ml-2 flex items-center gap-1">
             ← <span className="font-mono text-[12px]">rj/{communitySlug}</span>
           </Link>
         </div>
         <div className="max-w-5xl mx-auto px-4 pb-4">
-          <p className="text-[11px] font-medium text-slate-500 dark:text-zinc-500 uppercase tracking-widest mb-0.5">{product.category}</p>
+          <p className="text-[11px] font-medium text-[#8b7560] uppercase tracking-widest mb-0.5">{product.category}</p>
           <div className="flex items-start gap-2.5 flex-wrap">
-            <h1 className="text-xl font-bold text-slate-900 dark:text-zinc-100 leading-snug">{product.name}</h1>
+            <h1 className="text-xl font-bold text-[#4a3828] leading-snug">{product.name}</h1>
             {product.communitySeeded && !reviews.some((r: any) => r.isVerifiedPurchase === true) && (
-              <span className="mt-0.5 shrink-0 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/30 border border-violet-200 dark:border-violet-800 px-2 py-1 rounded-full">🌱 Community Seeded</span>
+              <span className="mt-0.5 shrink-0 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-violet-600 bg-violet-50 border border-violet-200 px-2 py-1 rounded-full">🌱 Community Seeded</span>
             )}
             {product.communitySeeded && reviews.some((r: any) => r.isVerifiedPurchase === true) && (
-              <span className="mt-0.5 shrink-0 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 px-2 py-1 rounded-full">✅ Verified</span>
+              <span className="mt-0.5 shrink-0 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-[#66bb6a] bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-full">✅ Verified</span>
             )}
             {product.bountyStatus === "active" && (product.bountyPoolRemaining ?? 0) > 0 && (
-              <span className="mt-0.5 shrink-0 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-amber-500 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-2 py-1 rounded-full">
+              <span className="mt-0.5 shrink-0 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-[#ffa726] bg-amber-50 border border-amber-200 px-2 py-1 rounded-full">
                 💰 ${(product.bountyPoolRemaining ?? 0).toFixed(0)} Bounty Pool
               </span>
             )}
           </div>
-          <p className="text-sm text-slate-500 dark:text-zinc-500">{product.brandName}</p>
+          <p className="text-sm text-[#8b7560]">{product.brandName}</p>
 
           {/* Community tags row */}
           <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-            <Link href={`/c/${communitySlug}`} className="text-[11px] font-semibold bg-slate-100 dark:bg-white/[0.1] text-slate-700 dark:text-zinc-100 px-2 py-0.5 rounded-full hover:opacity-80 transition">
+            <Link href={`/c/${communitySlug}`} className="text-[11px] font-semibold bg-[#ffecd2] text-[#5c4a38] px-2 py-0.5 rounded-full hover:opacity-80 transition">
               #{communitySlug}
             </Link>
             {(product.communityTags ?? []).map((tag: string) => (
-              <Link key={tag} href={`/c/${tag}`} className="text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700 px-2 py-0.5 rounded-full hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition">
+              <Link key={tag} href={`/c/${tag}`} className="text-[11px] font-semibold bg-[#fff0e6] text-[#e65100] border border-[#f5ddc0] px-2 py-0.5 rounded-full hover:bg-[#ffecd2] transition">
                 #{tag}
               </Link>
             ))}
-            <span className="text-[10px] font-mono text-slate-400 dark:text-zinc-600">rj/{communitySlug}/{productSlug}</span>
+            <span className="text-[10px] font-mono text-[#8b7560]">rj/{communitySlug}/{productSlug}</span>
           </div>
         </div>
       </div>
 
       {/* Two-column hub */}
       <div className="max-w-5xl mx-auto px-4 py-5">
-        <div className="flex flex-col md:flex-row gap-5">
+        <div className="flex flex-col md gap-5">
 
           {/* LEFT COLUMN */}
-          <div className="md:w-2/5 space-y-4 shrink-0">
+          <div className="md space-y-4 shrink-0">
 
             {/* Health + rating */}
-            <div className="bg-white dark:bg-white/[0.03] rounded-xl border border-slate-200 dark:border-white/[0.06] p-4">
+            <div className="bg-white rounded-xl border border-[#f5ddc0] p-4">
               <div className="flex items-center gap-4">
-                {avgHealthScore > 0 ? <HealthRing score={avgHealthScore} /> : <div className="w-[92px] h-[92px] rounded-full border-4 border-slate-200 dark:border-white/[0.06] flex items-center justify-center shrink-0"><span className="text-[11px] text-slate-500 dark:text-zinc-500 text-center leading-tight">No<br/>data</span></div>}
+                {avgHealthScore > 0 ? <HealthRing score={avgHealthScore} /> : <div className="w-[92px] h-[92px] rounded-full border-4 border-[#f5ddc0] flex items-center justify-center shrink-0"><span className="text-[11px] text-[#8b7560] text-center leading-tight">No<br/>data</span></div>}
                 <div className="flex-1 min-w-0">
-                  {avgRating > 0 && <div className="flex items-center gap-1 mb-1">{[1,2,3,4,5].map((n) => <span key={n} className={`text-base ${n <= Math.round(avgRating) ? "text-amber-500 dark:text-amber-400" : "text-slate-300 dark:text-zinc-700"}`}>★</span>)}<span className="text-sm font-semibold text-slate-900 dark:text-zinc-100 ml-1">{avgRating.toFixed(1)}</span></div>}
-                  <p className="text-[12px] text-slate-500 dark:text-zinc-500">{displayedReviews.length} review{displayedReviews.length !== 1 ? "s" : ""}{verifiedOnly && <span className="ml-1 text-emerald-600 dark:text-emerald-400">· verified</span>}</p>
-                  <span className="inline-block mt-1.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded">Active pool</span>
+                  {avgRating > 0 && <div className="flex items-center gap-1 mb-1">{[1,2,3,4,5].map((n) => <span key={n} className={`text-base ${n <= Math.round(avgRating) ? "text-[#ffa726]" : "text-[#d4b896]"}`}>★</span>)}<span className="text-sm font-semibold text-[#4a3828] ml-1">{avgRating.toFixed(1)}</span></div>}
+                  <p className="text-[12px] text-[#8b7560]">{displayedReviews.length} review{displayedReviews.length !== 1 ? "s" : ""}{verifiedOnly && <span className="ml-1 text-[#66bb6a]">· verified</span>}</p>
+                  <span className="inline-block mt-1.5 text-[10px] font-medium text-[#66bb6a] bg-emerald-50 px-2 py-0.5 rounded">Active pool</span>
                 </div>
               </div>
-              <button type="button" onClick={() => setVerifiedOnly((v) => !v)} className={`mt-3 w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold border transition ${verifiedOnly ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-700" : "bg-white dark:bg-white/[0.03] text-slate-500 dark:text-zinc-400 border-slate-200 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.1]"}`}><span>{verifiedOnly ? "✓" : "○"}</span>{verifiedOnly ? "Showing verified owners only" : "Show verified owners only"}</button>
+              <button type="button" onClick={() => setVerifiedOnly((v) => !v)} className={`mt-3 w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold border transition ${verifiedOnly ? "bg-emerald-50 text-[#66bb6a] border-emerald-200" : "bg-white text-[#8b7560] border-[#f5ddc0] hover:border-[#f5ddc0]"}`}><span>{verifiedOnly ? "✓" : "○"}</span>{verifiedOnly ? "Showing verified owners only" : "Show verified owners only"}</button>
             </div>
 
             {/* Pros / Cons */}
             {(topPros.length > 0 || topCons.length > 0) && (
-              <div className="bg-white dark:bg-white/[0.03] rounded-xl border border-slate-200 dark:border-white/[0.06] p-4 space-y-3">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-600">Community Summary</p>
-                {topPros.length > 0 && <div><p className="text-[10px] font-bold uppercase tracking-wide text-emerald-500 mb-1.5">✓ Loved for</p><div className="space-y-1.5">{topPros.map((p, i) => <div key={i} className="flex items-center gap-2"><div className="flex-1 bg-slate-100 dark:bg-white/[0.05] rounded-full h-1.5 overflow-hidden"><div className="h-full bg-emerald-500 rounded-full" style={{ width: `${Math.min(100, (p.count / (topPros[0]?.count || 1)) * 100)}%` }} /></div><span className="text-[12px] text-slate-700 dark:text-zinc-300 min-w-0 flex-shrink-0 max-w-[65%] truncate text-right">{p.text}</span><span className="text-[10px] text-emerald-500 font-bold shrink-0">×{p.count}</span></div>)}</div></div>}
-                {topPros.length > 0 && topCons.length > 0 && <div className="border-t border-slate-200 dark:border-white/[0.06]" />}
-                {topCons.length > 0 && <div><p className="text-[10px] font-bold uppercase tracking-wide text-red-500 mb-1.5">⚠ Common issues</p><div className="space-y-1.5">{topCons.map((c, i) => <div key={i} className="flex items-center gap-2"><div className="flex-1 bg-slate-100 dark:bg-white/[0.05] rounded-full h-1.5 overflow-hidden"><div className="h-full bg-red-500 rounded-full" style={{ width: `${Math.min(100, (c.count / (topCons[0]?.count || 1)) * 100)}%` }} /></div><span className="text-[12px] text-slate-700 dark:text-zinc-300 min-w-0 flex-shrink-0 max-w-[65%] truncate text-right">{c.text}</span><span className="text-[10px] text-red-500 font-bold shrink-0">×{c.count}</span></div>)}</div></div>}
+              <div className="bg-white rounded-xl border border-[#f5ddc0] p-4 space-y-3">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#8b7560]">Community Summary</p>
+                {topPros.length > 0 && <div><p className="text-[10px] font-bold uppercase tracking-wide text-[#66bb6a] mb-1.5">✓ Loved for</p><div className="space-y-1.5">{topPros.map((p, i) => <div key={i} className="flex items-center gap-2"><div className="flex-1 bg-[#ffecd2] rounded-full h-1.5 overflow-hidden"><div className="h-full bg-[#66bb6a] rounded-full" style={{ width: `${Math.min(100, (p.count / (topPros[0]?.count || 1)) * 100)}%` }} /></div><span className="text-[12px] text-[#5c4a38] min-w-0 flex-shrink-0 max-w-[65%] truncate text-right">{p.text}</span><span className="text-[10px] text-[#66bb6a] font-bold shrink-0">×{p.count}</span></div>)}</div></div>}
+                {topPros.length > 0 && topCons.length > 0 && <div className="border-t border-[#f5ddc0]" />}
+                {topCons.length > 0 && <div><p className="text-[10px] font-bold uppercase tracking-wide text-[#ef5350] mb-1.5">⚠ Common issues</p><div className="space-y-1.5">{topCons.map((c, i) => <div key={i} className="flex items-center gap-2"><div className="flex-1 bg-[#ffecd2] rounded-full h-1.5 overflow-hidden"><div className="h-full bg-[#ef5350] rounded-full" style={{ width: `${Math.min(100, (c.count / (topCons[0]?.count || 1)) * 100)}%` }} /></div><span className="text-[12px] text-[#5c4a38] min-w-0 flex-shrink-0 max-w-[65%] truncate text-right">{c.text}</span><span className="text-[10px] text-[#ef5350] font-bold shrink-0">×{c.count}</span></div>)}</div></div>}
               </div>
             )}
 
             {/* Variants */}
             {variants.length > 0 && (
-              <div className="bg-white dark:bg-white/[0.03] rounded-xl border border-slate-200 dark:border-white/[0.06] p-4">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-600 mb-2.5">Variants & SKUs</p>
+              <div className="bg-white rounded-xl border border-[#f5ddc0] p-4">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#8b7560] mb-2.5">Variants & SKUs</p>
                 <div className="space-y-1.5">
-                  <button type="button" onClick={() => setSelectedVariantId("all")} className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[12px] font-medium border transition ${selectedVariantId === "all" ? "bg-indigo-600 text-white border-indigo-600" : "bg-white dark:bg-white/[0.03] text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.1]"}`}><span>All variants</span><span className="opacity-60">{reviews.length}</span></button>
-                  {variants.map((v) => { const vc = reviews.filter((r) => r.variantId === v.id).length; const vavg = vc > 0 ? (reviews.filter((r) => r.variantId === v.id).reduce((s, r) => s + (r.rating || 0), 0) / vc).toFixed(1) : null; const sel = selectedVariantId === v.id; return <button key={v.id} type="button" onClick={() => setSelectedVariantId(v.id)} className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[12px] font-medium border transition ${sel ? "bg-violet-600 text-white border-violet-600" : "bg-white dark:bg-white/[0.03] text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.1]"}`}><span className="truncate">{v.name}</span><span className="flex items-center gap-1.5 shrink-0 ml-2">{vavg && <span className={sel ? "text-amber-200" : "text-amber-500"}>★ {vavg}</span>}<span className="opacity-60">({vc})</span></span></button>; })}
+                  <button type="button" onClick={() => setSelectedVariantId("all")} className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[12px] font-medium border transition ${selectedVariantId === "all" ? "bg-[#e65100] text-white border-[#e65100]" : "bg-white text-[#5c4a38] border-[#f5ddc0] hover:border-[#f5ddc0]"}`}><span>All variants</span><span className="opacity-60">{reviews.length}</span></button>
+                  {variants.map((v) => { const vc = reviews.filter((r) => r.variantId === v.id).length; const vavg = vc > 0 ? (reviews.filter((r) => r.variantId === v.id).reduce((s, r) => s + (r.rating || 0), 0) / vc).toFixed(1) : null; const sel = selectedVariantId === v.id; return <button key={v.id} type="button" onClick={() => setSelectedVariantId(v.id)} className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[12px] font-medium border transition ${sel ? "bg-violet-600 text-white border-violet-600" : "bg-white text-[#5c4a38] border-[#f5ddc0] hover:border-[#f5ddc0]"}`}><span className="truncate">{v.name}</span><span className="flex items-center gap-1.5 shrink-0 ml-2">{vavg && <span className={sel ? "text-amber-200" : "text-[#ffa726]"}>★ {vavg}</span>}<span className="opacity-60">({vc})</span></span></button>; })}
                 </div>
               </div>
             )}
@@ -348,13 +347,13 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
             )}
 
             {/* Write review CTA */}
-            <div className="bg-white dark:bg-white/[0.03] rounded-xl border border-slate-200 dark:border-white/[0.06] p-4">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-600 mb-3">Write a review</p>
-              {!user ? <p className="text-sm text-slate-500 dark:text-zinc-500 text-center py-1">Sign in to post a review.</p>
-              : hasAlreadyReviewed ? <p className="text-[12px] text-slate-500 dark:text-zinc-500 text-center py-1">✓ You&apos;ve reviewed this. Use &quot;+ New Entry&quot; on your review to add updates.</p>
+            <div className="bg-white rounded-xl border border-[#f5ddc0] p-4">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#8b7560] mb-3">Write a review</p>
+              {!user ? <p className="text-sm text-[#8b7560] text-center py-1">Sign in to post a review.</p>
+              : hasAlreadyReviewed ? <p className="text-[12px] text-[#8b7560] text-center py-1">✓ You&apos;ve reviewed this. Use &quot;+ New Entry&quot; on your review to add updates.</p>
               : <div className="space-y-2">
                   <button type="button" onClick={() => setReviewMode("verified")} className="w-full btn-brand text-[13px] font-semibold py-3 rounded-lg transition">Post a Review</button>
-                  <p className="text-[10px] text-slate-500 dark:text-zinc-500 text-center">Share your honest experience with this product.</p>
+                  <p className="text-[10px] text-[#8b7560] text-center">Share your honest experience with this product.</p>
                 </div>
               }
             </div>
@@ -366,20 +365,20 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
           {/* RIGHT COLUMN */}
           <div className="flex-1 min-w-0">
             {/* Feed tabs */}
-            <div className="flex border-b border-slate-200 dark:border-white/[0.06] mb-4 bg-white dark:bg-white/[0.03] rounded-t-xl overflow-hidden border border-b-0">
+            <div className="flex border-b border-[#f5ddc0] mb-4 bg-white rounded-t-xl overflow-hidden border border-b-0">
               {([{ id: "logs", label: "📋 Owner Logs", count: journeys.length }, { id: "qa", label: "❓ Ask an Owner", count: qaQuestions.length }, { id: "discussion", label: "💬 Discussion", count: generalDiscussions.length }] as { id: FeedTab; label: string; count: number }[]).map((tab) => (
-                <button key={tab.id} type="button" onClick={() => setFeedTab(tab.id)} className={`flex-1 px-3 py-3 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition border-b-2 -mb-px ${feedTab === tab.id ? "border-indigo-500 text-slate-900 dark:text-zinc-100 bg-white dark:bg-white/[0.03]" : "border-transparent text-slate-500 dark:text-zinc-500 bg-slate-50 dark:bg-white/[0.02] hover:text-slate-700 dark:hover:text-zinc-300"}`}>
+                <button key={tab.id} type="button" onClick={() => setFeedTab(tab.id)} className={`flex-1 px-3 py-3 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition border-b-2 -mb-px ${feedTab === tab.id ? "border-[#e65100] text-[#4a3828] bg-white" : "border-transparent text-[#8b7560] bg-[#ffecd2] hover:text-[#5c4a38]"}`}>
                   {tab.label}
-                  {tab.count > 0 && <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${feedTab === tab.id ? "bg-indigo-600 text-white" : "bg-slate-100 dark:bg-white/[0.06] text-slate-500 dark:text-zinc-400"}`}>{tab.count}</span>}
+                  {tab.count > 0 && <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${feedTab === tab.id ? "bg-[#e65100] text-white" : "bg-[#ffecd2] text-[#8b7560]"}`}>{tab.count}</span>}
                 </button>
               ))}
             </div>
 
-            {feedTab === "logs" && <div className="space-y-4">{journeys.length === 0 ? <div className="bg-white dark:bg-white/[0.03] rounded-xl border border-slate-200 dark:border-white/[0.06] py-14 text-center"><p className="text-2xl mb-2">📋</p><p className="text-sm text-slate-500 dark:text-zinc-500">No owner logs yet.</p>{user && !hasAlreadyReviewed && <button type="button" onClick={() => setReviewMode("verified")} className="mt-3 text-[12px] font-semibold text-violet-600 dark:text-violet-400 hover:underline">Start your ownership log →</button>}</div> : journeys.map((group, i) => <OwnershipJourneyCard key={group[0].id ?? i} reviews={group} currentUserId={currentUserId} currentUserName={currentUserName} onLike={handleLike} onHelpful={handleHelpful} onNotHelpful={handleNotHelpful} onNewEntry={(review) => setUpdatingReview(review)} />)}</div>}
+            {feedTab === "logs" && <div className="space-y-4">{journeys.length === 0 ? <div className="bg-white rounded-xl border border-[#f5ddc0] py-14 text-center"><p className="text-2xl mb-2">📋</p><p className="text-sm text-[#8b7560]">No owner logs yet.</p>{user && !hasAlreadyReviewed && <button type="button" onClick={() => setReviewMode("verified")} className="mt-3 text-[12px] font-semibold text-violet-600 hover:underline">Start your ownership log →</button>}</div> : journeys.map((group, i) => <OwnershipJourneyCard key={group[0].id ?? i} reviews={group} currentUserId={currentUserId} currentUserName={currentUserName} onLike={handleLike} onHelpful={handleHelpful} onNotHelpful={handleNotHelpful} onNewEntry={(review) => setUpdatingReview(review)} />)}</div>}
 
-            {feedTab === "qa" && <div className="bg-white dark:bg-white/[0.03] rounded-xl border border-slate-200 dark:border-white/[0.06] p-4"><QAFeed productId={product.id} questions={qaQuestions} qaAnswers={qaAnswers} currentUserId={currentUserId} currentUserName={currentUserName} verifiedOwnerIds={verifiedOwnerIds} onNewQuestion={(post) => setDiscussions((prev) => [post, ...prev])} onUpvoteQuestion={handleUpvotePost} onSubmitAnswer={handleSubmitAnswer} onUpvoteAnswer={handleUpvoteAnswer} /></div>}
+            {feedTab === "qa" && <div className="bg-white rounded-xl border border-[#f5ddc0] p-4"><QAFeed productId={product.id} questions={qaQuestions} qaAnswers={qaAnswers} currentUserId={currentUserId} currentUserName={currentUserName} verifiedOwnerIds={verifiedOwnerIds} onNewQuestion={(post) => setDiscussions((prev) => [post, ...prev])} onUpvoteQuestion={handleUpvotePost} onSubmitAnswer={handleSubmitAnswer} onUpvoteAnswer={handleUpvoteAnswer} /></div>}
 
-            {feedTab === "discussion" && <div className="bg-white dark:bg-white/[0.03] rounded-xl border border-slate-200 dark:border-white/[0.06] p-4"><DiscussionFeed productId={product.id} posts={generalDiscussions} currentUserId={currentUserId} currentUserName={currentUserName} onUpvote={handleUpvotePost} onNewPost={(p) => setDiscussions((prev) => [p, ...prev])} /></div>}
+            {feedTab === "discussion" && <div className="bg-white rounded-xl border border-[#f5ddc0] p-4"><DiscussionFeed productId={product.id} posts={generalDiscussions} currentUserId={currentUserId} currentUserName={currentUserName} onUpvote={handleUpvotePost} onNewPost={(p) => setDiscussions((prev) => [p, ...prev])} /></div>}
           </div>
         </div>
       </div>

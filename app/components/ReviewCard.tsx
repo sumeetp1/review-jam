@@ -60,7 +60,7 @@ export default function ReviewCard({
     .slice(0, 3);
 
   return (
-    <article className="px-4 py-4 md:px-4 md:py-3 bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-2xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors">
+    <article className="px-4 py-4 md:px-4 md:py-3 bg-white border border-[#f5ddc0] rounded-2xl hover:bg-[#fff0e6] transition-colors">
       <div className="flex gap-3">
         {/* Avatar */}
         <Avatar name={review.reviewerName} size="md" />
@@ -70,11 +70,11 @@ export default function ReviewCard({
           <div className="flex items-start justify-between gap-2 mb-0.5">
             <div className="flex items-center gap-1.5 min-w-0 flex-wrap leading-tight">
               {review.reviewerId ? (
-                <Link href={`/reviewer/${review.reviewerId}`} className="font-medium text-[15px] text-slate-900 dark:text-zinc-100 truncate max-w-[10rem] sm:max-w-none hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                <Link href={`/reviewer/${review.reviewerId}`} className="font-medium text-[15px] text-[#4a3828] truncate max-w-[10rem] sm:max-w-none hover:text-[#e65100] transition-colors">
                   {review.reviewerName || "Anonymous"}
                 </Link>
               ) : (
-                <span className="font-medium text-[15px] text-slate-900 dark:text-zinc-100 truncate max-w-[10rem] sm:max-w-none">
+                <span className="font-medium text-[15px] text-[#4a3828] truncate max-w-[10rem] sm:max-w-none">
                   {review.reviewerName || "Anonymous"}
                 </span>
               )}
@@ -88,7 +88,7 @@ export default function ReviewCard({
                 </span>
               )}
               {review.category && (
-                <span className="text-slate-500 dark:text-zinc-500 text-[13px]">· {review.category}</span>
+                <span className="text-[#8b7560] text-[13px]">· {review.category}</span>
               )}
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
@@ -96,7 +96,7 @@ export default function ReviewCard({
                 <HealthScoreBadge score={review.healthScore} breakdown={review.healthScoreBreakdown} />
               )}
               {review.rating != null && (
-                <span className="text-[11px] font-medium text-amber-500 dark:text-amber-400 tabular-nums">
+                <span className="text-[11px] font-medium text-[#ffa726] tabular-nums">
                   ★ {review.rating}
                 </span>
               )}
@@ -105,53 +105,53 @@ export default function ReviewCard({
 
           {/* Product name + context badges */}
           {review.productName && (
-            <p className="text-[13px] text-slate-500 dark:text-zinc-400 mb-1 flex items-center gap-1.5 flex-wrap">
+            <p className="text-[13px] text-[#8b7560] mb-1 flex items-center gap-1.5 flex-wrap">
               {review.productSlug && review.communitySlug ? (
-                <Link href={`/c/${review.communitySlug}/${review.productSlug}`} className="font-medium text-slate-700 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline transition-colors">
+                <Link href={`/c/${review.communitySlug}/${review.productSlug}`} className="font-medium text-[#5c4a38] hover:text-[#e65100] hover:underline transition-colors">
                   {review.productName}
                 </Link>
               ) : review.productId && !review.productId.startsWith("organic_") ? (
-                <Link href={`/product/${review.productId}`} className="font-medium text-slate-700 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline transition-colors">
+                <Link href={`/product/${review.productId}`} className="font-medium text-[#5c4a38] hover:text-[#e65100] hover:underline transition-colors">
                   {review.productName}
                 </Link>
               ) : (
                 <span>{review.productName}</span>
               )}
               {usageLabel && (
-                <span className="text-[10px] font-medium bg-slate-100 dark:bg-white/[0.06] text-slate-500 dark:text-zinc-400 px-1.5 py-0.5 rounded">
+                <span className="text-[10px] font-medium bg-[#ffecd2] text-[#8b7560] px-1.5 py-0.5 rounded">
                   {usageLabel}
                 </span>
               )}
               {/* Verified Owner badge */}
               {review.isVerifiedPurchase && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-emerald-500/10 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20 dark:border-emerald-500/20">
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-[#66bb6a]/10 text-[#66bb6a] px-1.5 py-0.5 rounded border border-[#66bb6a]/20">
                   ✓ Verified Owner
                 </span>
               )}
               {/* Anchor review badge */}
               {review.isAnchorReview && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-sky-500/10 dark:bg-sky-500/10 text-sky-400 dark:text-sky-400 px-1.5 py-0.5 rounded border border-sky-500/20 dark:border-sky-500/20">
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-[#81d4fa]/10 text-[#81d4fa] px-1.5 py-0.5 rounded border border-[#81d4fa]/20">
                   🎯 Received for review
                 </span>
               )}
               {/* Imported review badge */}
               {review.isImported && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-medium bg-slate-100 dark:bg-white/[0.05] text-slate-500 dark:text-zinc-400 px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/[0.06]">
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-medium bg-[#ffecd2] text-[#8b7560] px-1.5 py-0.5 rounded border border-[#f5ddc0]">
                   Imported{review.importSource ? ` from ${review.importSource.charAt(0).toUpperCase() + review.importSource.slice(1)}` : ""}
                 </span>
               )}
               {(review.communitySlug || review.channelSlug) && (
-                <a href={`/c/${review.communitySlug || review.channelSlug}`} className="text-[10px] font-medium bg-indigo-500/10 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-500/20 hover:underline">
+                <a href={`/c/${review.communitySlug || review.channelSlug}`} className="text-[10px] font-medium bg-[#e65100]/10 text-[#e65100] px-1.5 py-0.5 rounded border border-[#e65100]/20 hover:underline">
                   rj/{review.communitySlug || review.channelSlug}
                 </a>
               )}
               {review.variantName && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-medium bg-violet-500/10 dark:bg-violet-500/10 text-violet-400 dark:text-violet-400 px-1.5 py-0.5 rounded border border-violet-500/20 dark:border-violet-500/20">
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-medium bg-[#ce93d8]/10 text-[#ce93d8] px-1.5 py-0.5 rounded border border-[#ce93d8]/20">
                   🎨 {review.variantName}
                 </span>
               )}
               {(review.versionCount ?? 0) > 1 && (
-                <span className="text-[10px] font-medium bg-blue-500/10 dark:bg-blue-500/10 text-blue-400 dark:text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/20">
+                <span className="text-[10px] font-medium bg-[#81d4fa]/10 text-[#81d4fa] px-1.5 py-0.5 rounded border border-[#81d4fa]/20">
                   {review.versionCount} updates
                 </span>
               )}
@@ -160,7 +160,7 @@ export default function ReviewCard({
 
           {/* Summary headline */}
           {headline && (
-            <p className="text-[15px] font-semibold text-slate-900 dark:text-zinc-100 leading-snug mb-1">
+            <p className="text-[15px] font-semibold text-[#4a3828] leading-snug mb-1">
               {headline}
             </p>
           )}
@@ -170,7 +170,7 @@ export default function ReviewCard({
             <button
               type="button"
               onClick={() => setExpanded((v) => !v)}
-              className="text-[12px] font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 mb-1.5 transition-colors"
+              className="text-[12px] font-medium text-[#e65100] hover:text-[#e65100] mb-1.5 transition-colors"
             >
               {expanded ? "Show less" : "Read more"}
             </button>
@@ -183,9 +183,9 @@ export default function ReviewCard({
               {hasSubRatings && (
                 <div className="flex gap-3 flex-wrap mb-2">
                   {Object.entries(review.subRatings!).map(([attr, val]) => (
-                    <span key={attr} className="text-[11px] text-slate-500 dark:text-zinc-500">
+                    <span key={attr} className="text-[11px] text-[#8b7560]">
                       {attr}:{" "}
-                      <span className="text-amber-500 dark:text-amber-400">{"★".repeat(val)}</span>
+                      <span className="text-[#ffa726]">{"★".repeat(val)}</span>
                     </span>
                   ))}
                 </div>
@@ -195,7 +195,7 @@ export default function ReviewCard({
               {hasPros && (
                 <div className="flex flex-wrap gap-1 mb-1.5">
                   {review.pros!.map((pro, i) => (
-                    <span key={i} className="inline-flex items-center gap-0.5 text-[11px] font-medium bg-emerald-500/10 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                    <span key={i} className="inline-flex items-center gap-0.5 text-[11px] font-medium bg-[#66bb6a]/10 text-[#66bb6a] px-2 py-0.5 rounded-md border border-[#66bb6a]/20">
                       ✓ {pro}
                     </span>
                   ))}
@@ -206,7 +206,7 @@ export default function ReviewCard({
               {hasCons && (
                 <div className="flex flex-wrap gap-1 mb-1.5">
                   {review.cons!.map((con, i) => (
-                    <span key={i} className="inline-flex items-center gap-0.5 text-[11px] font-medium bg-rose-500/10 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 px-2 py-0.5 rounded-md border border-rose-500/20">
+                    <span key={i} className="inline-flex items-center gap-0.5 text-[11px] font-medium bg-[#f48fb1]/10 text-[#f48fb1] px-2 py-0.5 rounded-md border border-[#f48fb1]/20">
                       – {con}
                     </span>
                   ))}
@@ -215,7 +215,7 @@ export default function ReviewCard({
 
               {/* Review body */}
               {review.content && (
-                <p className="text-[15px] text-slate-700 dark:text-zinc-200 leading-relaxed font-normal mb-2 whitespace-pre-wrap">
+                <p className="text-[15px] text-[#5c4a38] leading-relaxed font-normal mb-2 whitespace-pre-wrap">
                   {review.content}
                 </p>
               )}
@@ -229,7 +229,7 @@ export default function ReviewCard({
                       <img
                         src={url}
                         alt=""
-                        className="w-24 h-24 md:w-20 md:h-20 object-cover rounded-lg border border-slate-200 dark:border-white/[0.06] hover:opacity-90 transition"
+                        className="w-24 h-24 md:w-20 md:h-20 object-cover rounded-lg border border-[#f5ddc0] hover:opacity-90 transition"
                       />
                     </a>
                   ))}
@@ -239,9 +239,9 @@ export default function ReviewCard({
               {/* Best for */}
               {hasBestFor && (
                 <div className="flex flex-wrap gap-1 mb-2">
-                  <span className="text-[11px] text-slate-400 dark:text-zinc-500 mr-0.5">Best for:</span>
+                  <span className="text-[11px] text-[#8b7560] mr-0.5">Best for:</span>
                   {review.bestFor!.map((tag, i) => (
-                    <span key={i} className="text-[11px] bg-slate-100 dark:bg-white/[0.06] text-slate-500 dark:text-zinc-400 px-2 py-0.5 rounded-md">
+                    <span key={i} className="text-[11px] bg-[#ffecd2] text-[#8b7560] px-2 py-0.5 rounded-md">
                       {tag}
                     </span>
                   ))}
@@ -256,7 +256,7 @@ export default function ReviewCard({
           )}
 
           {/* Action bar */}
-          <div className="flex items-center gap-1 text-[13px] md:text-[13px] text-slate-500 dark:text-zinc-500 mt-2 md:mt-1 -ml-2 md:-ml-1 flex-wrap">
+          <div className="flex items-center gap-1 text-[13px] md:text-[13px] text-[#8b7560] mt-2 md:mt-1 -ml-2 md:-ml-1 flex-wrap">
             {/* Like */}
             <button
               type="button"
@@ -264,8 +264,8 @@ export default function ReviewCard({
               disabled={!onLike}
               className={`flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 transition-colors ${
                 hasLiked
-                  ? "text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 dark:bg-indigo-500/10 font-medium"
-                  : "hover:text-slate-700 dark:hover:text-zinc-300 hover:bg-slate-50 dark:hover:bg-white/[0.04]"
+                  ? "text-[#e65100] bg-[#e65100]/10 font-medium"
+                  : "hover:text-[#5c4a38] hover:bg-[#fff0e6]"
               } disabled:cursor-default`}
             >
               <span aria-hidden>👍</span>
@@ -279,8 +279,8 @@ export default function ReviewCard({
               disabled={!onHelpful}
               className={`flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 transition-colors ${
                 hasHelpful
-                  ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-500/10"
-                  : "hover:text-slate-700 dark:hover:text-zinc-300 hover:bg-slate-50 dark:hover:bg-white/[0.04]"
+                  ? "text-[#66bb6a] bg-[#66bb6a]/10"
+                  : "hover:text-[#5c4a38] hover:bg-[#fff0e6]"
               } disabled:cursor-default`}
             >
               <span aria-hidden>✓</span>
@@ -294,8 +294,8 @@ export default function ReviewCard({
               disabled={!onNotHelpful}
               className={`flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 transition-colors ${
                 hasNotHelpful
-                  ? "text-rose-600 dark:text-rose-400 bg-rose-500/10 dark:bg-rose-500/10"
-                  : "hover:text-slate-700 dark:hover:text-zinc-300 hover:bg-slate-50 dark:hover:bg-white/[0.04]"
+                  ? "text-[#f48fb1] bg-[#f48fb1]/10"
+                  : "hover:text-[#5c4a38] hover:bg-[#fff0e6]"
               } disabled:cursor-default`}
               title="Not helpful"
             >
@@ -306,7 +306,7 @@ export default function ReviewCard({
             <button
               type="button"
               onClick={() => setShowComments((v) => !v)}
-              className="flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 hover:text-slate-700 dark:hover:text-zinc-300 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors"
+              className="flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 hover:text-[#5c4a38] hover:bg-[#fff0e6] transition-colors"
             >
               <span aria-hidden>💬</span>
               <span className="tabular-nums">{commentCount}</span>
@@ -327,8 +327,8 @@ export default function ReviewCard({
               }}
               className={`flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 transition-colors ${
                 linkCopied
-                  ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-500/10"
-                  : "hover:text-slate-700 dark:hover:text-zinc-300 hover:bg-slate-50 dark:hover:bg-white/[0.04]"
+                  ? "text-[#66bb6a] bg-[#66bb6a]/10"
+                  : "hover:text-[#5c4a38] hover:bg-[#fff0e6]"
               }`}
               title="Copy review link"
             >
@@ -347,7 +347,7 @@ export default function ReviewCard({
                   navigator.clipboard.writeText(text);
                 }
               }}
-              className="flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 hover:text-slate-700 dark:hover:text-zinc-300 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors"
+              className="flex items-center gap-1.5 rounded-lg py-2 px-2.5 md:py-1 md:px-1.5 hover:text-[#5c4a38] hover:bg-[#fff0e6] transition-colors"
               title="Share"
             >
               <span aria-hidden>↗</span>
@@ -357,7 +357,7 @@ export default function ReviewCard({
             {showPoolLink && review.productId && !review.productId.startsWith("organic_") && (
               <Link
                 href={`/product/${review.productId}`}
-                className="ml-auto font-medium text-slate-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline shrink-0 py-2 px-2.5 md:py-1 md:px-1.5 transition-colors"
+                className="ml-auto font-medium text-[#8b7560] hover:text-[#e65100] hover:underline shrink-0 py-2 px-2.5 md:py-1 md:px-1.5 transition-colors"
               >
                 View hub →
               </Link>

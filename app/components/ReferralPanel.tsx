@@ -62,7 +62,7 @@ export default function ReferralPanel({ userId, userName, userEmail }: Props) {
 
   if (isLoading) {
     return (
-      <div className="text-sm text-slate-500 dark:text-zinc-500 animate-pulse py-8 text-center">
+      <div className="text-sm text-[#8b7560] animate-pulse py-8 text-center">
         Loading referral codes...
       </div>
     );
@@ -73,8 +73,8 @@ export default function ReferralPanel({ userId, userName, userEmail }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-slate-900 dark:text-zinc-100">Invite Friends</h3>
-          <p className="text-[12px] text-slate-500 dark:text-zinc-500 mt-0.5">
+          <h3 className="text-sm font-semibold text-[#4a3828]">Invite Friends</h3>
+          <p className="text-[12px] text-[#8b7560] mt-0.5">
             {usedCount} of {MAX_REFERRAL_CODES} used
           </p>
         </div>
@@ -82,27 +82,27 @@ export default function ReferralPanel({ userId, userName, userEmail }: Props) {
           type="button"
           onClick={handleGenerate}
           disabled={atLimit || isGenerating}
-          className="text-xs font-semibold px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-200 dark:disabled:bg-zinc-800 disabled:text-slate-400 dark:disabled:text-zinc-500 text-white transition"
+          className="text-xs font-semibold px-3 py-2 rounded-lg bg-[#e65100] hover:bg-[#e65100]/90 disabled:bg-[#ffecd2] disabled:text-[#8b7560] text-white transition"
         >
           {isGenerating ? "Generating..." : atLimit ? "Limit reached" : "Generate Invite Code"}
         </button>
       </div>
 
       {error && (
-        <p className="text-[12px] font-medium text-red-500 dark:text-red-400">{error}</p>
+        <p className="text-[12px] font-medium text-[#ef5350]">{error}</p>
       )}
 
       {/* Usage bar */}
-      <div className="w-full bg-slate-100 dark:bg-white/[0.06] rounded-full h-1.5">
+      <div className="w-full bg-[#ffecd2] rounded-full h-1.5">
         <div
-          className="bg-indigo-500 h-1.5 rounded-full transition-all"
+          className="bg-[#e65100] h-1.5 rounded-full transition-all"
           style={{ width: `${(codes.length / MAX_REFERRAL_CODES) * 100}%` }}
         />
       </div>
 
       {/* Codes list */}
       {codes.length === 0 ? (
-        <p className="text-sm text-slate-500 dark:text-zinc-500 text-center py-6">
+        <p className="text-sm text-[#8b7560] text-center py-6">
           No invite codes generated yet. Create one to invite a friend.
         </p>
       ) : (
@@ -110,25 +110,25 @@ export default function ReferralPanel({ userId, userName, userEmail }: Props) {
           {codes.map((code) => (
             <div
               key={code.id}
-              className="flex items-center justify-between bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-lg px-3 py-2.5"
+              className="flex items-center justify-between bg-white border border-[#f5ddc0] rounded-lg px-3 py-2.5"
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <code className="text-sm font-mono font-semibold text-slate-900 dark:text-zinc-100">
+                  <code className="text-sm font-mono font-semibold text-[#4a3828]">
                     {code.id}
                   </code>
                   <span
                     className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
                       code.status === "active"
-                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                        : "bg-slate-100 dark:bg-white/[0.06] text-slate-400 dark:text-zinc-500"
+                        ? "bg-[#66bb6a]/10 text-[#66bb6a]"
+                        : "bg-[#ffecd2] text-[#8b7560]"
                     }`}
                   >
                     {code.status === "active" ? "Active" : "Used"}
                   </span>
                 </div>
                 {code.usedBy && (
-                  <p className="text-[11px] text-slate-500 dark:text-zinc-500 mt-0.5">
+                  <p className="text-[11px] text-[#8b7560] mt-0.5">
                     Redeemed by {code.usedBy}
                   </p>
                 )}
@@ -138,8 +138,8 @@ export default function ReferralPanel({ userId, userName, userEmail }: Props) {
                 onClick={() => handleCopy(code.id)}
                 className={`text-[11px] font-medium px-2.5 py-1.5 rounded-lg transition shrink-0 ml-2 ${
                   copiedCode === code.id
-                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                    : "bg-slate-100 dark:bg-white/[0.06] text-slate-600 dark:text-zinc-400 hover:bg-slate-200 dark:hover:bg-white/[0.1]"
+                    ? "bg-[#66bb6a]/10 text-[#66bb6a]"
+                    : "bg-[#ffecd2] text-[#5c4a38] hover:bg-[#fff0e6]"
                 }`}
               >
                 {copiedCode === code.id ? "Copied!" : "Copy"}
@@ -149,7 +149,7 @@ export default function ReferralPanel({ userId, userName, userEmail }: Props) {
         </div>
       )}
 
-      <p className="text-[11px] text-slate-400 dark:text-zinc-600 leading-relaxed">
+      <p className="text-[11px] text-[#8b7560] leading-relaxed">
         Share your invite code with friends. When they redeem it, they get instant access to Review Jam.
       </p>
     </div>

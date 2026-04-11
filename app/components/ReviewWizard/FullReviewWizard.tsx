@@ -276,17 +276,17 @@ export default function FullReviewWizard({
   return (
     <ModalShell onClose={onClose}>
       {/* ── Header ── */}
-      <div className="flex justify-between items-start px-5 pt-5 pb-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
+      <div className="flex justify-between items-start px-5 pt-5 pb-4 border-b border-[#f5ddc0] shrink-0">
         <div>
-          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">{headerLabel}</h2>
+          <h2 className="text-base font-semibold text-[#4a3828]">{headerLabel}</h2>
           {headerSub && (
-            <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5">{headerSub}</p>
+            <p className="text-[11px] text-[#66bb6a] mt-0.5">{headerSub}</p>
           )}
         </div>
         <button
           type="button"
           onClick={onClose}
-          className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-sm shrink-0"
+          className="text-[#8b7560] hover:text-[#5c4a38] p-1 rounded-md hover:bg-[#fff0e6] text-sm shrink-0"
         >
           ✕
         </button>
@@ -301,10 +301,10 @@ export default function FullReviewWizard({
                 <div
                   className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors ${
                     i + 1 < step
-                      ? "bg-emerald-500 text-white"
+                      ? "bg-[#66bb6a] text-white"
                       : i + 1 === step
-                      ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900"
-                      : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600"
+                      ? "bg-[#4a3828] text-white"
+                      : "bg-[#ffecd2] text-[#8b7560]"
                   }`}
                 >
                   {i + 1 < step ? "\u2713" : i + 1}
@@ -312,8 +312,8 @@ export default function FullReviewWizard({
                 <span
                   className={`text-[11px] font-medium hidden sm:block ${
                     i + 1 === step
-                      ? "text-slate-800 dark:text-slate-200"
-                      : "text-slate-400 dark:text-slate-600"
+                      ? "text-[#4a3828]"
+                      : "text-[#8b7560]"
                   }`}
                 >
                   {label}
@@ -323,8 +323,8 @@ export default function FullReviewWizard({
                 <div
                   className={`h-px flex-1 mx-2 ${
                     i + 1 < step
-                      ? "bg-emerald-300 dark:bg-emerald-700"
-                      : "bg-slate-200 dark:bg-slate-700"
+                      ? "bg-[#a5d6a7]"
+                      : "bg-[#f5ddc0]"
                   }`}
                 />
               )}
@@ -342,7 +342,7 @@ export default function FullReviewWizard({
             {/* Subject type picker — only in organic mode (user chooses what they're reviewing) */}
             {mode === "organic" && !productInfo && (
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                <label className="text-xs font-medium text-[#5c4a38]">
                   What type of thing are you reviewing?
                 </label>
                 <div className="flex gap-1.5 flex-wrap">
@@ -369,30 +369,30 @@ export default function FullReviewWizard({
 
             {mode === "organic" ? (
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                  {cfg.nameLabel} <span className="text-red-400">*</span>
+                <label className="text-xs font-medium text-[#5c4a38]">
+                  {cfg.nameLabel} <span className="text-[#e57373]">*</span>
                 </label>
                 <input
                   type="text"
                   value={productName}
                   onChange={(e) => setProductName(e.target.value)}
                   placeholder={cfg.namePlaceholder}
-                  className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-slate-100 dark:placeholder-slate-500"
+                  className="w-full bg-white border border-[#f5ddc0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#d4b896] text-[#4a3828] placeholder:text-[#b89878]"
                 />
               </div>
             ) : (
-              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg px-3 py-2.5">
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-0.5">Reviewing</p>
-                <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{productInfo?.name}</p>
+              <div className="bg-[#ffecd2] rounded-lg px-3 py-2.5">
+                <p className="text-[11px] text-[#8b7560] mb-0.5">Reviewing</p>
+                <p className="text-sm font-medium text-[#4a3828]">{productInfo?.name}</p>
               </div>
             )}
 
             {/* Variant picker — shown when the product has SKUs */}
             {(productInfo?.variants?.length ?? 0) > 0 && (
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                <label className="text-xs font-medium text-[#5c4a38]">
                   Which variant did you review?{" "}
-                  <span className="text-red-400">*</span>
+                  <span className="text-[#e57373]">*</span>
                 </label>
                 <div className="flex gap-2 flex-wrap">
                   {productInfo!.variants!.map((v) => (
@@ -410,14 +410,14 @@ export default function FullReviewWizard({
 
             {mode === "organic" && (
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Category</label>
+                <label className="text-xs font-medium text-[#5c4a38]">Category</label>
                 <input
                   type="text"
                   list="category-suggestions-full"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   placeholder="e.g. Tech, Roads & Routes, Restaurants..."
-                  className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none dark:text-slate-100"
+                  className="w-full bg-white border border-[#f5ddc0] rounded-lg px-3 py-2 text-sm outline-none text-[#4a3828]"
                 />
                 <datalist id="category-suggestions-full">
                   {SUGGESTED_CATEGORIES.map((cat) => (
@@ -430,17 +430,17 @@ export default function FullReviewWizard({
             {/* Product code for verified purchases */}
             {mode === "verified" && (
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                  Product code <span className="text-red-400">*</span>
+                <label className="text-xs font-medium text-[#5c4a38]">
+                  Product code <span className="text-[#e57373]">*</span>
                 </label>
                 <input
                   type="text"
                   value={productCode}
                   onChange={(e) => setProductCode(e.target.value)}
                   placeholder="Barcode, serial number, or order ID"
-                  className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-slate-100 dark:placeholder-slate-500"
+                  className="w-full bg-white border border-[#f5ddc0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#d4b896] text-[#4a3828] placeholder:text-[#b89878]"
                 />
-                <p className="text-[11px] text-slate-400 dark:text-slate-500">
+                <p className="text-[11px] text-[#8b7560]">
                   Found on the product packaging, receipt, or order confirmation.
                 </p>
               </div>
@@ -449,7 +449,7 @@ export default function FullReviewWizard({
             {/* Location field — shown for places, routes, businesses, events */}
             {cfg.showLocation && (
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                <label className="text-xs font-medium text-[#5c4a38]">
                   {cfg.locationLabel}
                 </label>
                 <input
@@ -457,20 +457,20 @@ export default function FullReviewWizard({
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder={cfg.locationPlaceholder}
-                  className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-slate-100 dark:placeholder-slate-500"
+                  className="w-full bg-white border border-[#f5ddc0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#d4b896] text-[#4a3828] placeholder:text-[#b89878]"
                 />
               </div>
             )}
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                Overall rating <span className="text-red-400">*</span>
+              <label className="text-xs font-medium text-[#5c4a38]">
+                Overall rating <span className="text-[#e57373]">*</span>
               </label>
               <StarPicker value={overallRating} onChange={setOverallRating} />
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              <label className="text-xs font-medium text-[#8b7560]">
                 Rate specific aspects <span className="font-normal">(optional — add your own dimensions)</span>
               </label>
               <div className="space-y-2">
@@ -485,7 +485,7 @@ export default function FullReviewWizard({
                         setCustomDimensions(updated);
                       }}
                       placeholder={cfg.suggestedDimensions[idx] ? `e.g. ${cfg.suggestedDimensions[idx]}` : `Dimension ${idx + 1}`}
-                      className="flex-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs outline-none dark:text-slate-100 dark:placeholder-slate-500"
+                      className="flex-1 bg-white border border-[#f5ddc0] rounded-lg px-2.5 py-1.5 text-xs outline-none text-[#4a3828] placeholder:text-[#b89878]"
                     />
                     {dim.trim() && (
                       <StarPicker
@@ -498,7 +498,7 @@ export default function FullReviewWizard({
                 ))}
                 {customDimensions.length < 5 && (
                   <button type="button" onClick={() => setCustomDimensions((d) => [...d, ""])}
-                    className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline">
+                    className="text-[11px] text-[#e65100] hover:underline">
                     + Add dimension
                   </button>
                 )}
@@ -507,7 +507,7 @@ export default function FullReviewWizard({
 
             {/* Source — adaptive per subject type */}
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+              <label className="text-xs font-medium text-[#5c4a38]">
                 {cfg.sourceLabel}
               </label>
               <div className="flex gap-2 flex-wrap">
@@ -525,7 +525,7 @@ export default function FullReviewWizard({
 
             {/* Duration — adaptive per subject type */}
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+              <label className="text-xs font-medium text-[#5c4a38]">
                 {cfg.durationLabel}
               </label>
               <div className="flex gap-2 flex-wrap">
@@ -544,7 +544,7 @@ export default function FullReviewWizard({
             {/* Purchase channel — only for products */}
             {cfg.showPurchaseChannel && (
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                <label className="text-xs font-medium text-[#5c4a38]">
                   Where did you buy it?
                 </label>
                 <div className="flex gap-2 flex-wrap">
@@ -567,9 +567,9 @@ export default function FullReviewWizard({
         {step === 2 && (
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                {cfg.proLabel} <span className="text-red-400">*</span>{" "}
-                <span className="font-normal text-slate-400">(at least one)</span>
+              <label className="text-xs font-medium text-[#5c4a38]">
+                {cfg.proLabel} <span className="text-[#e57373]">*</span>{" "}
+                <span className="font-normal text-[#8b7560]">(at least one)</span>
               </label>
               <ChipInput
                 items={pros}
@@ -581,9 +581,9 @@ export default function FullReviewWizard({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+              <label className="text-xs font-medium text-[#5c4a38]">
                 {cfg.conLabel}{" "}
-                <span className="font-normal text-slate-400">(optional)</span>
+                <span className="font-normal text-[#8b7560]">(optional)</span>
               </label>
               <ChipInput
                 items={cons}
@@ -595,23 +595,23 @@ export default function FullReviewWizard({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                Your full review <span className="text-red-400">*</span>{" "}
-                <span className="font-normal text-slate-400">(80–1000 characters)</span>
+              <label className="text-xs font-medium text-[#5c4a38]">
+                Your full review <span className="text-[#e57373]">*</span>{" "}
+                <span className="font-normal text-[#8b7560]">(80–1000 characters)</span>
               </label>
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder={cfg.reviewPlaceholder}
-                className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm h-32 resize-y focus:outline-none focus:ring-1 focus:ring-slate-400 dark:focus:ring-slate-600 dark:text-slate-100 dark:placeholder-slate-500"
+                className="w-full bg-white border border-[#f5ddc0] rounded-lg px-3 py-2 text-sm h-32 resize-y focus:outline-none focus:ring-1 focus:ring-[#d4b896] text-[#4a3828] placeholder:text-[#b89878]"
               />
               <p
                 className={`text-right text-[11px] tabular-nums ${
                   content.trim().length > 1000
-                    ? "text-red-500"
+                    ? "text-[#ef5350]"
                     : content.trim().length >= 80
-                    ? "text-emerald-500 dark:text-emerald-400"
-                    : "text-slate-400"
+                    ? "text-[#66bb6a]"
+                    : "text-[#8b7560]"
                 }`}
               >
                 {content.trim().length} / 1000
@@ -619,9 +619,9 @@ export default function FullReviewWizard({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                One-line summary <span className="text-red-400">*</span>{" "}
-                <span className="font-normal text-slate-400">(10–100 chars — shown as your headline)</span>
+              <label className="text-xs font-medium text-[#5c4a38]">
+                One-line summary <span className="text-[#e57373]">*</span>{" "}
+                <span className="font-normal text-[#8b7560]">(10–100 chars — shown as your headline)</span>
               </label>
               <input
                 type="text"
@@ -629,7 +629,7 @@ export default function FullReviewWizard({
                 onChange={(e) => setSummary(e.target.value)}
                 maxLength={100}
                 placeholder="e.g. The best noise-cancelling headphones I've ever owned"
-                className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-slate-100 dark:placeholder-slate-500"
+                className="w-full bg-white border border-[#f5ddc0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#d4b896] text-[#4a3828] placeholder:text-[#b89878]"
               />
             </div>
           </div>
@@ -638,11 +638,11 @@ export default function FullReviewWizard({
         {/* ════ STEP 3: Proof of Purchase ════ */}
         {step === 3 && (
           <div className="space-y-4 py-2">
-            <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 rounded-lg px-3 py-2.5">
-              <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300 mb-0.5">
+            <div className="bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2.5">
+              <p className="text-xs font-semibold text-emerald-800 mb-0.5">
                 ✓ Verified Owner badge
               </p>
-              <p className="text-[11px] text-emerald-700 dark:text-emerald-400 leading-relaxed">
+              <p className="text-[11px] text-emerald-700 leading-relaxed">
                 Upload a receipt or order screenshot and we'll verify your purchase. Verified reviews earn a trust badge and higher credibility scores. This step is optional — you can skip it.
               </p>
             </div>
@@ -660,7 +660,7 @@ export default function FullReviewWizard({
               <button
                 type="button"
                 onClick={() => receiptInputRef.current?.click()}
-                className="w-full border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl py-8 flex flex-col items-center gap-2 text-slate-400 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-500 dark:hover:text-slate-300 transition"
+                className="w-full border-2 border-dashed border-[#f5ddc0] rounded-xl py-8 flex flex-col items-center gap-2 text-[#8b7560] hover:border-[#d4b896] hover:text-[#5c4a38] transition"
               >
                 <span className="text-3xl">🧾</span>
                 <span className="text-sm font-medium">Upload receipt or order screenshot</span>
@@ -670,15 +670,15 @@ export default function FullReviewWizard({
 
             {receiptVerification.status === "checking" && (
               <div className="flex flex-col items-center gap-3 py-8">
-                <div className="w-8 h-8 border-2 border-slate-300 border-t-emerald-500 rounded-full animate-spin" />
-                <p className="text-sm text-slate-500 dark:text-slate-400">Parsing receipt...</p>
+                <div className="w-8 h-8 border-2 border-[#d4b896] border-t-[#66bb6a] rounded-full animate-spin" />
+                <p className="text-sm text-[#8b7560]">Parsing receipt...</p>
               </div>
             )}
 
             {(receiptVerification.status === "verified" || receiptVerification.status === "failed") && receiptPreview && (
               <div className="space-y-3">
                 {/* Receipt thumbnail */}
-                <div className="relative w-full max-h-48 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
+                <div className="relative w-full max-h-48 overflow-hidden rounded-lg border border-[#f5ddc0]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={receiptPreview} alt="Receipt" className="w-full object-contain max-h-48" />
                   <button
@@ -691,17 +691,17 @@ export default function FullReviewWizard({
                 </div>
 
                 {receiptVerification.status === "verified" ? (
-                  <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 rounded-lg px-3 py-2.5 space-y-1">
-                    <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2.5 space-y-1">
+                    <p className="text-xs font-semibold text-emerald-700 flex items-center gap-1">
                       <span>✓</span> Purchase verified
                     </p>
                     {receiptVerification.storeName && (
-                      <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
+                      <p className="text-[11px] text-emerald-700">
                         <span className="font-medium">Store:</span> {receiptVerification.storeName}
                       </p>
                     )}
                     {receiptVerification.purchaseDate && (
-                      <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
+                      <p className="text-[11px] text-emerald-700">
                         <span className="font-medium">Date:</span>{" "}
                         {new Date(receiptVerification.purchaseDate).toLocaleDateString(undefined, {
                           year: "numeric", month: "long", day: "numeric",
@@ -709,23 +709,23 @@ export default function FullReviewWizard({
                       </p>
                     )}
                     {receiptVerification.detectedProduct && (
-                      <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
+                      <p className="text-[11px] text-emerald-700">
                         <span className="font-medium">Product:</span> {receiptVerification.detectedProduct}
                       </p>
                     )}
                   </div>
                 ) : (
-                  <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-lg px-3 py-2.5">
-                    <p className="text-xs font-semibold text-amber-700 dark:text-amber-300 mb-0.5">
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5">
+                    <p className="text-xs font-semibold text-amber-700 mb-0.5">
                       Could not verify purchase
                     </p>
-                    <p className="text-[11px] text-amber-700 dark:text-amber-400 leading-relaxed">
+                    <p className="text-[11px] text-amber-700 leading-relaxed">
                       We couldn&apos;t read a store name and date from this image. Try a clearer photo, or skip this step.
                     </p>
                     <button
                       type="button"
                       onClick={() => receiptInputRef.current?.click()}
-                      className="mt-2 text-[11px] font-medium text-amber-700 dark:text-amber-400 underline underline-offset-2"
+                      className="mt-2 text-[11px] font-medium text-amber-700 underline underline-offset-2"
                     >
                       Try a different image
                     </button>
@@ -734,14 +734,14 @@ export default function FullReviewWizard({
               </div>
             )}
 
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center">
+            <p className="text-[11px] text-[#8b7560] text-center">
               Your receipt is used only for verification and is not stored or shared.
             </p>
 
             <button
               type="button"
               onClick={() => { setError(""); setStep((s) => s + 1); }}
-              className="w-full text-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 py-1 transition underline-offset-2 hover:underline"
+              className="w-full text-[12px] text-[#8b7560] hover:text-[#5c4a38] py-1 transition underline-offset-2 hover:underline"
             >
               Skip — continue without verification
             </button>
@@ -752,9 +752,9 @@ export default function FullReviewWizard({
         {step === finishStepNumber && (
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+              <label className="text-xs font-medium text-[#5c4a38]">
                 Best for{" "}
-                <span className="font-normal text-slate-400">(optional — helps buyers find this review)</span>
+                <span className="font-normal text-[#8b7560]">(optional — helps buyers find this review)</span>
               </label>
               <ChipInput
                 items={bestFor}
@@ -766,9 +766,9 @@ export default function FullReviewWizard({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+              <label className="text-xs font-medium text-[#5c4a38]">
                 Photos{" "}
-                <span className="font-normal text-slate-400">(up to 3 — optional)</span>
+                <span className="font-normal text-[#8b7560]">(up to 3 — optional)</span>
               </label>
               <input
                 ref={fileInputRef}
@@ -782,7 +782,7 @@ export default function FullReviewWizard({
                 {mediaPreviews.map((src, idx) => (
                   <div
                     key={idx}
-                    className="relative w-20 h-20 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800"
+                    className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#f5ddc0] bg-[#ffecd2]"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt="" className="w-full h-full object-cover" />
@@ -799,22 +799,22 @@ export default function FullReviewWizard({
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-20 h-20 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-center text-slate-400 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-500 transition text-2xl"
+                    className="w-20 h-20 border-2 border-dashed border-[#f5ddc0] rounded-lg flex items-center justify-center text-[#8b7560] hover:border-[#d4b896] hover:text-[#5c4a38] transition text-2xl"
                   >
                     +
                   </button>
                 )}
               </div>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500">
+              <p className="text-[11px] text-[#8b7560]">
                 Reviews with photos get 1.5x engagement weight in payouts.
               </p>
             </div>
 
-            <div className="space-y-2.5 pt-1 border-t border-slate-100 dark:border-slate-800">
+            <div className="space-y-2.5 pt-1 border-t border-[#f5ddc0]">
               {mode === "verified" && (
                 <label className="flex items-start gap-2.5">
-                  <input type="checkbox" checked readOnly className="mt-0.5 accent-slate-900 shrink-0" />
-                  <span className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  <input type="checkbox" checked readOnly className="mt-0.5 accent-[#4a3828] shrink-0" />
+                  <span className="text-xs text-[#8b7560] leading-relaxed">
                     I am a verified purchaser of this product.
                   </span>
                 </label>
@@ -824,11 +824,11 @@ export default function FullReviewWizard({
                   type="checkbox"
                   checked={isHonestOpinion}
                   onChange={(e) => setIsHonestOpinion(e.target.checked)}
-                  className="mt-0.5 accent-slate-900 shrink-0"
+                  className="mt-0.5 accent-[#4a3828] shrink-0"
                 />
-                <span className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                <span className="text-xs text-[#5c4a38] leading-relaxed">
                   I confirm this is my honest, independent opinion.{" "}
-                  <span className="text-red-400">*</span>
+                  <span className="text-[#e57373]">*</span>
                 </span>
               </label>
             </div>
@@ -836,19 +836,19 @@ export default function FullReviewWizard({
         )}
 
         {error && (
-          <p className="text-xs text-red-500 dark:text-red-400 mt-2 mb-2 px-3 py-2 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-100 dark:border-red-900/40">
+          <p className="text-xs text-[#ef5350] mt-2 mb-2 px-3 py-2 bg-red-50 rounded-lg border border-red-100">
             {error}
           </p>
         )}
       </div>
 
       {/* ── Footer ── */}
-      <div className="px-5 py-4 border-t border-slate-100 dark:border-slate-800 flex gap-2 shrink-0">
+      <div className="px-5 py-4 border-t border-[#f5ddc0] flex gap-2 shrink-0">
         {step > 1 ? (
           <button
             type="button"
             onClick={() => { setError(""); setStep((s) => s - 1); }}
-            className="flex-1 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+            className="flex-1 border border-[#f5ddc0] text-[#5c4a38] py-2 rounded-lg text-sm font-medium hover:bg-[#fff0e6] transition"
           >
             Back
           </button>
@@ -856,7 +856,7 @@ export default function FullReviewWizard({
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+            className="flex-1 border border-[#f5ddc0] text-[#5c4a38] py-2 rounded-lg text-sm font-medium hover:bg-[#fff0e6] transition"
           >
             Cancel
           </button>
@@ -867,7 +867,7 @@ export default function FullReviewWizard({
             type="button"
             onClick={goNext}
             disabled={receiptVerification.status === "checking"}
-            className="flex-[1.4] bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 dark:hover:bg-slate-200 transition disabled:opacity-50"
+            className="flex-[1.4] bg-[#4a3828] text-white py-2 rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50"
           >
             {receiptVerification.status === "checking" ? "Verifying..." : "Continue \u2192"}
           </button>
@@ -876,7 +876,7 @@ export default function FullReviewWizard({
             type="button"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="flex-[1.4] bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 dark:hover:bg-slate-200 transition disabled:opacity-50"
+            className="flex-[1.4] bg-[#4a3828] text-white py-2 rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50"
           >
             {isSubmitting ? "Submitting..." : "Submit review"}
           </button>

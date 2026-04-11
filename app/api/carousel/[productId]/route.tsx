@@ -72,7 +72,7 @@ export async function GET(
       qrDataUrl = await QRCode.toDataURL(productUrl, {
         width: 200,
         margin: 1,
-        color: { dark: "#0f172a", light: "#ffffff" },
+        color: { dark: "#4a3828", light: "#fff8f3" },
       });
     } catch {
       // Fallback: 1px transparent PNG if QR generation fails
