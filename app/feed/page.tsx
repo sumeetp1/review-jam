@@ -477,7 +477,7 @@ function FeedPageInner() {
       )}
 
       {/* Mobile Nav */}
-      <nav className="md bg-[#13111a]/95 backdrop-blur-sm border-b border-[#2a2535] sticky top-0 z-40">
+      <nav className="md:hidden bg-[#13111a]/95 backdrop-blur-sm border-b border-[#2a2535] sticky top-0 z-40">
         {!showMobileSearch ? (
           <div className="px-3 h-12 flex justify-between items-center">
             <Link href="/" className="flex items-center">
@@ -511,7 +511,7 @@ function FeedPageInner() {
 
       {/* Mobile slide-down menu */}
       {showMobileMenu && (
-        <div className="md fixed inset-0 z-50" onClick={() => setShowMobileMenu(false)}>
+        <div className="md:hidden fixed inset-0 z-50" onClick={() => setShowMobileMenu(false)}>
           <div className="absolute inset-0 bg-black/40" />
           <div className="absolute top-0 right-0 w-72 bg-[#1c1826] h-full shadow-xl border-l border-[#2a2535] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             {/* Close button */}
@@ -573,10 +573,10 @@ function FeedPageInner() {
       <div className="max-w-[900px] mx-auto flex justify-center">
 
         {/* Center: Feed */}
-        <main className="w-full md md md md border-[#2a2535] min-h-screen">
+        <main className="w-full md:w-[600px] md:max-w-[600px] md:shrink-0 md:border-r border-[#2a2535] min-h-screen">
 
-          <div className="sticky top-12 md z-30 bg-[#13111a]/95 backdrop-blur-sm border-b border-[#2a2535]">
-            <div className="hidden md items-center justify-between h-12 px-4 border-b border-[#2a2535]">
+          <div className="sticky top-12 md:top-0 z-30 bg-[#13111a]/95 backdrop-blur-sm border-b border-[#2a2535]">
+            <div className="hidden md:flex items-center justify-between h-12 px-4 border-b border-[#2a2535]">
               {user && <div className="ml-auto"><NotificationBell userId={user.uid} /></div>}
             </div>
 
@@ -587,7 +587,7 @@ function FeedPageInner() {
                   key={tab.id}
                   type="button"
                   onClick={() => setFeedTab(tab.id)}
-                  className={`flex-1 py-3.5 md text-sm font-medium transition-colors border-b-2 -mb-px ${
+                  className={`flex-1 py-3.5 md:py-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
                     feedTab === tab.id
                       ? "border-[#e04c8a] text-[#f472b6]"
                       : "border-transparent text-[#8b839e] hover:text-[#cbc5d9]"
@@ -599,7 +599,7 @@ function FeedPageInner() {
             </div>
 
             {/* Desktop search + category pills */}
-            <div className="hidden md px-4 py-3">
+            <div className="hidden md:block px-4 py-3">
               <input
                 type="search"
                 placeholder="Search"
@@ -644,7 +644,7 @@ function FeedPageInner() {
             </div>
 
             {/* Mobile: horizontal category chips only (no search, no arrows) */}
-            <div className="md px-3 py-2">
+            <div className="md:hidden px-3 py-2">
               <div className="flex gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3.5 py-2 rounded-full text-[13px] font-medium border transition shrink-0 ${activeCategoryFilter === "All" ? "bg-[#e04c8a]/20 text-[#f9a8d4] border-[#e04c8a]/30" : "bg-[#1c1826] text-[#8b839e] border-[#2a2535]"}`}>
                   All

@@ -232,7 +232,7 @@ export default function CollectionDetailPage({ params }: { params: Promise<{ slu
             <p className="text-[#8b839e] text-sm">This collection has no products yet.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm lg gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {sorted.map((p) => (
               <Link
                 key={p.id}

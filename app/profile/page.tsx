@@ -201,7 +201,7 @@ export default function ProfilePage() {
       {/* Nav */}
       <nav className="sticky top-0 z-40 bg-[#13111a]/95 backdrop-blur-md border-b border-[#2a2535]">
         <div className="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-          <Link href="/" className="shrink-0 md">
+          <Link href="/" className="shrink-0 md:hidden">
             <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} />
           </Link>
           <button
@@ -214,7 +214,7 @@ export default function ProfilePage() {
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto px-4 sm py-6 space-y-5">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         {/* Identity card */}
         <div className="bg-[#1c1826] p-5 rounded-xl border border-[#2a2535] flex items-center gap-4">
           <Avatar name={user.displayName} src={user.photoURL} size="lg" />
@@ -252,7 +252,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Stats row */}
-        <div className="grid grid-cols-2 sm gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { label: "Reviews", value: myReviews.length },
             { label: "Avg rating", value: avgRating ? `★ ${avgRating}` : "—" },
@@ -304,7 +304,7 @@ export default function ProfilePage() {
             {activeTab === "overview" && (
               <div className="space-y-4">
                 <h3 className="text-sm font-semibold text-[#e8e4f0]">Badges</h3>
-                <div className="grid grid-cols-2 sm gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {ALL_BADGES.map((b) => {
                     const earned = badges.includes(b.id);
                     return (

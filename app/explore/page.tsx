@@ -117,7 +117,7 @@ function CreateHubModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm justify-center p-4">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
       <div className="bg-[#1c1826] rounded-2xl w-full max-w-lg border border-[#2a2535] shadow-2xl overflow-hidden">
 
         {/* Header */}
@@ -421,12 +421,12 @@ function ExplorePage() {
       {/* Header */}
       <div className="sticky top-0 z-40 bg-[#13111a]/95 backdrop-blur-md border-b border-[#2a2535]">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-4">
-          <Link href="/" className="shrink-0 md">
+          <Link href="/" className="shrink-0 md:hidden">
             <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} />
           </Link>
           <div className="flex-1 min-w-0">
             <h1 className="text-base font-semibold text-[#e8e4f0] leading-tight">Explore products</h1>
-            <p className="text-[12px] text-[#8b839e] hidden sm">
+            <p className="text-[12px] text-[#8b839e] hidden sm:block">
               Authentic, engagement-ranked reviews
             </p>
           </div>
@@ -435,14 +435,14 @@ function ExplorePage() {
             className="flex items-center gap-1.5 text-sm font-medium text-[#8b839e] hover:text-[#e04c8a] transition shrink-0"
           >
             <span>📚</span>
-            <span className="hidden sm">Collections</span>
+            <span className="hidden sm:inline">Collections</span>
           </Link>
         </div>
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-5 space-y-4">
         {/* Search + sort row */}
-        <div className="flex gap-3 flex-col sm">
+        <div className="flex gap-3 flex-col sm:flex-row">
           <input
             type="search"
             placeholder="Search products or brands…"
@@ -544,7 +544,7 @@ function ExplorePage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm lg gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map((p) => {
               const isCompareSelected = compareIds.has(p.id);
               return (

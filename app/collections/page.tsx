@@ -78,7 +78,7 @@ export default function CollectionsPage() {
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-4">
           <div className="flex-1 min-w-0">
             <h1 className="text-base font-semibold text-[#e8e4f0] leading-tight">Collections</h1>
-            <p className="text-[12px] text-[#8b839e] hidden sm">
+            <p className="text-[12px] text-[#8b839e] hidden sm:block">
               Curated product lists by the community
             </p>
           </div>
@@ -102,7 +102,7 @@ export default function CollectionsPage() {
             <p className="text-[#8b839e] text-sm">No collections yet. Be the first to create one!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm lg gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {collections.map((c) => (
               <Link
                 key={c.id}

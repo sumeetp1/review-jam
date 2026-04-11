@@ -126,7 +126,7 @@ export default function ReviewerProfilePage({
 
   return (
     <main className="min-h-screen bg-[#13111a] text-[#e8e4f0]">
-      <div className="max-w-3xl mx-auto px-4 sm py-6 space-y-5">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         {/* Back link */}
         <Link
           href="/feed"
@@ -189,7 +189,7 @@ export default function ReviewerProfilePage({
         </div>
 
         {/* Stats row */}
-        <div className="grid grid-cols-2 sm gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { label: "Reviews", value: reviews.length },
             {

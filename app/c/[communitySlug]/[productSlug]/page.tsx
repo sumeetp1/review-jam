@@ -260,7 +260,7 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
       {/* Header */}
       <div className="sticky top-0 z-30 bg-[#13111a]/95 backdrop-blur-md border-b border-[#2a2535]">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
-          <Link href="/" className="shrink-0 md">
+          <Link href="/" className="shrink-0 md:hidden">
             <Image src="/logo-dark.svg" alt="Review Jam" width={100} height={24} />
           </Link>
           <Link href={`/c/${communitySlug}`} className="text-sm text-[#8b839e] hover:underline ml-2 flex items-center gap-1">
@@ -302,10 +302,10 @@ export default function ProductHubPage({ params }: { params: Promise<{ community
 
       {/* Two-column hub */}
       <div className="max-w-5xl mx-auto px-4 py-5">
-        <div className="flex flex-col md gap-5">
+        <div className="flex flex-col md:flex-row gap-5">
 
           {/* LEFT COLUMN */}
-          <div className="md space-y-4 shrink-0">
+          <div className="md:w-2/5 space-y-4 shrink-0">
 
             {/* Health + rating */}
             <div className="bg-[#1c1826] rounded-xl border border-[#2a2535] p-4">

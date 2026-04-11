@@ -74,11 +74,11 @@ export default function CommunitiesPage() {
     <div className="min-h-screen bg-[#13111a] pb-20">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-[#13111a]/95 backdrop-blur-md border-b border-[#2a2535]">
-        <div className="max-w-5xl mx-auto px-4 md py-3 flex items-center justify-between gap-4">
-          <Link href="/" className="shrink-0 md">
+        <div className="max-w-5xl mx-auto px-4 md:px-8 py-3 flex items-center justify-between gap-4">
+          <Link href="/" className="shrink-0 md:hidden">
             <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} />
           </Link>
-          <h1 className="text-base font-bold text-[#e8e4f0] hidden sm">Communities</h1>
+          <h1 className="text-base font-bold text-[#e8e4f0] hidden sm:block">Communities</h1>
           {user ? (
             <button
               type="button"
@@ -91,7 +91,7 @@ export default function CommunitiesPage() {
         </div>
 
         {/* Search + filter */}
-        <div className="max-w-5xl mx-auto px-4 md pb-3 flex gap-2">
+        <div className="max-w-5xl mx-auto px-4 md:px-8 pb-3 flex gap-2">
           <div className="relative flex-1">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8b839e] pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
@@ -118,7 +118,7 @@ export default function CommunitiesPage() {
       </header>
 
       {/* Community grid (desktop) / list (mobile) */}
-      <div className="max-w-5xl mx-auto px-4 md py-4">
+      <div className="max-w-5xl mx-auto px-4 md:px-6 py-4">
         {loading ? (
           <p className="text-center text-sm text-[#8b839e] py-12 animate-pulse">Loading communities...</p>
         ) : filtered.length === 0 ? (
@@ -134,7 +134,7 @@ export default function CommunitiesPage() {
         ) : (
           <>
             {/* Desktop: card grid */}
-            <div className="hidden md md lg gap-4">
+            <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filtered.map((c) => (
                 <Link
                   key={c.id}
@@ -178,7 +178,7 @@ export default function CommunitiesPage() {
             </div>
 
             {/* Mobile: compact list */}
-            <div className="md divide-y divide-[#2a2535]">
+            <div className="md:hidden divide-y divide-[#2a2535]">
               {filtered.map((c) => (
                 <Link
                   key={c.id}

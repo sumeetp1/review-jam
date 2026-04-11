@@ -224,7 +224,7 @@ export default function CommunityPage({ params }: { params: Promise<{ communityS
       <header className="sticky top-0 z-40 bg-[#13111a]/95 backdrop-blur-md border-b border-[#2a2535]">
         <div className="max-w-5xl mx-auto px-4 py-3">
           <div className="flex items-center gap-3">
-            <Link href="/" className="shrink-0 mr-1 md">
+            <Link href="/" className="shrink-0 mr-1 md:hidden">
               <Image src="/logo-dark.svg" alt="Review Jam" width={90} height={22} />
             </Link>
             <button type="button" onClick={() => router.push("/c")} className="text-[#8b839e] hover:text-[#cbc5d9] shrink-0 text-lg leading-none">
@@ -278,7 +278,7 @@ export default function CommunityPage({ params }: { params: Promise<{ communityS
               <p className="text-[12px] text-[#8b839e]">Admins can assign products here from the admin panel.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm lg gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {products.map((p) => {
                 const isTagged = p.communitySlug !== communitySlug;
                 return (

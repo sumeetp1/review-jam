@@ -131,7 +131,7 @@ export default function ComparePage() {
   return (
     <div className="min-h-screen bg-[#13111a]">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 md h-14 shrink-0 relative z-10 border-b border-[#2a2535]">
+      <header className="flex items-center justify-between px-4 md:px-8 h-14 shrink-0 relative z-10 border-b border-[#2a2535]">
         <Link href="/" className="flex items-center">
           <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} priority />
         </Link>
@@ -150,27 +150,27 @@ export default function ComparePage() {
       </header>
 
       {/* Hero */}
-      <section className="px-4 md pt-16 md pb-12 text-center">
-        <h1 className="text-3xl md font-extrabold text-[#e8e4f0] tracking-tight mb-4">
+      <section className="px-4 md:px-8 pt-16 md:pt-24 pb-12 text-center">
+        <h1 className="text-3xl md:text-5xl font-extrabold text-[#e8e4f0] tracking-tight mb-4">
           Not another review platform.<br />
           <span className="text-gradient">A fundamentally different model.</span>
         </h1>
-        <p className="text-base md text-[#8b839e] max-w-2xl mx-auto leading-relaxed mb-6">
+        <p className="text-base md:text-lg text-[#8b839e] max-w-2xl mx-auto leading-relaxed mb-6">
           See how Review Jam compares to existing review platforms across every dimension that matters for trust, quality, and genuine consumer insight.
         </p>
       </section>
 
       {/* Core Insight */}
-      <section className="px-4 md pb-16">
-        <div className="max-w-3xl mx-auto glass-card px-6 md py-6 text-center">
-          <p className="text-sm md text-[#cbc5d9] leading-relaxed">
+      <section className="px-4 md:px-8 pb-16">
+        <div className="max-w-3xl mx-auto glass-card px-6 md:px-8 py-6 text-center">
+          <p className="text-sm md:text-base text-[#cbc5d9] leading-relaxed">
             <span className="font-bold text-[#e8e4f0]">The core difference:</span> Other platforms measure reviews by star ratings. Review Jam measures reviews by <span className="font-bold text-[#e04c8a]">quality, depth, and engagement</span>. Reviewers are paid to be thorough, not positive. Brand funding is decoupled from review sentiment.
           </p>
         </div>
       </section>
 
       {/* Comparison Table */}
-      <section className="px-4 md pb-20">
+      <section className="px-4 md:px-8 pb-20">
         <div className="max-w-6xl mx-auto overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead>
@@ -231,16 +231,16 @@ export default function ComparePage() {
       </section>
 
       {/* Deep Dive Sections */}
-      <section className="px-4 md pb-20">
+      <section className="px-4 md:px-8 pb-20">
         <div className="max-w-4xl mx-auto space-y-12">
 
           {/* Why incentives matter */}
-          <div className="glass-card px-6 md py-8">
+          <div className="glass-card px-6 md:px-8 py-8">
             <h2 className="text-xl font-bold text-[#e8e4f0] mb-3">Why incentive alignment matters</h2>
             <p className="text-[14px] text-[#cbc5d9] leading-relaxed mb-4">
               The biggest problem in reviews isn&apos;t fake reviews — it&apos;s misaligned incentives. When influencers are paid per post, they write what brands want. When nobody is paid at all, only the furious bother to write. The honest middle — detailed, balanced ownership experiences — is missing.
             </p>
-            <div className="grid md gap-4">
+            <div className="grid md:grid-cols-2 gap-4">
               <div className="bg-[#f87171]/5 rounded-xl px-5 py-4 border border-[#f87171]/10">
                 <div className="text-sm font-semibold text-[#f87171] mb-2">Misaligned incentive</div>
                 <p className="text-[13px] text-[#8b839e]">Paid to be positive. No cons listed. Marketing language. Sounds like an ad — because it is one.</p>
@@ -253,7 +253,7 @@ export default function ComparePage() {
           </div>
 
           {/* Cold start */}
-          <div className="glass-card px-6 md py-8">
+          <div className="glass-card px-6 md:px-8 py-8">
             <h2 className="text-xl font-bold text-[#e8e4f0] mb-3">The cold start problem</h2>
             <p className="text-[14px] text-[#cbc5d9] leading-relaxed mb-4">
               New products face a death spiral: no reviews leads to no trust leads to no purchases leads to no reviews. Every platform struggles with this. Here&apos;s how each one tries to solve it — and why most solutions make the trust problem worse.
@@ -279,12 +279,12 @@ export default function ComparePage() {
           </div>
 
           {/* Health Score deep dive */}
-          <div className="glass-card px-6 md py-8">
+          <div className="glass-card px-6 md:px-8 py-8">
             <h2 className="text-xl font-bold text-[#e8e4f0] mb-3">Quality scoring: stars vs Health Score</h2>
             <p className="text-[14px] text-[#cbc5d9] leading-relaxed mb-4">
               Star ratings tell you sentiment. Health Score tells you substance. A 3-star review with detailed pros, cons, photos, and 6-month ownership updates is infinitely more useful than a 5-star &quot;Great product!&quot; — and our scoring reflects that.
             </p>
-            <div className="grid grid-cols-2 md gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div className="text-center px-3 py-4 rounded-xl bg-[#e04c8a]/5 border border-[#e04c8a]/12">
                 <div className="text-2xl font-extrabold text-[#e04c8a]">40</div>
                 <div className="text-[11px] text-[#8b839e] mt-1 font-medium">Quality</div>
@@ -312,8 +312,8 @@ export default function ComparePage() {
       </section>
 
       {/* CTA */}
-      <section className="px-4 md py-16 md border-t border-[#2a2535] text-center">
-        <h2 className="text-2xl md font-extrabold text-[#e8e4f0] tracking-tight mb-4">
+      <section className="px-4 md:px-8 py-16 md:py-20 border-t border-[#2a2535] text-center">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-[#e8e4f0] tracking-tight mb-4">
           Ready to experience the difference?
         </h2>
         <p className="text-base text-[#8b839e] mb-8 max-w-lg mx-auto">
@@ -330,8 +330,8 @@ export default function ComparePage() {
       </section>
 
       {/* Footer */}
-      <footer className="px-4 md py-8 border-t border-[#2a2535]">
-        <div className="max-w-4xl mx-auto flex flex-col md items-center justify-between gap-4">
+      <footer className="px-4 md:px-8 py-8 border-t border-[#2a2535]">
+        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center">
             <Image src="/logo-dark.svg" alt="Review Jam" width={90} height={22} className="opacity-50 hover:opacity-80 transition" />
           </Link>

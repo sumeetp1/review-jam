@@ -229,7 +229,7 @@ function CompareProductsPage() {
             <h1 className="text-base font-semibold text-[#e8e4f0] leading-tight">
               Product Comparison
             </h1>
-            <p className="text-[12px] text-[#8b839e] hidden sm">
+            <p className="text-[12px] text-[#8b839e] hidden sm:block">
               {products.length} product{products.length !== 1 ? "s" : ""} side by side
             </p>
           </div>
@@ -240,7 +240,7 @@ function CompareProductsPage() {
         {/* Mobile: stacked, Medium+: horizontal scroll table */}
 
         {/* Desktop comparison table */}
-        <div className="hidden md overflow-x-auto">
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr>
