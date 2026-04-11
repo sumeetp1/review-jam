@@ -6,8 +6,8 @@ export default function BuyLinksCard({ buyLinks }: { buyLinks: BuyLink[] }) {
   if (!buyLinks || buyLinks.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-xl border border-[#f5ddc0] p-4">
-      <p className="text-[10px] font-bold uppercase tracking-widest text-[#8b7560] mb-2.5 flex items-center gap-1.5">
+    <div className="bg-[#1c1826] rounded-xl border border-[#2a2535] p-4">
+      <p className="text-[10px] font-bold uppercase tracking-widest text-[#8b839e] mb-2.5 flex items-center gap-1.5">
         <span className="text-sm">🛒</span> Where to Buy
       </p>
       <div className="space-y-1.5">
@@ -17,14 +17,14 @@ export default function BuyLinksCard({ buyLinks }: { buyLinks: BuyLink[] }) {
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[12px] font-medium border border-[#f5ddc0] bg-white hover:border-[#d4b896] hover:bg-[#fff0e6] transition group"
+            className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[12px] font-medium border border-[#2a2535] bg-[#1c1826] hover:border-[#3a3348] hover:bg-[#231e2e] transition group"
           >
-            <span className="text-[#5c4a38] font-semibold truncate">{link.retailer}</span>
+            <span className="text-[#cbc5d9] font-semibold truncate">{link.retailer}</span>
             <span className="flex items-center gap-2 shrink-0 ml-2">
               {link.price && (
-                <span className="text-[#66bb6a] font-semibold">{link.price}</span>
+                <span className="text-[#34d399] font-semibold">{link.price}</span>
               )}
-              <span className="text-[#8b7560] group-hover:text-[#5c4a38] transition">↗</span>
+              <span className="text-[#8b839e] group-hover:text-[#cbc5d9] transition">↗</span>
             </span>
           </a>
         ))}

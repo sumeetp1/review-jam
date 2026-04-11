@@ -18,8 +18,8 @@ export default function OptionButton({
       disabled={disabled}
       className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
         selected
-          ? "bg-[#4a3828] text-white border-[#4a3828]"
-          : "bg-white text-[#5c4a38] border-[#f5ddc0] hover:border-[#d4b896] disabled:opacity-40"
+          ? "bg-[#e04c8a] text-white border-[#e04c8a]"
+          : "bg-[#1c1826] text-[#cbc5d9] border-[#2a2535] hover:border-[#3a3348] disabled:opacity-40"
       }`}
     >
       {children}

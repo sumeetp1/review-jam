@@ -89,7 +89,7 @@ export default function WidgetStudioPage() {
 
           {/* Product selector */}
           <div>
-            <h3 className="text-xs font-semibold text-[#8b7560] uppercase tracking-wide mb-3">
+            <h3 className="text-xs font-semibold text-[#8b839e] uppercase tracking-wide mb-3">
               Select product
             </h3>
             <div className="space-y-2">
@@ -100,12 +100,12 @@ export default function WidgetStudioPage() {
                   onClick={() => setSelectedProduct(p)}
                   className={`w-full text-left px-4 py-3 rounded-xl border transition ${
                     selectedProduct?.id === p.id
-                      ? "bg-[#e65100]/10 border-[#e65100]/40 text-[#4a3828]"
-                      : "bg-white border-[#f5ddc0] text-[#5c4a38] hover:border-[#e6c9a0]"
+                      ? "bg-[#e04c8a]/12 border-[#e04c8a]/40 text-[#e8e4f0]"
+                      : "bg-[#1c1826] border-[#2a2535] text-[#cbc5d9] hover:border-[#e6c9a0]"
                   }`}
                 >
                   <p className="text-sm font-medium leading-tight">{p.name}</p>
-                  <p className="text-xs text-[#8b7560] mt-0.5">{p.brandName} &middot; {p.category}</p>
+                  <p className="text-xs text-[#8b839e] mt-0.5">{p.brandName} &middot; {p.category}</p>
                 </button>
               ))}
             </div>
@@ -113,7 +113,7 @@ export default function WidgetStudioPage() {
 
           {/* Theme toggle */}
           <div>
-            <h3 className="text-xs font-semibold text-[#8b7560] uppercase tracking-wide mb-3">
+            <h3 className="text-xs font-semibold text-[#8b839e] uppercase tracking-wide mb-3">
               Theme
             </h3>
             <div className="flex gap-2">
@@ -124,22 +124,22 @@ export default function WidgetStudioPage() {
                   onClick={() => setTheme(t.id)}
                   className={`flex-1 py-2.5 rounded-xl border text-xs font-medium transition text-center ${
                     theme === t.id
-                      ? "bg-[#e65100] border-[#e65100] text-white"
-                      : "bg-white border-[#f5ddc0] text-[#8b7560] hover:border-[#e6c9a0]"
+                      ? "bg-[#e04c8a] border-[#e04c8a] text-white"
+                      : "bg-[#1c1826] border-[#2a2535] text-[#8b839e] hover:border-[#e6c9a0]"
                   }`}
                 >
                   {t.label}
                 </button>
               ))}
             </div>
-            <p className="text-[11px] text-[#b89878] mt-2">
+            <p className="text-[11px] text-[#4a4458] mt-2">
               &ldquo;Auto&rdquo; follows the visitor&apos;s system preference.
             </p>
           </div>
 
           {/* Widget size */}
           <div>
-            <h3 className="text-xs font-semibold text-[#8b7560] uppercase tracking-wide mb-3">
+            <h3 className="text-xs font-semibold text-[#8b839e] uppercase tracking-wide mb-3">
               Widget size
             </h3>
             <div className="flex gap-2">
@@ -150,8 +150,8 @@ export default function WidgetStudioPage() {
                   onClick={() => setSize(s.id)}
                   className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 rounded-xl border text-xs font-medium transition ${
                     size === s.id
-                      ? "bg-[#e65100] border-[#e65100] text-white"
-                      : "bg-white border-[#f5ddc0] text-[#8b7560] hover:border-[#e6c9a0]"
+                      ? "bg-[#e04c8a] border-[#e04c8a] text-white"
+                      : "bg-[#1c1826] border-[#2a2535] text-[#8b839e] hover:border-[#e6c9a0]"
                   }`}
                 >
                   {s.label}
@@ -164,30 +164,30 @@ export default function WidgetStudioPage() {
 
         {/* ── Right panel: preview + actions ─────────────────────────────── */}
         <div className="space-y-4">
-          <h3 className="text-xs font-semibold text-[#8b7560] uppercase tracking-wide">
+          <h3 className="text-xs font-semibold text-[#8b839e] uppercase tracking-wide">
             Live preview
           </h3>
 
           {selectedProduct ? (
-            <div className="bg-white border border-[#f5ddc0] rounded-xl p-6 flex flex-col items-center">
+            <div className="bg-[#1c1826] border border-[#2a2535] rounded-xl p-6 flex flex-col items-center">
               {/* Simulated browser chrome */}
               <div
-                className="bg-[#ffecd2] rounded-t-xl px-4 py-2.5 flex items-center gap-2 border border-[#f5ddc0] border-b-0"
+                className="bg-[#1c1826] rounded-t-xl px-4 py-2.5 flex items-center gap-2 border border-[#2a2535] border-b-0"
                 style={{ width: `${Math.min(widthPx + 20, 500)}px`, maxWidth: "100%" }}
               >
                 <div className="flex gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#d4b896]" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#d4b896]" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#d4b896]" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#3a3348]" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#3a3348]" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#3a3348]" />
                 </div>
-                <div className="flex-1 bg-[#fff0e6] rounded-md px-3 py-1 text-[10px] text-[#8b7560] font-mono truncate">
+                <div className="flex-1 bg-[#231e2e] rounded-md px-3 py-1 text-[10px] text-[#8b839e] font-mono truncate">
                   {baseUrl}/api/widget/{selectedProduct.id}
                 </div>
               </div>
 
               {/* iframe embed */}
               <div
-                className="border border-[#f5ddc0] border-t-0 rounded-b-xl overflow-hidden bg-[#fff8f3]"
+                className="border border-[#2a2535] border-t-0 rounded-b-xl overflow-hidden bg-[#13111a]"
                 style={{ width: `${Math.min(widthPx + 20, 500)}px`, maxWidth: "100%" }}
               >
                 <iframe
@@ -201,13 +201,13 @@ export default function WidgetStudioPage() {
                 />
               </div>
 
-              <p className="text-[11px] text-[#b89878] mt-3 text-center">
+              <p className="text-[11px] text-[#4a4458] mt-3 text-center">
                 Auto-refreshes when you change settings.
               </p>
             </div>
           ) : (
-            <div className="bg-white border border-[#f5ddc0] rounded-xl p-12 flex items-center justify-center">
-              <p className="text-[#8b7560] text-sm">Select a product to preview the widget</p>
+            <div className="bg-[#1c1826] border border-[#2a2535] rounded-xl p-12 flex items-center justify-center">
+              <p className="text-[#8b839e] text-sm">Select a product to preview the widget</p>
             </div>
           )}
 
@@ -217,13 +217,13 @@ export default function WidgetStudioPage() {
               <button
                 type="button"
                 onClick={() => handleCopy(widgetUrl)}
-                className="flex-1 min-w-[140px] text-xs font-medium bg-[#e65100] hover:bg-[#d84315] text-white px-4 py-2.5 rounded-lg transition text-center"
+                className="flex-1 min-w-[140px] text-xs font-medium bg-[#e04c8a] hover:bg-[#d84315] text-white px-4 py-2.5 rounded-lg transition text-center"
               >
                 {copied ? "\u2713 Copied!" : "Copy Widget Link"}
               </button>
               <Link
                 href="/brands/dashboard/integrations"
-                className="flex-1 min-w-[140px] text-xs font-medium border border-[#f5ddc0] text-[#5c4a38] hover:bg-[#fff0e6] px-4 py-2.5 rounded-lg transition text-center"
+                className="flex-1 min-w-[140px] text-xs font-medium border border-[#2a2535] text-[#cbc5d9] hover:bg-[#231e2e] px-4 py-2.5 rounded-lg transition text-center"
               >
                 Get Shopify Code
               </Link>
@@ -231,7 +231,7 @@ export default function WidgetStudioPage() {
                 href={widgetUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs font-medium text-[#8b7560] hover:text-[#4a3828] px-4 py-2.5 rounded-lg transition"
+                className="text-xs font-medium text-[#8b839e] hover:text-[#e8e4f0] px-4 py-2.5 rounded-lg transition"
               >
                 View Full Page &rarr;
               </a>
@@ -240,11 +240,11 @@ export default function WidgetStudioPage() {
 
           {/* Collapsible View Code section */}
           {selectedProduct && (
-            <div className="bg-white border border-[#f5ddc0] rounded-xl overflow-hidden">
+            <div className="bg-[#1c1826] border border-[#2a2535] rounded-xl overflow-hidden">
               <button
                 type="button"
                 onClick={() => setCodeOpen(!codeOpen)}
-                className="w-full px-5 py-3 flex items-center justify-between text-xs font-semibold text-[#5c4a38] hover:bg-[#fff0e6] transition"
+                className="w-full px-5 py-3 flex items-center justify-between text-xs font-semibold text-[#cbc5d9] hover:bg-[#231e2e] transition"
               >
                 <span>View Code</span>
                 <span className={`transition-transform ${codeOpen ? "rotate-180" : ""}`}>
@@ -262,8 +262,8 @@ export default function WidgetStudioPage() {
                         onClick={() => setSnippetTab(tab.id)}
                         className={`px-3 py-1.5 rounded-md text-xs font-medium border transition ${
                           snippetTab === tab.id
-                            ? "bg-[#ffecd2] text-[#4a3828] border-transparent"
-                            : "bg-transparent text-[#8b7560] border-[#f5ddc0] hover:border-[#e6c9a0]"
+                            ? "bg-[#1c1826] text-[#e8e4f0] border-transparent"
+                            : "bg-transparent text-[#8b839e] border-[#2a2535] hover:border-[#e6c9a0]"
                         }`}
                       >
                         {tab.label}
@@ -273,7 +273,7 @@ export default function WidgetStudioPage() {
 
                   {/* Code block */}
                   <div className="relative">
-                    <pre className="bg-[#ffecd2] border border-[#f5ddc0] rounded-xl p-4 text-[11px] text-[#5c4a38] font-mono overflow-x-auto leading-relaxed whitespace-pre-wrap break-all">
+                    <pre className="bg-[#1c1826] border border-[#2a2535] rounded-xl p-4 text-[11px] text-[#cbc5d9] font-mono overflow-x-auto leading-relaxed whitespace-pre-wrap break-all">
                       {getSnippet()}
                     </pre>
                     <button
@@ -281,8 +281,8 @@ export default function WidgetStudioPage() {
                       onClick={() => handleCopy()}
                       className={`absolute top-3 right-3 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition ${
                         copied
-                          ? "bg-[#66bb6a] text-white"
-                          : "bg-white hover:bg-[#fff0e6] text-[#4a3828]"
+                          ? "bg-[#34d399] text-white"
+                          : "bg-[#1c1826] hover:bg-[#231e2e] text-[#e8e4f0]"
                       }`}
                     >
                       {copied ? "\u2713 Copied!" : "Copy"}

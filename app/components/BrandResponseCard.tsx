@@ -85,13 +85,13 @@ export default function BrandResponseCard({
   }
 
   return (
-    <div className="ml-0 md:ml-12 mt-3 pl-4 border-l-2 border-[#e65100]/50">
-      <div className="bg-[#fff0e6] rounded-lg p-3">
+    <div className="ml-0 md:ml-12 mt-3 pl-4 border-l-2 border-[#e04c8a]/50">
+      <div className="bg-[#231e2e] rounded-lg p-3">
         <div className="flex items-center gap-2 mb-1.5">
-          <span className="text-[11px] font-semibold bg-[#ffecd2] text-[#e65100] px-2 py-0.5 rounded-full">
+          <span className="text-[11px] font-semibold bg-[#1c1826] text-[#e04c8a] px-2 py-0.5 rounded-full">
             Official Response
           </span>
-          <span className="text-[11px] text-[#8b7560]">
+          <span className="text-[11px] text-[#8b839e]">
             {timeAgo(brandResponse.respondedAt)}
             {editedAt && " \u00b7 edited"}
           </span>
@@ -103,14 +103,14 @@ export default function BrandResponseCard({
               value={editBody}
               onChange={(e) => setEditBody(e.target.value)}
               rows={3}
-              className="w-full bg-white border border-[#f5ddc0] rounded-lg p-2.5 text-[13px] text-[#5c4a38] outline-none focus:border-[#ff8a65] transition resize-none"
+              className="w-full bg-[#1c1826] border border-[#2a2535] rounded-lg p-2.5 text-[13px] text-[#cbc5d9] outline-none focus:border-[#f472b6] transition resize-none"
             />
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={handleSave}
                 disabled={isSaving || !editBody.trim()}
-                className="text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-[#e65100] hover:bg-[#e65100]/90 disabled:bg-[#ffecd2] disabled:text-[#8b7560] text-white transition"
+                className="text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-[#e04c8a] hover:bg-[#e04c8a]/90 disabled:bg-[#1c1826] disabled:text-[#8b839e] text-white transition"
               >
                 {isSaving ? "Saving..." : "Save"}
               </button>
@@ -120,7 +120,7 @@ export default function BrandResponseCard({
                   setEditBody(displayBody);
                   setIsEditing(false);
                 }}
-                className="text-[11px] font-medium px-3 py-1.5 rounded-lg text-[#8b7560] hover:text-[#5c4a38] hover:bg-[#fff0e6] transition"
+                className="text-[11px] font-medium px-3 py-1.5 rounded-lg text-[#8b839e] hover:text-[#cbc5d9] hover:bg-[#231e2e] transition"
               >
                 Cancel
               </button>
@@ -128,14 +128,14 @@ export default function BrandResponseCard({
           </div>
         ) : (
           <>
-            <p className="text-[13px] text-[#5c4a38] leading-relaxed whitespace-pre-wrap">
+            <p className="text-[13px] text-[#cbc5d9] leading-relaxed whitespace-pre-wrap">
               {displayBody}
             </p>
             {isBrandOwner && (
               <button
                 type="button"
                 onClick={() => setIsEditing(true)}
-                className="mt-2 text-[11px] font-medium text-[#e65100] hover:text-[#ff8a65] transition-colors"
+                className="mt-2 text-[11px] font-medium text-[#e04c8a] hover:text-[#f472b6] transition-colors"
               >
                 Edit
               </button>

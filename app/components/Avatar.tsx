@@ -72,16 +72,16 @@ function Identicon({ seed, className }: { seed: string; className: string }) {
 // ── Community avatar (emoji-based with gradient ring) ─────────────────────────
 
 const COMMUNITY_GRADIENTS = [
-  ["from-[#ffcc80]", "to-[#ffab91]"],
-  ["from-[#ce93d8]", "to-[#f48fb1]"],
-  ["from-[#81d4fa]", "to-[#93c5fd]"],
-  ["from-[#a5d6a7]", "to-[#80cbc4]"],
-  ["from-[#f48fb1]", "to-[#ffab91]"],
-  ["from-[#ff8a65]", "to-[#ffab91]"],
-  ["from-[#ce93d8]", "to-[#f48fb1]"],
-  ["from-[#aed581]", "to-[#a5d6a7]"],
-  ["from-[#80deea]", "to-[#80cbc4]"],
-  ["from-[#ffab91]", "to-[#ef9a9a]"],
+  ["from-[#fbbf24]", "to-[#fb7185]"],
+  ["from-[#a78bfa]", "to-[#e04c8a]"],
+  ["from-[#38bdf8]", "to-[#60a5fa]"],
+  ["from-[#34d399]", "to-[#2dd4bf]"],
+  ["from-[#fb7185]", "to-[#f9a8d4]"],
+  ["from-[#e04c8a]", "to-[#7c3aed]"],
+  ["from-[#a78bfa]", "to-[#e04c8a]"],
+  ["from-[#86efac]", "to-[#34d399]"],
+  ["from-[#67e8f9]", "to-[#2dd4bf]"],
+  ["from-[#fb7185]", "to-[#f87171]"],
 ];
 
 function CommunityIcon({ emoji, seed, className }: { emoji?: string | null; seed: string; className: string }) {

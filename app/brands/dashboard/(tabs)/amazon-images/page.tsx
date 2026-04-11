@@ -76,11 +76,11 @@ export default function AmazonImagesPage() {
   return (
     <div className="space-y-6">
       {/* Intro banner */}
-      <div className="bg-gradient-to-r from-[#e65100]/10 to-[#ff8a65]/10 border border-[#e65100]/20 rounded-xl p-5">
-        <h2 className="text-sm font-semibold text-[#e65100] mb-1">
+      <div className="bg-gradient-to-r from-[#e04c8a]/12 to-[#f472b6]/10 border border-[#e04c8a]/20 rounded-xl p-5">
+        <h2 className="text-sm font-semibold text-[#e04c8a] mb-1">
           Put your reviews in the Amazon carousel
         </h2>
-        <p className="text-xs text-[#8b7560] leading-relaxed max-w-2xl">
+        <p className="text-xs text-[#8b839e] leading-relaxed max-w-2xl">
           Generate high-resolution review images (2000x2000 PNG) to upload as product images on Amazon.
           Each image includes your Health Score, top reviews, and a QR code that links shoppers directly to your Review Jam page.
         </p>
@@ -93,7 +93,7 @@ export default function AmazonImagesPage() {
 
           {/* Product selector */}
           <div>
-            <h3 className="text-xs font-semibold text-[#8b7560] uppercase tracking-wide mb-3">
+            <h3 className="text-xs font-semibold text-[#8b839e] uppercase tracking-wide mb-3">
               1 &mdash; Select product
             </h3>
             <div className="space-y-2">
@@ -104,12 +104,12 @@ export default function AmazonImagesPage() {
                   onClick={() => setSelectedProduct(p)}
                   className={`w-full text-left px-4 py-3 rounded-xl border transition ${
                     selectedProduct?.id === p.id
-                      ? "bg-[#e65100]/10 border-[#e65100]/40 text-[#4a3828]"
-                      : "bg-white border-[#f5ddc0] text-[#5c4a38] hover:border-[#e6c9a0]"
+                      ? "bg-[#e04c8a]/12 border-[#e04c8a]/40 text-[#e8e4f0]"
+                      : "bg-[#1c1826] border-[#2a2535] text-[#cbc5d9] hover:border-[#e6c9a0]"
                   }`}
                 >
                   <p className="text-sm font-medium leading-tight">{p.name}</p>
-                  <p className="text-xs text-[#8b7560] mt-0.5">{p.brandName} &middot; {p.category}</p>
+                  <p className="text-xs text-[#8b839e] mt-0.5">{p.brandName} &middot; {p.category}</p>
                 </button>
               ))}
             </div>
@@ -117,7 +117,7 @@ export default function AmazonImagesPage() {
 
           {/* Template picker */}
           <div>
-            <h3 className="text-xs font-semibold text-[#8b7560] uppercase tracking-wide mb-3">
+            <h3 className="text-xs font-semibold text-[#8b839e] uppercase tracking-wide mb-3">
               2 &mdash; Choose template
             </h3>
             <div className="grid grid-cols-2 gap-2">
@@ -128,15 +128,15 @@ export default function AmazonImagesPage() {
                   onClick={() => setTemplate(t.id)}
                   className={`text-left p-3 rounded-xl border transition ${
                     template === t.id
-                      ? "bg-[#e65100]/10 border-[#e65100]/40"
-                      : "bg-white border-[#f5ddc0] hover:border-[#e6c9a0]"
+                      ? "bg-[#e04c8a]/12 border-[#e04c8a]/40"
+                      : "bg-[#1c1826] border-[#2a2535] hover:border-[#e6c9a0]"
                   }`}
                 >
                   <span className="text-lg">{t.icon}</span>
-                  <p className={`text-xs font-medium mt-1 ${template === t.id ? "text-[#e65100]" : "text-[#5c4a38]"}`}>
+                  <p className={`text-xs font-medium mt-1 ${template === t.id ? "text-[#e04c8a]" : "text-[#cbc5d9]"}`}>
                     {t.label}
                   </p>
-                  <p className="text-[10px] text-[#8b7560] mt-0.5">{t.description}</p>
+                  <p className="text-[10px] text-[#8b839e] mt-0.5">{t.description}</p>
                 </button>
               ))}
             </div>
@@ -144,7 +144,7 @@ export default function AmazonImagesPage() {
 
           {/* Theme picker */}
           <div>
-            <h3 className="text-xs font-semibold text-[#8b7560] uppercase tracking-wide mb-3">
+            <h3 className="text-xs font-semibold text-[#8b839e] uppercase tracking-wide mb-3">
               3 &mdash; Choose theme
             </h3>
             <div className="flex gap-2">
@@ -155,13 +155,13 @@ export default function AmazonImagesPage() {
                   onClick={() => setTheme(t.id)}
                   className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-xl border text-xs font-medium transition ${
                     theme === t.id
-                      ? "bg-[#e65100]/10 border-[#e65100]/40 text-[#e65100]"
-                      : "bg-white border-[#f5ddc0] text-[#8b7560] hover:border-[#e6c9a0]"
+                      ? "bg-[#e04c8a]/12 border-[#e04c8a]/40 text-[#e04c8a]"
+                      : "bg-[#1c1826] border-[#2a2535] text-[#8b839e] hover:border-[#e6c9a0]"
                   }`}
                 >
                   <span className="text-lg">{t.emoji}</span>
                   {t.label}
-                  <span className="text-[10px] text-[#b89878]">{t.note}</span>
+                  <span className="text-[10px] text-[#4a4458]">{t.note}</span>
                 </button>
               ))}
             </div>
@@ -174,7 +174,7 @@ export default function AmazonImagesPage() {
                 type="button"
                 onClick={handleDownload}
                 disabled={downloading}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-[#e65100] to-[#ff8a65] text-white font-semibold text-sm hover:from-[#d84315] hover:to-[#ff7043] transition disabled:opacity-50"
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-[#e04c8a] to-[#f472b6] text-white font-semibold text-sm hover:from-[#d84315] hover:to-[#ff7043] transition disabled:opacity-50"
               >
                 {downloading ? "Generating\u2026" : `Download ${TEMPLATE_OPTIONS.find((t) => t.id === template)?.label} PNG`}
               </button>
@@ -182,7 +182,7 @@ export default function AmazonImagesPage() {
                 type="button"
                 onClick={handleDownloadAll}
                 disabled={downloadingAll}
-                className="w-full py-3 rounded-xl border border-[#f5ddc0] text-[#5c4a38] text-sm font-medium hover:bg-[#fff0e6] transition disabled:opacity-50"
+                className="w-full py-3 rounded-xl border border-[#2a2535] text-[#cbc5d9] text-sm font-medium hover:bg-[#231e2e] transition disabled:opacity-50"
               >
                 {downloadingAll ? "Generating all\u2026" : "Download All 4 Templates"}
               </button>
@@ -190,15 +190,15 @@ export default function AmazonImagesPage() {
           )}
 
           {/* How-to */}
-          <div className="bg-[#fff0e6] border border-[#f5ddc0] rounded-xl p-5 space-y-2.5">
-            <h4 className="text-xs font-semibold text-[#5c4a38] mb-3">How to use</h4>
+          <div className="bg-[#231e2e] border border-[#2a2535] rounded-xl p-5 space-y-2.5">
+            <h4 className="text-xs font-semibold text-[#cbc5d9] mb-3">How to use</h4>
             {[
               ["1\uFE0F\u20E3", "Download the image(s) you want"],
               ["2\uFE0F\u20E3", "Go to Amazon Seller Central \u2192 Edit Listing \u2192 Images"],
               ["3\uFE0F\u20E3", "Upload as one of your additional product images (slots 2-9)"],
               ["4\uFE0F\u20E3", "Shoppers scan the QR code to read full reviews on ReviewJam"],
             ].map(([icon, text]) => (
-              <div key={String(text)} className="flex items-start gap-2.5 text-xs text-[#8b7560]">
+              <div key={String(text)} className="flex items-start gap-2.5 text-xs text-[#8b839e]">
                 <span className="shrink-0">{icon}</span>
                 <span>{text}</span>
               </div>
@@ -208,13 +208,13 @@ export default function AmazonImagesPage() {
 
         {/* Right panel: preview */}
         <div>
-          <h3 className="text-xs font-semibold text-[#8b7560] uppercase tracking-wide mb-3">
+          <h3 className="text-xs font-semibold text-[#8b839e] uppercase tracking-wide mb-3">
             Preview
           </h3>
 
           {selectedProduct ? (
-            <div className="bg-white border border-[#f5ddc0] rounded-xl p-4">
-              <div className="relative aspect-square rounded-lg overflow-hidden bg-[#fff0e6] border border-[#f5ddc0]">
+            <div className="bg-[#1c1826] border border-[#2a2535] rounded-xl p-4">
+              <div className="relative aspect-square rounded-lg overflow-hidden bg-[#231e2e] border border-[#2a2535]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   key={imgKey}
@@ -226,23 +226,23 @@ export default function AmazonImagesPage() {
               </div>
 
               <div className="mt-3 flex items-center justify-between">
-                <p className="text-[11px] text-[#b89878]">
+                <p className="text-[11px] text-[#4a4458]">
                   2000x2000 PNG &middot; Amazon-ready
                 </p>
-                <p className="text-[11px] text-[#b89878]">
+                <p className="text-[11px] text-[#4a4458]">
                   Cached for 1 hour
                 </p>
               </div>
             </div>
           ) : (
-            <div className="bg-white border border-[#f5ddc0] rounded-xl p-12 flex items-center justify-center">
-              <p className="text-[#8b7560] text-sm">Select a product to preview</p>
+            <div className="bg-[#1c1826] border border-[#2a2535] rounded-xl p-12 flex items-center justify-center">
+              <p className="text-[#8b839e] text-sm">Select a product to preview</p>
             </div>
           )}
 
           {/* Specs */}
-          <div className="mt-6 bg-[#fff0e6] border border-[#f5ddc0] rounded-xl p-5 space-y-2.5">
-            <h4 className="text-xs font-semibold text-[#5c4a38] mb-3">Image specifications</h4>
+          <div className="mt-6 bg-[#231e2e] border border-[#2a2535] rounded-xl p-5 space-y-2.5">
+            <h4 className="text-xs font-semibold text-[#cbc5d9] mb-3">Image specifications</h4>
             {[
               ["\u{1F4D0}", "2000x2000px \u2014 meets Amazon zoom requirement (min 1000px)"],
               ["\u{1F4F8}", "PNG format \u2014 crisp text, Amazon-compatible"],
@@ -251,7 +251,7 @@ export default function AmazonImagesPage() {
               ["\u{1F4F1}", "QR code linking to your Review Jam product page"],
               ["\u{1F504}", "Images update with latest review data when re-downloaded"],
             ].map(([icon, text]) => (
-              <div key={String(text)} className="flex items-start gap-2.5 text-xs text-[#8b7560]">
+              <div key={String(text)} className="flex items-start gap-2.5 text-xs text-[#8b839e]">
                 <span className="shrink-0">{icon}</span>
                 <span>{text}</span>
               </div>

@@ -104,9 +104,9 @@ export default function AdminDashboard() {
     }).catch(() => {}).finally(() => setIsLoadingEmails(false));
   }, [user]);
 
-  if (isAuthLoading) return <div className="min-h-screen bg-[#fff8f3] flex items-center justify-center text-[#8b7560] font-bold animate-pulse">Verifying Security Credentials...</div>;
-  if (!user) return <div className="min-h-screen bg-[#fff8f3] flex flex-col items-center justify-center text-[#4a3828] p-10"><p className="text-xl text-[#8b7560] mb-4">Please log in to access the Admin Dashboard.</p><Link href="/" className="bg-[#e65100] px-6 py-2 rounded-xl font-bold hover:bg-[#d84315] text-white transition">Go Home to Login</Link></div>;
-  if (user?.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase().trim()) return <div className="min-h-screen bg-[#fff8f3] flex flex-col items-center justify-center text-[#4a3828] p-10"><p className="text-[#ef5350] font-black text-5xl mb-2">ACCESS DENIED</p><p className="text-[#8b7560] mb-8 text-lg">Logged in as {user?.email || "Unknown"}.</p><Link href="/" className="bg-[#4a3828] px-6 py-3 rounded-xl font-bold hover:bg-[#5c4a38] text-white transition">Return to Market</Link></div>;
+  if (isAuthLoading) return <div className="min-h-screen bg-[#13111a] flex items-center justify-center text-[#8b839e] font-bold animate-pulse">Verifying Security Credentials...</div>;
+  if (!user) return <div className="min-h-screen bg-[#13111a] flex flex-col items-center justify-center text-[#e8e4f0] p-10"><p className="text-xl text-[#8b839e] mb-4">Please log in to access the Admin Dashboard.</p><Link href="/" className="bg-[#e04c8a] px-6 py-2 rounded-xl font-bold hover:bg-[#d84315] text-white transition">Go Home to Login</Link></div>;
+  if (user?.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase().trim()) return <div className="min-h-screen bg-[#13111a] flex flex-col items-center justify-center text-[#e8e4f0] p-10"><p className="text-[#f87171] font-black text-5xl mb-2">ACCESS DENIED</p><p className="text-[#8b839e] mb-8 text-lg">Logged in as {user?.email || "Unknown"}.</p><Link href="/" className="bg-[#e8e4f0] px-6 py-3 rounded-xl font-bold hover:bg-[#cbc5d9] text-white transition">Return to Market</Link></div>;
 
   const handleToggleAiCheck = async () => {
     setIsTogglingAi(true);
@@ -169,21 +169,21 @@ export default function AdminDashboard() {
   };
 
   return (
-    <main className="min-h-screen bg-[#fff8f3] p-10 text-[#4a3828] font-sans">
+    <main className="min-h-screen bg-[#13111a] p-10 text-[#e8e4f0] font-sans">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-end mb-2">
-          <h1 className="text-4xl font-black text-[#e65100]">Command Center</h1>
-          <Link href="/" className="text-[#8b7560] hover:text-[#4a3828] font-bold transition">&larr; Back to Site</Link>
+          <h1 className="text-4xl font-black text-[#e04c8a]">Command Center</h1>
+          <Link href="/" className="text-[#8b839e] hover:text-[#e8e4f0] font-bold transition">&larr; Back to Site</Link>
         </div>
-        <p className="text-[#8b7560] mb-10 border-b border-[#f5ddc0] pb-4">Logged in as Admin: {user?.email}</p>
+        <p className="text-[#8b839e] mb-10 border-b border-[#2a2535] pb-4">Logged in as Admin: {user?.email}</p>
 
         <DataSeeder user={user} />
 
         {/* --- AI MODERATION TOGGLE --- */}
-        <div className="bg-white p-6 rounded-3xl border border-[#f5ddc0] mb-8 flex justify-between items-center shadow-lg">
+        <div className="bg-[#1c1826] p-6 rounded-3xl border border-[#2a2535] mb-8 flex justify-between items-center shadow-lg">
           <div>
-            <h2 className="text-xl font-bold text-[#4a3828] mb-1">🤖 AI Review Moderation</h2>
-            <p className="text-[#8b7560] text-sm">
+            <h2 className="text-xl font-bold text-[#e8e4f0] mb-1">🤖 AI Review Moderation</h2>
+            <p className="text-[#8b839e] text-sm">
               {aiCheckEnabled
                 ? "Reviews are being screened by Gemini before posting."
                 : "AI check is OFF — all reviews post instantly without moderation."}
@@ -194,24 +194,24 @@ export default function AdminDashboard() {
             disabled={isTogglingAi}
             className={`relative inline-flex items-center gap-3 font-bold py-3 px-6 rounded-xl transition disabled:opacity-50 ${
               aiCheckEnabled
-                ? "bg-[#66bb6a] hover:bg-[#4caf50] text-white"
-                : "bg-[#d4b896] hover:bg-[#c9a87e] text-white"
+                ? "bg-[#34d399] hover:bg-[#4caf50] text-white"
+                : "bg-[#3a3348] hover:bg-[#c9a87e] text-white"
             }`}
           >
-            <span className={`w-3 h-3 rounded-full ${aiCheckEnabled ? "bg-white" : "bg-[#8b7560]"}`} />
+            <span className={`w-3 h-3 rounded-full ${aiCheckEnabled ? "bg-[#1c1826]" : "bg-[#8b839e]"}`} />
             {isTogglingAi ? "Saving\u2026" : aiCheckEnabled ? "AI Check: ON" : "AI Check: OFF"}
           </button>
         </div>
 
         {/* --- WEEKLY DIGEST --- */}
-        <div className="bg-white p-6 rounded-3xl border border-[#f5ddc0] mb-8 flex flex-col sm:flex-row justify-between sm:items-center gap-4 shadow-lg">
+        <div className="bg-[#1c1826] p-6 rounded-3xl border border-[#2a2535] mb-8 flex flex-col sm:flex-row justify-between sm:items-center gap-4 shadow-lg">
           <div>
-            <h2 className="text-xl font-bold text-[#4a3828] mb-1">Weekly Digest Emails</h2>
-            <p className="text-[#8b7560] text-sm">
+            <h2 className="text-xl font-bold text-[#e8e4f0] mb-1">Weekly Digest Emails</h2>
+            <p className="text-[#8b839e] text-sm">
               Send a personalised weekly digest to every user with new reviews, earnings, and trending categories.
             </p>
             {digestResult && (
-              <p className={`text-sm mt-2 font-medium ${digestResult.startsWith("Error") || digestResult.startsWith("Failed") ? "text-[#ef5350]" : "text-[#66bb6a]"}`}>
+              <p className={`text-sm mt-2 font-medium ${digestResult.startsWith("Error") || digestResult.startsWith("Failed") ? "text-[#f87171]" : "text-[#34d399]"}`}>
                 {digestResult}
               </p>
             )}
@@ -219,16 +219,16 @@ export default function AdminDashboard() {
           <button
             onClick={handleSendDigest}
             disabled={isSendingDigest}
-            className="bg-[#e65100] hover:bg-[#d84315] disabled:opacity-50 text-white font-bold py-3 px-6 rounded-xl transition whitespace-nowrap"
+            className="bg-[#e04c8a] hover:bg-[#d84315] disabled:opacity-50 text-white font-bold py-3 px-6 rounded-xl transition whitespace-nowrap"
           >
             {isSendingDigest ? "Sending..." : "Send Weekly Digest"}
           </button>
         </div>
 
         {/* --- ALLOWED EMAILS --- */}
-        <div className="bg-white p-6 rounded-3xl border border-[#f5ddc0] mb-8 shadow-lg">
-          <h2 className="text-xl font-bold text-[#4a3828] mb-1">🔐 Site Access — Allowed Emails</h2>
-          <p className="text-[#8b7560] text-sm mb-4">Only these email addresses can access the site. Admin email is always allowed.</p>
+        <div className="bg-[#1c1826] p-6 rounded-3xl border border-[#2a2535] mb-8 shadow-lg">
+          <h2 className="text-xl font-bold text-[#e8e4f0] mb-1">🔐 Site Access — Allowed Emails</h2>
+          <p className="text-[#8b839e] text-sm mb-4">Only these email addresses can access the site. Admin email is always allowed.</p>
           <div className="flex gap-2 mb-4">
             <input
               type="email"
@@ -236,29 +236,29 @@ export default function AdminDashboard() {
               onChange={(e) => setNewEmail(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAddEmail()}
               placeholder="email@example.com"
-              className="flex-1 px-4 py-2.5 rounded-xl bg-[#ffecd2] border border-[#f5ddc0] text-[#4a3828] text-sm placeholder:text-[#b89878] outline-none focus:border-[#ff8a65]"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-[#1c1826] border border-[#2a2535] text-[#e8e4f0] text-sm placeholder:text-[#4a4458] outline-none focus:border-[#f472b6]"
             />
-            <button onClick={handleAddEmail} className="bg-[#e65100] hover:bg-[#d84315] text-white px-5 py-2.5 rounded-xl text-sm font-bold transition">
+            <button onClick={handleAddEmail} className="bg-[#e04c8a] hover:bg-[#d84315] text-white px-5 py-2.5 rounded-xl text-sm font-bold transition">
               Add
             </button>
           </div>
           {isLoadingEmails ? (
-            <p className="text-[#8b7560] text-sm">Loading...</p>
+            <p className="text-[#8b839e] text-sm">Loading...</p>
           ) : (
             <div className="space-y-2">
               {/* Admin email — always shown, can't remove */}
-              <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-[#ffecd2]/50 border border-[#f5ddc0]/50">
-                <span className="text-sm text-[#5c4a38]">{ADMIN_EMAIL}</span>
-                <span className="text-[11px] text-[#8b7560] font-medium">ADMIN</span>
+              <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-[#1c1826]/50 border border-[#2a2535]/50">
+                <span className="text-sm text-[#cbc5d9]">{ADMIN_EMAIL}</span>
+                <span className="text-[11px] text-[#8b839e] font-medium">ADMIN</span>
               </div>
               {allowedEmails.filter(e => e.toLowerCase() !== ADMIN_EMAIL.toLowerCase()).map((email) => (
-                <div key={email} className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-[#ffecd2]/50 border border-[#f5ddc0]/50">
-                  <span className="text-sm text-[#5c4a38]">{email}</span>
-                  <button onClick={() => handleRemoveEmail(email)} className="text-[#ef5350] hover:text-[#e57373] text-sm font-bold transition">Remove</button>
+                <div key={email} className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-[#1c1826]/50 border border-[#2a2535]/50">
+                  <span className="text-sm text-[#cbc5d9]">{email}</span>
+                  <button onClick={() => handleRemoveEmail(email)} className="text-[#f87171] hover:text-[#fca5a5] text-sm font-bold transition">Remove</button>
                 </div>
               ))}
               {allowedEmails.filter(e => e.toLowerCase() !== ADMIN_EMAIL.toLowerCase()).length === 0 && (
-                <p className="text-[#8b7560] text-sm">No additional emails added yet.</p>
+                <p className="text-[#8b839e] text-sm">No additional emails added yet.</p>
               )}
             </div>
           )}

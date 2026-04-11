@@ -1692,54 +1692,54 @@ export default function DataSeeder({ user }: DataSeederProps) {
   return (
     <>
       {/* --- ONE-CLICK SEED BUTTON --- */}
-      <div className="bg-gradient-to-r from-[#ffe0b2] to-[#ffccbc] p-6 rounded-3xl border border-[#f5ddc0] mb-8 flex justify-between items-center shadow-lg">
+      <div className="bg-gradient-to-r from-[rgba(251,191,36,0.12)] to-[#ffccbc] p-6 rounded-3xl border border-[#2a2535] mb-8 flex justify-between items-center shadow-lg">
         <div>
-          <h2 className="text-xl font-bold text-[#4a3828] mb-1">🧪 Test Environment Seeder</h2>
-          <p className="text-[#5c4a38] text-sm">Populate your UI with highly realistic dummy campaigns and reviews instantly.</p>
+          <h2 className="text-xl font-bold text-[#e8e4f0] mb-1">🧪 Test Environment Seeder</h2>
+          <p className="text-[#cbc5d9] text-sm">Populate your UI with highly realistic dummy campaigns and reviews instantly.</p>
         </div>
         <button
           onClick={handleSeedDatabase}
           disabled={isProcessing}
-          className="bg-[#e65100] hover:bg-[#d84315] text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
+          className="bg-[#e04c8a] hover:bg-[#d84315] text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
         >
           {isProcessing ? "Injecting Data..." : "Generate Dummy Data"}
         </button>
       </div>
 
       {/* --- WIDGET DEMO SEEDER --- */}
-      <div className="bg-gradient-to-r from-[#ffecd2] to-[#ffe0b2] p-6 rounded-3xl border border-[#f5ddc0] mb-8 flex justify-between items-center shadow-lg">
+      <div className="bg-gradient-to-r from-[#1c1826] to-[rgba(251,191,36,0.12)] p-6 rounded-3xl border border-[#2a2535] mb-8 flex justify-between items-center shadow-lg">
         <div>
-          <h2 className="text-xl font-bold text-[#4a3828] mb-1">🧩 Seed Widget Demo</h2>
-          <p className="text-[#5c4a38] text-sm">
+          <h2 className="text-xl font-bold text-[#e8e4f0] mb-1">🧩 Seed Widget Demo</h2>
+          <p className="text-[#cbc5d9] text-sm">
             Adds a &quot;SonicPulse X1&quot; campaign with 6 rich reviews under{" "}
-            <span className="text-[#e65100] font-mono">sumit.pandey75@gmail.com</span> —
+            <span className="text-[#e04c8a] font-mono">sumit.pandey75@gmail.com</span> —
             does <strong>not</strong> delete existing data.
           </p>
         </div>
         <button
           onClick={handleSeedWidgetDemo}
           disabled={isProcessing}
-          className="bg-[#ffa726] hover:bg-[#ff9800] text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
+          className="bg-[#fbbf24] hover:bg-[#ff9800] text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
         >
           {isProcessing ? "Seeding…" : "Seed Widget Demo"}
         </button>
       </div>
 
       {/* --- COMMUNITY SLUG MIGRATION --- */}
-      <div className="bg-gradient-to-r from-[#e8f5e9] to-[#c8e6c9] p-6 rounded-3xl border border-[#a5d6a7] mb-8 flex justify-between items-center shadow-lg">
+      <div className="bg-gradient-to-r from-[rgba(52,211,153,0.12)] to-[#c8e6c9] p-6 rounded-3xl border border-[#6ee7b7] mb-8 flex justify-between items-center shadow-lg">
         <div>
-          <h2 className="text-xl font-bold text-[#4a3828] mb-1">🗂️ Migrate Product Slugs</h2>
-          <p className="text-[#5c4a38] text-sm">
-            Adds <span className="font-mono text-[#66bb6a]">slug</span> and{" "}
-            <span className="font-mono text-[#66bb6a]">communitySlug</span> to all products so they work on{" "}
-            <span className="font-mono text-[#66bb6a]">/c/[community]/[product]</span> URLs.
+          <h2 className="text-xl font-bold text-[#e8e4f0] mb-1">🗂️ Migrate Product Slugs</h2>
+          <p className="text-[#cbc5d9] text-sm">
+            Adds <span className="font-mono text-[#34d399]">slug</span> and{" "}
+            <span className="font-mono text-[#34d399]">communitySlug</span> to all products so they work on{" "}
+            <span className="font-mono text-[#34d399]">/c/[community]/[product]</span> URLs.
             Safe to run multiple times.
           </p>
         </div>
         <button
           onClick={handleMigrateProductSlugs}
           disabled={isProcessing}
-          className="bg-[#66bb6a] hover:bg-[#4caf50] text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
+          className="bg-[#34d399] hover:bg-[#4caf50] text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
         >
           {isProcessing ? "Migrating…" : "Run Migration"}
         </button>
@@ -1748,24 +1748,24 @@ export default function DataSeeder({ user }: DataSeederProps) {
       {/* --- PERSONAL DATA SEEDER --- */}
       <div className="bg-gradient-to-r from-[#fce4ec] to-[#f8bbd0] p-6 rounded-3xl border border-[#f48fb1] mb-8 flex justify-between items-center shadow-lg">
         <div>
-          <h2 className="text-xl font-bold text-[#4a3828] mb-1">👤 Seed Personal Data</h2>
-          <p className="text-[#5c4a38] text-sm">
+          <h2 className="text-xl font-bold text-[#e8e4f0] mb-1">👤 Seed Personal Data</h2>
+          <p className="text-[#cbc5d9] text-sm">
             Creates profile + 3 verified reviews (Sony with Ownership Journey, Linear, Whoop 5.0) attributed to{" "}
-            <span className="text-[#e65100] font-mono">sumit.pandey75@gmail.com</span>.
+            <span className="text-[#e04c8a] font-mono">sumit.pandey75@gmail.com</span>.
             Sign in as that account first.
           </p>
         </div>
         <button
           onClick={handleSeedPersonalData}
           disabled={isProcessing}
-          className="bg-[#e65100] hover:bg-[#d84315] text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
+          className="bg-[#e04c8a] hover:bg-[#d84315] text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
         >
           {isProcessing ? "Seeding…" : "Seed My Data"}
         </button>
       </div>
 
       {statusMessage && (
-        <div className={`mb-8 p-4 rounded-xl border font-mono text-sm font-bold ${statusMessage.includes("Error") || statusMessage.includes("failed") ? "bg-[#ef5350]/10 border-[#ef5350]/50 text-[#ef5350]" : "bg-[#66bb6a]/10 border-[#66bb6a]/50 text-[#66bb6a]"}`}>
+        <div className={`mb-8 p-4 rounded-xl border font-mono text-sm font-bold ${statusMessage.includes("Error") || statusMessage.includes("failed") ? "bg-[#f87171]/10 border-[#f87171]/50 text-[#f87171]" : "bg-[#34d399]/10 border-[#34d399]/50 text-[#34d399]"}`}>
           {statusMessage}
         </div>
       )}

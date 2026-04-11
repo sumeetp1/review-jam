@@ -435,7 +435,7 @@ function FeedPageInner() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#fff8f3] text-[#8b7560] transition-colors duration-200">
+    <main className="min-h-screen bg-[#13111a] text-[#8b839e] transition-colors duration-200">
 
       {reviewMode && user && (
         <ReviewWizard
@@ -448,9 +448,9 @@ function FeedPageInner() {
 
       {showOnboarding && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-[2px]">
-          <div className="bg-white rounded-xl p-5 max-w-md w-full shadow-lg border border-[#f5ddc0]">
-            <h2 className="text-base font-semibold text-[#4a3828] mb-1">What are you into?</h2>
-            <p className="text-sm text-[#8b7560] mb-4">Personalise your feed.</p>
+          <div className="bg-[#1c1826] rounded-xl p-5 max-w-md w-full shadow-lg border border-[#2a2535]">
+            <h2 className="text-base font-semibold text-[#e8e4f0] mb-1">What are you into?</h2>
+            <p className="text-sm text-[#8b839e] mb-4">Personalise your feed.</p>
             <div className="flex flex-wrap gap-2 mb-5">
               {dynamicCategories.map((cat) => (
                 <button
@@ -461,15 +461,15 @@ function FeedPageInner() {
                   )}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
                     selectedInterests.includes(cat)
-                      ? "bg-[#e65100]/20 text-[#ffab91] border-[#e65100]/30"
-                      : "bg-white text-[#8b7560] border-[#f5ddc0]"
+                      ? "bg-[#e04c8a]/20 text-[#f9a8d4] border-[#e04c8a]/30"
+                      : "bg-[#1c1826] text-[#8b839e] border-[#2a2535]"
                   }`}
                 >
                   {cat}
                 </button>
               ))}
             </div>
-            <button type="button" onClick={handleCompleteOnboarding} className="w-full bg-[#e65100] text-white py-2.5 rounded-lg text-sm font-medium hover:opacity-90 transition">
+            <button type="button" onClick={handleCompleteOnboarding} className="w-full bg-[#e04c8a] text-white py-2.5 rounded-lg text-sm font-medium hover:opacity-90 transition">
               Continue
             </button>
           </div>
@@ -477,18 +477,18 @@ function FeedPageInner() {
       )}
 
       {/* Mobile Nav */}
-      <nav className="md bg-[#fff8f3]/95 backdrop-blur-sm border-b border-[#f5ddc0] sticky top-0 z-40">
+      <nav className="md bg-[#13111a]/95 backdrop-blur-sm border-b border-[#2a2535] sticky top-0 z-40">
         {!showMobileSearch ? (
           <div className="px-3 h-12 flex justify-between items-center">
             <Link href="/" className="flex items-center">
-              <Image src="/logo.svg" alt="Review Jam" width={118} height={28} priority />
+              <Image src="/logo-dark.svg" alt="Review Jam" width={118} height={28} priority />
             </Link>
             <div className="flex items-center gap-1">
-              <button type="button" onClick={() => setShowMobileSearch(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#fff0e6] transition" aria-label="Search">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#8b7560]"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <button type="button" onClick={() => setShowMobileSearch(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#231e2e] transition" aria-label="Search">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#8b839e]"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
               </button>
-              <button type="button" onClick={() => setShowMobileMenu((v) => !v)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#fff0e6] transition" aria-label="Menu">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[#5c4a38]"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+              <button type="button" onClick={() => setShowMobileMenu((v) => !v)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#231e2e] transition" aria-label="Menu">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[#cbc5d9]"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
               </button>
             </div>
           </div>
@@ -500,9 +500,9 @@ function FeedPageInner() {
               placeholder="Search reviews…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-[#ffecd2] rounded-full px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-[#e65100]/30 text-[#4a3828] placeholder-[#b89878]"
+              className="flex-1 bg-[#1c1826] rounded-full px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-[#e04c8a]/30 text-[#e8e4f0] placeholder-[#4a4458]"
             />
-            <button type="button" onClick={() => { setShowMobileSearch(false); setSearchQuery(""); }} className="w-10 h-10 flex items-center justify-center rounded-full text-[#8b7560] hover:bg-[#fff0e6] text-sm font-medium shrink-0">
+            <button type="button" onClick={() => { setShowMobileSearch(false); setSearchQuery(""); }} className="w-10 h-10 flex items-center justify-center rounded-full text-[#8b839e] hover:bg-[#231e2e] text-sm font-medium shrink-0">
               ✕
             </button>
           </div>
@@ -513,26 +513,26 @@ function FeedPageInner() {
       {showMobileMenu && (
         <div className="md fixed inset-0 z-50" onClick={() => setShowMobileMenu(false)}>
           <div className="absolute inset-0 bg-black/40" />
-          <div className="absolute top-0 right-0 w-72 bg-white h-full shadow-xl border-l border-[#f5ddc0] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="absolute top-0 right-0 w-72 bg-[#1c1826] h-full shadow-xl border-l border-[#2a2535] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             {/* Close button */}
             <div className="flex justify-end p-3">
-              <button type="button" onClick={() => setShowMobileMenu(false)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#fff0e6] text-[#8b7560] text-lg">
+              <button type="button" onClick={() => setShowMobileMenu(false)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#231e2e] text-[#8b839e] text-lg">
                 ✕
               </button>
             </div>
 
             {/* User section */}
-            <div className="px-4 pb-4 border-b border-[#f5ddc0]">
+            <div className="px-4 pb-4 border-b border-[#2a2535]">
               {user ? (
                 <div className="flex items-center gap-3">
                   <Avatar name={user.displayName} src={user.photoURL} size="lg" className="w-11 h-11" />
                   <div className="min-w-0">
-                    <p className="font-semibold text-base text-[#4a3828] truncate">{user.displayName}</p>
-                    <p className="text-xs text-[#8b7560] truncate">{user.email}</p>
+                    <p className="font-semibold text-base text-[#e8e4f0] truncate">{user.displayName}</p>
+                    <p className="text-xs text-[#8b839e] truncate">{user.email}</p>
                   </div>
                 </div>
               ) : (
-                <button type="button" onClick={() => { handleLogin(); setShowMobileMenu(false); }} className="w-full bg-[#e65100] text-white text-sm font-medium py-3 rounded-lg hover:opacity-90 transition">
+                <button type="button" onClick={() => { handleLogin(); setShowMobileMenu(false); }} className="w-full bg-[#e04c8a] text-white text-sm font-medium py-3 rounded-lg hover:opacity-90 transition">
                   Sign in with Google
                 </button>
               )}
@@ -551,7 +551,7 @@ function FeedPageInner() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setShowMobileMenu(false)}
-                  className="flex items-center gap-3 px-4 py-3.5 text-[15px] font-medium text-[#5c4a38] hover:bg-white transition"
+                  className="flex items-center gap-3 px-4 py-3.5 text-[15px] font-medium text-[#cbc5d9] hover:bg-[#1c1826] transition"
                 >
                   <span aria-hidden className="text-lg w-6 text-center">{item.icon}</span> {item.label}
                 </Link>
@@ -560,7 +560,7 @@ function FeedPageInner() {
 
             {/* Logout */}
             {user && (
-              <div className="border-t border-[#f5ddc0] p-4">
+              <div className="border-t border-[#2a2535] p-4">
                 <button type="button" onClick={() => { handleLogout(); setShowMobileMenu(false); }} className="text-sm text-rose-400 font-medium">
                   Log out
                 </button>
@@ -573,15 +573,15 @@ function FeedPageInner() {
       <div className="max-w-[900px] mx-auto flex justify-center">
 
         {/* Center: Feed */}
-        <main className="w-full md md md md border-[#f5ddc0] min-h-screen">
+        <main className="w-full md md md md border-[#2a2535] min-h-screen">
 
-          <div className="sticky top-12 md z-30 bg-[#fff8f3]/95 backdrop-blur-sm border-b border-[#f5ddc0]">
-            <div className="hidden md items-center justify-between h-12 px-4 border-b border-[#f5ddc0]">
+          <div className="sticky top-12 md z-30 bg-[#13111a]/95 backdrop-blur-sm border-b border-[#2a2535]">
+            <div className="hidden md items-center justify-between h-12 px-4 border-b border-[#2a2535]">
               {user && <div className="ml-auto"><NotificationBell userId={user.uid} /></div>}
             </div>
 
             {/* Feed Tabs */}
-            <div className="flex border-b border-[#f5ddc0]">
+            <div className="flex border-b border-[#2a2535]">
               {FEED_TABS.map((tab) => (
                 <button
                   key={tab.id}
@@ -589,8 +589,8 @@ function FeedPageInner() {
                   onClick={() => setFeedTab(tab.id)}
                   className={`flex-1 py-3.5 md text-sm font-medium transition-colors border-b-2 -mb-px ${
                     feedTab === tab.id
-                      ? "border-[#e65100] text-[#ff8a65]"
-                      : "border-transparent text-[#8b7560] hover:text-[#5c4a38]"
+                      ? "border-[#e04c8a] text-[#f472b6]"
+                      : "border-transparent text-[#8b839e] hover:text-[#cbc5d9]"
                   }`}
                 >
                   {tab.label}
@@ -605,14 +605,14 @@ function FeedPageInner() {
                 placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#e65100]/30 text-[#4a3828] placeholder-[#b89878] border border-[#f5ddc0]"
+                className="w-full bg-[#1c1826] rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#e04c8a]/30 text-[#e8e4f0] placeholder-[#4a4458] border border-[#2a2535]"
               />
               <div className="relative mt-2.5 flex items-center">
-                <button type="button" onClick={() => scrollCategories("left")} className="absolute left-0 z-10 p-1 bg-gradient-to-r from-[#fff8f3] via-[#fff8f3] to-transparent text-[#8b7560] hover:text-[#5c4a38] transition h-full flex items-center justify-start w-8" aria-label="Scroll left">
+                <button type="button" onClick={() => scrollCategories("left")} className="absolute left-0 z-10 p-1 bg-gradient-to-r from-[#13111a] via-[#13111a] to-transparent text-[#8b839e] hover:text-[#cbc5d9] transition h-full flex items-center justify-start w-8" aria-label="Scroll left">
                   <span className="text-lg leading-none">‹</span>
                 </button>
                 <div ref={categoriesRef} className="flex gap-1.5 overflow-x-auto snap-x scroll-smooth px-7 w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                  <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${activeCategoryFilter === "All" ? "bg-[#e65100]/20 text-[#ffab91] border-[#e65100]/30 shadow-sm shadow-[#e65100]/10" : "bg-white text-[#8b7560] border-[#f5ddc0] hover:border-[#e65100]/30 hover:text-[#ff8a65]"}`}>
+                  <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${activeCategoryFilter === "All" ? "bg-[#e04c8a]/20 text-[#f9a8d4] border-[#e04c8a]/30 shadow-sm shadow-[#e04c8a]/12" : "bg-[#1c1826] text-[#8b839e] border-[#2a2535] hover:border-[#e04c8a]/30 hover:text-[#f472b6]"}`}>
                     All
                   </button>
                   {dynamicCategories.map((cat) => {
@@ -625,10 +625,10 @@ function FeedPageInner() {
                         onClick={() => setActiveCategoryFilter(cat)}
                         className={`whitespace-nowrap flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium border transition snap-start ${
                           isActive
-                            ? "bg-[#e65100]/20 text-[#ffab91] border-[#e65100]/30 shadow-sm shadow-[#e65100]/10"
+                            ? "bg-[#e04c8a]/20 text-[#f9a8d4] border-[#e04c8a]/30 shadow-sm shadow-[#e04c8a]/12"
                             : isBoosted
                             ? "bg-violet-500/10 text-violet-400 border-violet-500/20 hover:bg-violet-500/20"
-                            : "bg-white text-[#8b7560] border-[#f5ddc0] hover:border-[#e65100]/30 hover:text-[#ff8a65]"
+                            : "bg-[#1c1826] text-[#8b839e] border-[#2a2535] hover:border-[#e04c8a]/30 hover:text-[#f472b6]"
                         }`}
                       >
                         {isBoosted && <span aria-hidden>🔥</span>}
@@ -637,7 +637,7 @@ function FeedPageInner() {
                     );
                   })}
                 </div>
-                <button type="button" onClick={() => scrollCategories("right")} className="absolute right-0 z-10 p-1 bg-gradient-to-l from-[#fff8f3] via-[#fff8f3] to-transparent text-[#8b7560] hover:text-[#5c4a38] transition h-full flex items-center justify-end w-8" aria-label="Scroll right">
+                <button type="button" onClick={() => scrollCategories("right")} className="absolute right-0 z-10 p-1 bg-gradient-to-l from-[#13111a] via-[#13111a] to-transparent text-[#8b839e] hover:text-[#cbc5d9] transition h-full flex items-center justify-end w-8" aria-label="Scroll right">
                   <span className="text-lg leading-none">›</span>
                 </button>
               </div>
@@ -646,7 +646,7 @@ function FeedPageInner() {
             {/* Mobile: horizontal category chips only (no search, no arrows) */}
             <div className="md px-3 py-2">
               <div className="flex gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3.5 py-2 rounded-full text-[13px] font-medium border transition shrink-0 ${activeCategoryFilter === "All" ? "bg-[#e65100]/20 text-[#ffab91] border-[#e65100]/30" : "bg-white text-[#8b7560] border-[#f5ddc0]"}`}>
+                <button type="button" onClick={() => setActiveCategoryFilter("All")} className={`whitespace-nowrap px-3.5 py-2 rounded-full text-[13px] font-medium border transition shrink-0 ${activeCategoryFilter === "All" ? "bg-[#e04c8a]/20 text-[#f9a8d4] border-[#e04c8a]/30" : "bg-[#1c1826] text-[#8b839e] border-[#2a2535]"}`}>
                   All
                 </button>
                 {dynamicCategories.map((cat) => {
@@ -659,10 +659,10 @@ function FeedPageInner() {
                       onClick={() => setActiveCategoryFilter(cat)}
                       className={`whitespace-nowrap flex items-center gap-1 px-3.5 py-2 rounded-full text-[13px] font-medium border transition shrink-0 ${
                         isActive
-                          ? "bg-[#e65100]/20 text-[#ffab91] border-[#e65100]/30"
+                          ? "bg-[#e04c8a]/20 text-[#f9a8d4] border-[#e04c8a]/30"
                           : isBoosted
                           ? "bg-violet-500/10 text-violet-400 border-violet-500/20"
-                          : "bg-white text-[#8b7560] border-[#f5ddc0]"
+                          : "bg-[#1c1826] text-[#8b839e] border-[#2a2535]"
                       }`}
                     >
                       {isBoosted && <span aria-hidden>🔥</span>}
@@ -675,24 +675,24 @@ function FeedPageInner() {
           </div>
 
           {/* Feed */}
-          <div className="divide-y divide-[#f5ddc0]">
+          <div className="divide-y divide-[#2a2535]">
             {isLoading ? (
-              <div className="py-12 text-center text-[#b89878] text-sm animate-pulse">Loading...</div>
+              <div className="py-12 text-center text-[#4a4458] text-sm animate-pulse">Loading...</div>
             ) : feedTab === "following" && followingSet.size === 0 ? (
               <div className="text-center py-12">
-                <p className="text-sm text-[#8b7560]">Follow reviewers to see their reviews here.</p>
-                <Link href="/explore" className="text-sm text-[#e65100] hover:underline mt-2 inline-block">
+                <p className="text-sm text-[#8b839e]">Follow reviewers to see their reviews here.</p>
+                <Link href="/explore" className="text-sm text-[#e04c8a] hover:underline mt-2 inline-block">
                   Discover products &rarr;
                 </Link>
               </div>
             ) : displayedReviews.length === 0 ? (
               <div className="py-14 px-6 text-center flex flex-col items-center max-w-sm mx-auto">
-                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-sm mb-3 text-[#8b7560]">📝</div>
-                <h3 className="text-sm font-semibold text-[#4a3828] mb-1">No posts yet</h3>
-                <p className="text-sm text-[#8b7560] mb-5 leading-relaxed">
+                <div className="w-10 h-10 bg-[#1c1826] rounded-full flex items-center justify-center text-sm mb-3 text-[#8b839e]">📝</div>
+                <h3 className="text-sm font-semibold text-[#e8e4f0] mb-1">No posts yet</h3>
+                <p className="text-sm text-[#8b839e] mb-5 leading-relaxed">
                   When people review in this view, they will show up here.
                 </p>
-                <button type="button" onClick={() => { if (!user) handleLogin(); else setReviewMode("organic"); }} className="text-sm font-medium bg-[#e65100] text-white px-4 py-2 rounded-full hover:opacity-90 transition">
+                <button type="button" onClick={() => { if (!user) handleLogin(); else setReviewMode("organic"); }} className="text-sm font-medium bg-[#e04c8a] text-white px-4 py-2 rounded-full hover:opacity-90 transition">
                   Write a review
                 </button>
               </div>

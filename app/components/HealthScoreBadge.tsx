@@ -13,10 +13,10 @@ export default function HealthScoreBadge({ score, breakdown }: Props) {
 
   const { pill, dot } =
     score >= 70
-      ? { pill: "bg-emerald-50 text-[#66bb6a] border-emerald-200", dot: "bg-[#66bb6a]" }
+      ? { pill: "bg-emerald-950/30 text-[#34d399] border-emerald-800", dot: "bg-[#34d399]" }
       : score >= 40
-      ? { pill: "bg-amber-50 text-[#ffa726] border-amber-200", dot: "bg-[#ffa726]" }
-      : { pill: "bg-red-50 text-[#ef5350] border-red-200", dot: "bg-[#ef5350]" };
+      ? { pill: "bg-amber-950/30 text-[#fbbf24] border-amber-800", dot: "bg-[#fbbf24]" }
+      : { pill: "bg-red-950/30 text-[#f87171] border-red-800", dot: "bg-[#f87171]" };
 
   return (
     <div className="relative">
@@ -31,18 +31,18 @@ export default function HealthScoreBadge({ score, breakdown }: Props) {
       </button>
 
       {expanded && breakdown && (
-        <div className="absolute top-full right-0 mt-1.5 z-50 bg-white border border-[#f5ddc0] rounded-xl shadow-xl p-3 w-52">
+        <div className="absolute top-full right-0 mt-1.5 z-50 bg-[#1c1826] border border-[#2a2535] rounded-xl shadow-xl p-3 w-52">
           <div className="flex items-center justify-between mb-2.5">
-            <p className="text-[11px] font-semibold text-[#4a3828]">Review Health</p>
-            <span className={`text-[11px] font-bold tabular-nums ${score >= 70 ? "text-[#66bb6a]" : score >= 40 ? "text-[#ffa726]" : "text-[#ef5350]"}`}>{score}/100</span>
+            <p className="text-[11px] font-semibold text-[#e8e4f0]">Review Health</p>
+            <span className={`text-[11px] font-bold tabular-nums ${score >= 70 ? "text-[#34d399]" : score >= 40 ? "text-[#fbbf24]" : "text-[#f87171]"}`}>{score}/100</span>
           </div>
           <div className="space-y-1.5">
             <ScoreBar label="Quality" value={breakdown.quality} max={40} color="bg-blue-500" />
-            <ScoreBar label="Engagement" value={breakdown.engagement} max={25} color="bg-[#ffa726]" />
-            <ScoreBar label="Credibility" value={breakdown.credibility} max={20} color="bg-[#66bb6a]" />
-            <ScoreBar label="Freshness" value={breakdown.freshness} max={15} color="bg-violet-500" />
+            <ScoreBar label="Engagement" value={breakdown.engagement} max={25} color="bg-[#fbbf24]" />
+            <ScoreBar label="Credibility" value={breakdown.credibility} max={20} color="bg-[#34d399]" />
+            <ScoreBar label="Freshness" value={breakdown.freshness} max={15} color="bg-violet-950/300" />
           </div>
-          <p className="text-[10px] text-[#8b7560] mt-2.5 leading-relaxed">Higher score = higher payout share</p>
+          <p className="text-[10px] text-[#8b839e] mt-2.5 leading-relaxed">Higher score = higher payout share</p>
         </div>
       )}
     </div>
@@ -53,11 +53,11 @@ function ScoreBar({ label, value, max, color }: { label: string; value: number; 
   const pct = Math.min((value / max) * 100, 100);
   return (
     <div>
-      <div className="flex justify-between text-[10px] text-[#8b7560] mb-0.5">
+      <div className="flex justify-between text-[10px] text-[#8b839e] mb-0.5">
         <span>{label}</span>
-        <span className="tabular-nums font-medium">{value}<span className="text-[#c4a882]">/{max}</span></span>
+        <span className="tabular-nums font-medium">{value}<span className="text-[#4a4458]">/{max}</span></span>
       </div>
-      <div className="h-1.5 bg-[#ffecd2] rounded-full overflow-hidden">
+      <div className="h-1.5 bg-[#1c1826] rounded-full overflow-hidden">
         <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
       </div>
     </div>

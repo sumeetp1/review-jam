@@ -17,9 +17,9 @@ import type { Channel } from "../../lib/types";
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function SectionHeader({ label, collapsed }: { label: string; collapsed: boolean }) {
-  if (collapsed) return <div className="border-t border-[#f5ddc0] mx-2 my-1" />;
+  if (collapsed) return <div className="border-t border-[#2a2535] mx-2 my-1" />;
   return (
-    <p className="px-2 pt-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-[#b89878] select-none">
+    <p className="px-2 pt-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-[#4a4458] select-none">
       {label}
     </p>
   );
@@ -34,8 +34,8 @@ function NavRow({
 }) {
   const cls = `flex items-center ${collapsed ? "justify-center" : "gap-2.5"} px-2 py-1.5 rounded-md text-[13px] transition select-none cursor-pointer ${
     active
-      ? "text-[#e65100] bg-[#e65100]/10 font-semibold"
-      : "text-[#8b7560] hover:bg-[#fff0e6] font-medium"
+      ? "text-[#e04c8a] bg-[#e04c8a]/12 font-semibold"
+      : "text-[#8b839e] hover:bg-[#231e2e] font-medium"
   }`;
 
   const inner = (
@@ -56,7 +56,7 @@ function NavRow({
     return (
       <div className="relative group">
         {el}
-        <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-[#4a3828] text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition z-50">
+        <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-[#e8e4f0] text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition z-50">
           {label}
         </div>
       </div>
@@ -129,14 +129,14 @@ export default function GlobalSidebar() {
 
   return (
     <>
-      <aside className={`hidden md:flex flex-col ${isCollapsed ? "w-[60px]" : "w-[240px] xl:w-[256px]"} h-screen sticky top-0 border-r border-[#f5ddc0] bg-[#ffecd2] overflow-y-auto overflow-x-hidden pb-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] transition-all duration-200 shrink-0`}>
+      <aside className={`hidden md:flex flex-col ${isCollapsed ? "w-[60px]" : "w-[240px] xl:w-[256px]"} h-screen sticky top-0 border-r border-[#2a2535] bg-[#1c1826] overflow-y-auto overflow-x-hidden pb-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] transition-all duration-200 shrink-0`}>
 
         {/* Collapse toggle */}
         <div className={`flex items-center ${isCollapsed ? "justify-center" : "justify-end"} px-3 pt-4 pb-2 shrink-0`}>
           <button
             type="button"
             onClick={toggleCollapse}
-            className="w-7 h-7 flex items-center justify-center rounded-md text-[#b89878] hover:bg-[#ffe0b2] hover:text-[#8b7560] transition"
+            className="w-7 h-7 flex items-center justify-center rounded-md text-[#4a4458] hover:bg-[#231e2e] hover:text-[#8b839e] transition"
             aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -174,34 +174,34 @@ export default function GlobalSidebar() {
 
         {!isCollapsed && (
           <>
-            <div className="border-t border-[#f5ddc0] mx-2 my-1" />
+            <div className="border-t border-[#2a2535] mx-2 my-1" />
 
             {/* ── Your Channels ───────────────────────────── */}
             <SectionHeader label="Your communities" collapsed={false} />
             <div className="px-1">
               {joinedChannels.length === 0 && !user && (
-                <p className="px-2 py-1 text-[12px] text-[#8b7560]">
-                  <button type="button" onClick={handleLogin} className="text-[#e65100] hover:underline">Sign in</button> to join communities
+                <p className="px-2 py-1 text-[12px] text-[#8b839e]">
+                  <button type="button" onClick={handleLogin} className="text-[#e04c8a] hover:underline">Sign in</button> to join communities
                 </p>
               )}
               {joinedChannels.length === 0 && user && (
-                <p className="px-2 py-1 text-[12px] text-[#8b7560]">No communities joined yet.</p>
+                <p className="px-2 py-1 text-[12px] text-[#8b839e]">No communities joined yet.</p>
               )}
               {visibleJoined.map((ch) => (
                 <NavRow key={ch.id} href={`/c/${ch.slug}`} icon={ch.iconEmoji} label={`rj/${ch.slug}`}
                   active={pathname === `/c/${ch.slug}`}
-                  right={<span className="text-[10px] text-[#b89878] tabular-nums">{ch.memberCount.toLocaleString()}</span>}
+                  right={<span className="text-[10px] text-[#4a4458] tabular-nums">{ch.memberCount.toLocaleString()}</span>}
                 />
               ))}
               {joinedChannels.length > 5 && (
                 <button type="button" onClick={() => setShowAllChannels((v) => !v)}
-                  className="w-full text-left px-2 py-1 text-[11px] text-[#8b7560] hover:text-[#5c4a38] transition">
+                  className="w-full text-left px-2 py-1 text-[11px] text-[#8b839e] hover:text-[#cbc5d9] transition">
                   {showAllChannels ? "Show less" : `See ${joinedChannels.length - 5} more\u2026`}
                 </button>
               )}
             </div>
 
-            <div className="border-t border-[#f5ddc0] mx-2 my-1" />
+            <div className="border-t border-[#2a2535] mx-2 my-1" />
 
             {/* ── Discover communities ─────────────────────── */}
             <SectionHeader label="Communities" collapsed={false} />
@@ -211,7 +211,7 @@ export default function GlobalSidebar() {
                   active={pathname === `/c/${ch.slug}`}
                   right={
                     <button type="button" onClick={(e) => handleJoin(e, ch)} disabled={joining === ch.id}
-                      className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full border border-[#e65100]/40 text-[#e65100] hover:bg-[#e65100]/10 disabled:opacity-50 transition">
+                      className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full border border-[#e04c8a]/40 text-[#e04c8a] hover:bg-[#e04c8a]/12 disabled:opacity-50 transition">
                       {joining === ch.id ? "\u2026" : "+ Join"}
                     </button>
                   }
@@ -219,21 +219,21 @@ export default function GlobalSidebar() {
               ))}
               {popularChannels.length > (user ? 3 : 5) && (
                 <button type="button" onClick={() => setShowAllChannels((v) => !v)}
-                  className="w-full text-left px-2 py-1 text-[11px] text-[#8b7560] hover:text-[#5c4a38] transition">
+                  className="w-full text-left px-2 py-1 text-[11px] text-[#8b839e] hover:text-[#cbc5d9] transition">
                   {showAllChannels ? "Show less" : `See ${popularChannels.length - (user ? 3 : 5)} more\u2026`}
                 </button>
               )}
               <div className="flex gap-2 px-2 py-1">
-                <Link href="/c" className="text-[11px] text-[#e65100] hover:underline font-medium">All communities</Link>
+                <Link href="/c" className="text-[11px] text-[#e04c8a] hover:underline font-medium">All communities</Link>
                 {user && (
-                  <button type="button" onClick={() => setShowCreate(true)} className="text-[11px] text-[#8b7560] hover:text-[#5c4a38] transition">
+                  <button type="button" onClick={() => setShowCreate(true)} className="text-[11px] text-[#8b839e] hover:text-[#cbc5d9] transition">
                     + Create
                   </button>
                 )}
               </div>
             </div>
 
-            <div className="border-t border-[#f5ddc0] mx-2 my-1" />
+            <div className="border-t border-[#2a2535] mx-2 my-1" />
 
             {/* ── Resources ───────────────────────────────── */}
             <SectionHeader label="Resources" collapsed={false} />
@@ -242,15 +242,15 @@ export default function GlobalSidebar() {
               <NavRow href="/brands/dashboard" icon="📊" label="Brand dashboard" />
             </nav>
 
-            <div className="border-t border-[#f5ddc0] mx-2 my-1" />
+            <div className="border-t border-[#2a2535] mx-2 my-1" />
 
             {/* ── Footer ──────────────────────────────────── */}
-            <div className="px-3 pt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-[#b89878]">
-              <span className="cursor-pointer hover:text-[#8b7560]">Terms</span>
-              <span className="cursor-pointer hover:text-[#8b7560]">Privacy</span>
-              <Link href="/brands" className="hover:text-[#8b7560]">Brands</Link>
+            <div className="px-3 pt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-[#4a4458]">
+              <span className="cursor-pointer hover:text-[#8b839e]">Terms</span>
+              <span className="cursor-pointer hover:text-[#8b839e]">Privacy</span>
+              <Link href="/brands" className="hover:text-[#8b839e]">Brands</Link>
               <p className="w-full mt-1 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#e65100]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#e04c8a]" />
                 &copy; 2026 Review Jam
               </p>
             </div>

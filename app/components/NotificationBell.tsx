@@ -80,7 +80,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
       <button
         type="button"
         onClick={handleToggle}
-        className="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#fff0e6] transition"
+        className="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#231e2e] transition"
         aria-label="Notifications"
       >
         <svg
@@ -92,34 +92,34 @@ export default function NotificationBell({ userId }: { userId: string }) {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="text-[#5c4a38]"
+          className="text-[#cbc5d9]"
         >
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 min-w-[15px] h-[15px] bg-[#ef5350] text-white text-[9px] font-bold flex items-center justify-center rounded-full px-0.5 leading-none">
+          <span className="absolute top-1 right-1 min-w-[15px] h-[15px] bg-[#f87171] text-white text-[9px] font-bold flex items-center justify-center rounded-full px-0.5 leading-none">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 top-11 w-80 bg-white border border-[#f5ddc0] rounded-xl shadow-xl z-50 overflow-hidden">
-          <div className="px-4 py-3 border-b border-[#f5ddc0]">
-            <span className="text-sm font-semibold text-[#4a3828]">Notifications</span>
+        <div className="absolute right-0 top-11 w-80 bg-[#1c1826] border border-[#2a2535] rounded-xl shadow-xl z-50 overflow-hidden">
+          <div className="px-4 py-3 border-b border-[#2a2535]">
+            <span className="text-sm font-semibold text-[#e8e4f0]">Notifications</span>
           </div>
-          <div className="max-h-80 overflow-y-auto divide-y divide-[#f5ddc0]">
+          <div className="max-h-80 overflow-y-auto divide-y divide-[#2a2535]">
             {notifs.length === 0 ? (
-              <p className="text-sm text-[#8b7560] text-center py-8">No notifications yet</p>
+              <p className="text-sm text-[#8b839e] text-center py-8">No notifications yet</p>
             ) : (
               notifs.map((n) => (
-                <div key={n.id} className="px-4 py-3 hover:bg-[#fff0e6] transition">
+                <div key={n.id} className="px-4 py-3 hover:bg-[#231e2e] transition">
                   <div className="flex items-start gap-2.5">
                     <span className="text-sm mt-0.5 shrink-0">{TYPE_ICON[n.type] ?? "🔔"}</span>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-[#4a3828] leading-tight">{n.title}</p>
-                      <p className="text-xs text-[#8b7560] mt-0.5 leading-relaxed">{n.body}</p>
+                      <p className="text-sm font-medium text-[#e8e4f0] leading-tight">{n.title}</p>
+                      <p className="text-xs text-[#8b839e] mt-0.5 leading-relaxed">{n.body}</p>
                     </div>
                   </div>
                 </div>

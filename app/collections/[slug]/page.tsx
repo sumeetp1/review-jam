@@ -30,7 +30,7 @@ function HealthCircle({ score }: { score: number }) {
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </svg>
-      <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-[#4a3828]">
+      <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-[#e8e4f0]">
         {score}
       </span>
     </div>
@@ -155,7 +155,7 @@ export default function CollectionDetailPage({ params }: { params: Promise<{ slu
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#fff8f3] flex items-center justify-center text-[#8b7560] text-sm animate-pulse">
+      <div className="min-h-screen bg-[#13111a] flex items-center justify-center text-[#8b839e] text-sm animate-pulse">
         Loading...
       </div>
     );
@@ -163,9 +163,9 @@ export default function CollectionDetailPage({ params }: { params: Promise<{ slu
 
   if (!collectionData) {
     return (
-      <main className="min-h-screen bg-[#fff8f3] text-[#4a3828] flex flex-col items-center justify-center gap-4">
-        <p className="text-[#8b7560] text-sm">Collection not found.</p>
-        <Link href="/collections" className="text-sm text-[#e65100] hover:underline">
+      <main className="min-h-screen bg-[#13111a] text-[#e8e4f0] flex flex-col items-center justify-center gap-4">
+        <p className="text-[#8b839e] text-sm">Collection not found.</p>
+        <Link href="/collections" className="text-sm text-[#e04c8a] hover:underline">
           Back to Collections
         </Link>
       </main>
@@ -173,13 +173,13 @@ export default function CollectionDetailPage({ params }: { params: Promise<{ slu
   }
 
   return (
-    <main className="min-h-screen bg-[#fff8f3] text-[#4a3828]">
+    <main className="min-h-screen bg-[#13111a] text-[#e8e4f0]">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-[#fff8f3]/95 backdrop-blur-md border-b border-[#f5ddc0]">
+      <div className="sticky top-0 z-40 bg-[#13111a]/95 backdrop-blur-md border-b border-[#2a2535]">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-4">
           <Link
             href="/collections"
-            className="text-sm text-[#8b7560] hover:text-[#4a3828] transition shrink-0"
+            className="text-sm text-[#8b839e] hover:text-[#e8e4f0] transition shrink-0"
           >
             &larr; Collections
           </Link>
@@ -191,17 +191,17 @@ export default function CollectionDetailPage({ params }: { params: Promise<{ slu
         <div className="flex items-start gap-4">
           <span className="text-4xl leading-none shrink-0">{collectionData.emoji}</span>
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl font-bold text-[#4a3828]">{collectionData.name}</h1>
-            <p className="text-[13px] text-[#8b7560] mt-1">
+            <h1 className="text-xl font-bold text-[#e8e4f0]">{collectionData.name}</h1>
+            <p className="text-[13px] text-[#8b839e] mt-1">
               by {collectionData.creatorName} &middot; {collectionData.productIds.length} product{collectionData.productIds.length !== 1 ? "s" : ""}
               {collectionData.isOfficial && (
-                <span className="ml-2 text-[10px] font-semibold text-[#e65100] bg-[#e65100]/10 px-1.5 py-0.5 rounded-full">
+                <span className="ml-2 text-[10px] font-semibold text-[#e04c8a] bg-[#e04c8a]/12 px-1.5 py-0.5 rounded-full">
                   Official
                 </span>
               )}
             </p>
             {collectionData.description && (
-              <p className="text-[13px] text-[#5c4a38] mt-2 leading-relaxed">
+              <p className="text-[13px] text-[#cbc5d9] mt-2 leading-relaxed">
                 {collectionData.description}
               </p>
             )}
@@ -217,8 +217,8 @@ export default function CollectionDetailPage({ params }: { params: Promise<{ slu
               onClick={() => setSortKey(opt.key)}
               className={`px-2.5 py-1.5 rounded-md text-xs font-medium border transition ${
                 sortKey === opt.key
-                  ? "bg-[#e65100]/20 text-[#e65100] border-[#e65100]/30"
-                  : "bg-white text-[#8b7560] border-[#f5ddc0] hover:bg-[#fff0e6]"
+                  ? "bg-[#e04c8a]/20 text-[#e04c8a] border-[#e04c8a]/30"
+                  : "bg-[#1c1826] text-[#8b839e] border-[#2a2535] hover:bg-[#231e2e]"
               }`}
             >
               {opt.label}
@@ -229,7 +229,7 @@ export default function CollectionDetailPage({ params }: { params: Promise<{ slu
         {/* Product grid */}
         {sorted.length === 0 ? (
           <div className="py-12 text-center">
-            <p className="text-[#8b7560] text-sm">This collection has no products yet.</p>
+            <p className="text-[#8b839e] text-sm">This collection has no products yet.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm lg gap-4">
@@ -237,12 +237,12 @@ export default function CollectionDetailPage({ params }: { params: Promise<{ slu
               <Link
                 key={p.id}
                 href={p.slug && p.communitySlug ? `/c/${p.communitySlug}/${p.slug}` : `/product/${p.id}`}
-                className="group glass-card flex flex-col overflow-hidden hover:border-[#f5ddc0] hover:shadow-md hover:shadow-[#f5ddc0]/50 transition"
+                className="group glass-card flex flex-col overflow-hidden hover:border-[#2a2535] hover:shadow-md hover:shadow-[#2a2535]/50 transition"
               >
                 {/* Cover image */}
                 <div className="relative">
                   {p.coverImage ? (
-                    <div className="relative w-full h-40 overflow-hidden bg-[#ffecd2] shrink-0">
+                    <div className="relative w-full h-40 overflow-hidden bg-[#1c1826] shrink-0">
                       <img
                         src={p.coverImage}
                         alt={p.name}
@@ -252,13 +252,13 @@ export default function CollectionDetailPage({ params }: { params: Promise<{ slu
                       <div className="absolute bottom-2 left-3 flex items-center gap-1.5">
                         {p.avgRating > 0 && (
                           <span className="text-[11px] font-semibold text-white flex items-center gap-0.5">
-                            <span className="text-[#ffcc80]">&#9733;</span> {p.avgRating.toFixed(1)}
+                            <span className="text-[#fde68a]">&#9733;</span> {p.avgRating.toFixed(1)}
                           </span>
                         )}
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full h-40 bg-gradient-to-br from-[#ffecd2] to-[#f5ddc0] flex items-center justify-center shrink-0">
+                    <div className="w-full h-40 bg-gradient-to-br from-[#1c1826] to-[#2a2535] flex items-center justify-center shrink-0">
                       <span className="text-4xl opacity-30 select-none">&#128230;</span>
                     </div>
                   )}
@@ -274,29 +274,29 @@ export default function CollectionDetailPage({ params }: { params: Promise<{ slu
                 <div className="p-4 flex flex-col gap-2 flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-[14px] font-semibold text-[#4a3828] group-hover:text-[#e65100] leading-snug transition-colors">
+                      <h3 className="text-[14px] font-semibold text-[#e8e4f0] group-hover:text-[#e04c8a] leading-snug transition-colors">
                         {p.name}
                       </h3>
-                      <p className="text-[12px] text-[#8b7560] mt-0.5">{p.brandName}</p>
+                      <p className="text-[12px] text-[#8b839e] mt-0.5">{p.brandName}</p>
                     </div>
                     {!p.coverImage && p.avgRating > 0 && (
-                      <span className="text-[11px] text-[#ffa726] font-semibold shrink-0">&#9733; {p.avgRating.toFixed(1)}</span>
+                      <span className="text-[11px] text-[#fbbf24] font-semibold shrink-0">&#9733; {p.avgRating.toFixed(1)}</span>
                     )}
                   </div>
 
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[11px] bg-[#ffecd2] text-[#8b7560] px-2 py-0.5 rounded-full font-medium border border-[#f5ddc0]">
+                    <span className="text-[11px] bg-[#1c1826] text-[#8b839e] px-2 py-0.5 rounded-full font-medium border border-[#2a2535]">
                       {p.category}
                     </span>
                   </div>
 
                   {p.topQuote && (
-                    <p className="text-[12px] text-[#8b7560] leading-relaxed line-clamp-2 italic">
+                    <p className="text-[12px] text-[#8b839e] leading-relaxed line-clamp-2 italic">
                       &ldquo;{p.topQuote}&rdquo;
                     </p>
                   )}
 
-                  <div className="flex items-center gap-3 text-[11px] text-[#8b7560] mt-auto pt-2 border-t border-[#f5ddc0]">
+                  <div className="flex items-center gap-3 text-[11px] text-[#8b839e] mt-auto pt-2 border-t border-[#2a2535]">
                     <span>{p.reviewCount} review{p.reviewCount !== 1 ? "s" : ""}</span>
                     <span>&#128077; {p.totalLikes}</span>
                   </div>

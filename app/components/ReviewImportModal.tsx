@@ -330,21 +330,21 @@ export default function ReviewImportModal({ isOpen, onClose, userId, userName }:
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
-      <div className="bg-white rounded-2xl w-full max-w-lg border border-[#f5ddc0] shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="bg-[#1c1826] rounded-2xl w-full max-w-lg border border-[#2a2535] shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#f5ddc0]">
-          <h2 className="text-base font-semibold text-[#4a3828]">Import Reviews</h2>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#2a2535]">
+          <h2 className="text-base font-semibold text-[#e8e4f0]">Import Reviews</h2>
           <button
             type="button"
             onClick={handleClose}
-            className="text-[#8b7560] hover:text-[#5c4a38] text-xl leading-none"
+            className="text-[#8b839e] hover:text-[#cbc5d9] text-xl leading-none"
           >
             &times;
           </button>
         </div>
 
         {/* Tab toggle */}
-        <div className="flex border-b border-[#f5ddc0]">
+        <div className="flex border-b border-[#2a2535]">
           {(["paste", "csv"] as const).map((m) => (
             <button
               key={m}
@@ -352,8 +352,8 @@ export default function ReviewImportModal({ isOpen, onClose, userId, userName }:
               onClick={() => { setMode(m); setError(""); setSuccessCount(0); }}
               className={`flex-1 px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
                 mode === m
-                  ? "border-[#e65100] text-[#4a3828]"
-                  : "border-transparent text-[#8b7560] hover:text-[#5c4a38]"
+                  ? "border-[#e04c8a] text-[#e8e4f0]"
+                  : "border-transparent text-[#8b839e] hover:text-[#cbc5d9]"
               }`}
             >
               {m === "paste" ? "Paste Review" : "CSV Upload"}
@@ -365,7 +365,7 @@ export default function ReviewImportModal({ isOpen, onClose, userId, userName }:
         <div className="overflow-y-auto flex-1 p-5 space-y-4">
           {/* Success banner */}
           {successCount > 0 && (
-            <div className="bg-[#66bb6a]/10 border border-[#66bb6a]/20 rounded-lg p-3 text-sm text-[#66bb6a]">
+            <div className="bg-[#34d399]/12 border border-[#34d399]/20 rounded-lg p-3 text-sm text-[#34d399]">
               Successfully imported {successCount} review{successCount !== 1 ? "s" : ""}.
             </div>
           )}
@@ -382,23 +382,23 @@ export default function ReviewImportModal({ isOpen, onClose, userId, userName }:
             <>
               {/* Product name */}
               <div>
-                <label className="block text-[12px] font-medium text-[#8b7560] mb-1">Product name *</label>
+                <label className="block text-[12px] font-medium text-[#8b839e] mb-1">Product name *</label>
                 <input
                   type="text"
                   value={productName}
                   onChange={(e) => setProductName(e.target.value)}
                   placeholder="e.g. Sony WH-1000XM5"
-                  className="w-full text-sm bg-white border border-[#f5ddc0] rounded-lg px-3 py-2 text-[#4a3828] placeholder:text-[#b89878] focus:outline-none focus:ring-1 focus:ring-[#e65100]"
+                  className="w-full text-sm bg-[#1c1826] border border-[#2a2535] rounded-lg px-3 py-2 text-[#e8e4f0] placeholder:text-[#4a4458] focus:outline-none focus:ring-1 focus:ring-[#e04c8a]"
                 />
               </div>
 
               {/* Source platform */}
               <div>
-                <label className="block text-[12px] font-medium text-[#8b7560] mb-1">Source platform</label>
+                <label className="block text-[12px] font-medium text-[#8b839e] mb-1">Source platform</label>
                 <select
                   value={sourcePlatform}
                   onChange={(e) => setSourcePlatform(e.target.value as SourcePlatform)}
-                  className="w-full text-sm bg-white border border-[#f5ddc0] rounded-lg px-3 py-2 text-[#4a3828] focus:outline-none focus:ring-1 focus:ring-[#e65100]"
+                  className="w-full text-sm bg-[#1c1826] border border-[#2a2535] rounded-lg px-3 py-2 text-[#e8e4f0] focus:outline-none focus:ring-1 focus:ring-[#e04c8a]"
                 >
                   {SOURCE_PLATFORMS.map((p) => (
                     <option key={p} value={p}>{p}</option>
@@ -408,7 +408,7 @@ export default function ReviewImportModal({ isOpen, onClose, userId, userName }:
 
               {/* Rating */}
               <div>
-                <label className="block text-[12px] font-medium text-[#8b7560] mb-1">Rating</label>
+                <label className="block text-[12px] font-medium text-[#8b839e] mb-1">Rating</label>
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
@@ -416,7 +416,7 @@ export default function ReviewImportModal({ isOpen, onClose, userId, userName }:
                       type="button"
                       onClick={() => setRating(star)}
                       className={`text-xl transition-colors ${
-                        star <= rating ? "text-amber-400" : "text-[#f5ddc0]"
+                        star <= rating ? "text-amber-400" : "text-[#2a2535]"
                       }`}
                     >
                       &#9733;
@@ -427,37 +427,37 @@ export default function ReviewImportModal({ isOpen, onClose, userId, userName }:
 
               {/* Review text */}
               <div>
-                <label className="block text-[12px] font-medium text-[#8b7560] mb-1">Review text *</label>
+                <label className="block text-[12px] font-medium text-[#8b839e] mb-1">Review text *</label>
                 <textarea
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   rows={5}
                   placeholder="Paste your review here..."
-                  className="w-full text-sm bg-white border border-[#f5ddc0] rounded-lg px-3 py-2 text-[#4a3828] placeholder:text-[#b89878] focus:outline-none focus:ring-1 focus:ring-[#e65100] resize-none"
+                  className="w-full text-sm bg-[#1c1826] border border-[#2a2535] rounded-lg px-3 py-2 text-[#e8e4f0] placeholder:text-[#4a4458] focus:outline-none focus:ring-1 focus:ring-[#e04c8a] resize-none"
                 />
               </div>
 
               {/* Pros */}
               <div>
-                <label className="block text-[12px] font-medium text-[#8b7560] mb-1">Pros (comma-separated)</label>
+                <label className="block text-[12px] font-medium text-[#8b839e] mb-1">Pros (comma-separated)</label>
                 <input
                   type="text"
                   value={prosText}
                   onChange={(e) => setProsText(e.target.value)}
                   placeholder="e.g. Great battery, Comfortable, Good ANC"
-                  className="w-full text-sm bg-white border border-[#f5ddc0] rounded-lg px-3 py-2 text-[#4a3828] placeholder:text-[#b89878] focus:outline-none focus:ring-1 focus:ring-[#e65100]"
+                  className="w-full text-sm bg-[#1c1826] border border-[#2a2535] rounded-lg px-3 py-2 text-[#e8e4f0] placeholder:text-[#4a4458] focus:outline-none focus:ring-1 focus:ring-[#e04c8a]"
                 />
               </div>
 
               {/* Cons */}
               <div>
-                <label className="block text-[12px] font-medium text-[#8b7560] mb-1">Cons (comma-separated)</label>
+                <label className="block text-[12px] font-medium text-[#8b839e] mb-1">Cons (comma-separated)</label>
                 <input
                   type="text"
                   value={consText}
                   onChange={(e) => setConsText(e.target.value)}
                   placeholder="e.g. Heavy, Expensive"
-                  className="w-full text-sm bg-white border border-[#f5ddc0] rounded-lg px-3 py-2 text-[#4a3828] placeholder:text-[#b89878] focus:outline-none focus:ring-1 focus:ring-[#e65100]"
+                  className="w-full text-sm bg-[#1c1826] border border-[#2a2535] rounded-lg px-3 py-2 text-[#e8e4f0] placeholder:text-[#4a4458] focus:outline-none focus:ring-1 focus:ring-[#e04c8a]"
                 />
               </div>
 
@@ -466,7 +466,7 @@ export default function ReviewImportModal({ isOpen, onClose, userId, userName }:
                 type="button"
                 onClick={handlePasteSubmit}
                 disabled={submitting}
-                className="w-full bg-[#e65100] text-white text-sm font-medium py-2.5 rounded-lg hover:bg-[#e65100]/90 transition disabled:opacity-50"
+                className="w-full bg-[#e04c8a] text-white text-sm font-medium py-2.5 rounded-lg hover:bg-[#e04c8a]/90 transition disabled:opacity-50"
               >
                 {submitting ? "Importing..." : "Import Review"}
               </button>
@@ -477,8 +477,8 @@ export default function ReviewImportModal({ isOpen, onClose, userId, userName }:
           {mode === "csv" && (
             <>
               <div>
-                <label className="block text-[12px] font-medium text-[#8b7560] mb-1">Upload CSV file</label>
-                <p className="text-[11px] text-[#8b7560] mb-2">
+                <label className="block text-[12px] font-medium text-[#8b839e] mb-1">Upload CSV file</label>
+                <p className="text-[11px] text-[#8b839e] mb-2">
                   Expected columns: productName, sourcePlatform, rating, content, pros, cons
                 </p>
                 <input
@@ -486,7 +486,7 @@ export default function ReviewImportModal({ isOpen, onClose, userId, userName }:
                   type="file"
                   accept=".csv"
                   onChange={handleFileSelect}
-                  className="w-full text-sm text-[#5c4a38] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-[#e65100]/10 file:text-[#e65100] hover:file:bg-[#e65100]/20 file:cursor-pointer file:transition"
+                  className="w-full text-sm text-[#cbc5d9] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-[#e04c8a]/12 file:text-[#e04c8a] hover:file:bg-[#e04c8a]/20 file:cursor-pointer file:transition"
                 />
               </div>
 
@@ -499,13 +499,13 @@ export default function ReviewImportModal({ isOpen, onClose, userId, userName }:
               {/* Preview table */}
               {csvRows.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-[12px] font-medium text-[#8b7560]">
+                  <p className="text-[12px] font-medium text-[#8b839e]">
                     {csvRows.length} row{csvRows.length !== 1 ? "s" : ""} parsed
                   </p>
-                  <div className="overflow-x-auto -mx-1 rounded-lg border border-[#f5ddc0]">
+                  <div className="overflow-x-auto -mx-1 rounded-lg border border-[#2a2535]">
                     <table className="w-full text-[12px]">
                       <thead>
-                        <tr className="text-left text-[10px] text-[#8b7560] uppercase tracking-wide bg-[#ffecd2]">
+                        <tr className="text-left text-[10px] text-[#8b839e] uppercase tracking-wide bg-[#1c1826]">
                           <th className="px-3 py-2 font-medium">#</th>
                           <th className="px-3 py-2 font-medium">Product</th>
                           <th className="px-3 py-2 font-medium">Source</th>
@@ -513,21 +513,21 @@ export default function ReviewImportModal({ isOpen, onClose, userId, userName }:
                           <th className="px-3 py-2 font-medium">Preview</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#f5ddc0]">
+                      <tbody className="divide-y divide-[#2a2535]">
                         {csvRows.slice(0, 10).map((row, i) => (
                           <tr key={i}>
-                            <td className="px-3 py-2 text-[#8b7560]">{i + 1}</td>
-                            <td className="px-3 py-2 text-[#4a3828] max-w-[120px] truncate">{row.productName}</td>
-                            <td className="px-3 py-2 text-[#8b7560]">{row.sourcePlatform}</td>
-                            <td className="px-3 py-2 text-[#ffa726]">{"*".repeat(row.rating)}</td>
-                            <td className="px-3 py-2 text-[#8b7560] max-w-[160px] truncate">{row.content}</td>
+                            <td className="px-3 py-2 text-[#8b839e]">{i + 1}</td>
+                            <td className="px-3 py-2 text-[#e8e4f0] max-w-[120px] truncate">{row.productName}</td>
+                            <td className="px-3 py-2 text-[#8b839e]">{row.sourcePlatform}</td>
+                            <td className="px-3 py-2 text-[#fbbf24]">{"*".repeat(row.rating)}</td>
+                            <td className="px-3 py-2 text-[#8b839e] max-w-[160px] truncate">{row.content}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
                   {csvRows.length > 10 && (
-                    <p className="text-[11px] text-[#8b7560]">
+                    <p className="text-[11px] text-[#8b839e]">
                       Showing first 10 of {csvRows.length} rows.
                     </p>
                   )}
@@ -535,7 +535,7 @@ export default function ReviewImportModal({ isOpen, onClose, userId, userName }:
                     type="button"
                     onClick={handleCSVImport}
                     disabled={submitting}
-                    className="w-full bg-[#e65100] text-white text-sm font-medium py-2.5 rounded-lg hover:bg-[#e65100]/90 transition disabled:opacity-50"
+                    className="w-full bg-[#e04c8a] text-white text-sm font-medium py-2.5 rounded-lg hover:bg-[#e04c8a]/90 transition disabled:opacity-50"
                   >
                     {submitting ? "Importing..." : `Import All (${csvRows.length})`}
                   </button>

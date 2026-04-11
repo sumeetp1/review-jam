@@ -29,7 +29,7 @@ export default function StarPicker({
             className={
               (hovered || value) >= star
                 ? "text-amber-400"
-                : "text-[#f5ddc0]"
+                : "text-[#2a2535]"
             }
           >
             ★

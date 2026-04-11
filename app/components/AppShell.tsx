@@ -27,7 +27,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     getDoc(doc(db, "config", "allowedEmails"))
       .then((snap) => {
         const emails: string[] = snap.exists() ? (snap.data().emails || []) : [];
-        // Admin is always allowed
         const combined = [...new Set([ADMIN_EMAIL.toLowerCase(), ...emails.map((e: string) => e.toLowerCase())])];
         setAllowedEmails(combined);
       })
@@ -42,10 +41,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // ── Access gate ──
   if (loading || loadingAllowlist) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fff8f3]">
+      <div className="min-h-screen flex items-center justify-center bg-[#13111a]">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-[#e65100] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-[#8b7560]">Verifying access...</p>
+          <div className="w-8 h-8 border-2 border-[#e04c8a] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-[#4a4458]">Verifying access...</p>
         </div>
       </div>
     );
@@ -53,11 +52,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fff8f3] px-4">
+      <div className="min-h-screen flex items-center justify-center bg-[#13111a] px-4">
         <div className="text-center max-w-sm">
-          <img src="/logo.svg" alt="Review Jam" width={120} height={30} className="mx-auto mb-6" />
-          <h1 className="text-xl font-bold text-[#4a3828] mb-2">Invite only</h1>
-          <p className="text-sm text-[#8b7560] mb-6">This site is currently in private preview. Sign in with an invited Google account to continue.</p>
+          <img src="/logo-dark.svg" alt="Review Jam" width={120} height={30} className="mx-auto mb-6" />
+          <h1 className="text-xl font-bold text-[#e8e4f0] mb-2">Invite only</h1>
+          <p className="text-sm text-[#8b839e] mb-6">This site is currently in private preview. Sign in with an invited Google account to continue.</p>
           <button
             onClick={() => signInWithPopup(auth, googleProvider).catch(() => {})}
             className="btn-brand px-6 py-3 rounded-xl text-sm font-semibold w-full"
@@ -78,7 +77,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       try {
         await redeemReferralCode(inviteCode.trim(), user.email);
         setRedeemSuccess(true);
-        // Re-fetch the allowlist to update state
         const snap = await getDoc(doc(db, "config", "allowedEmails"));
         const emails: string[] = snap.exists() ? (snap.data().emails || []) : [];
         const combined = [...new Set([ADMIN_EMAIL.toLowerCase(), ...emails.map((e: string) => e.toLowerCase())])];
@@ -91,29 +89,29 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     };
 
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fff8f3] px-4">
+      <div className="min-h-screen flex items-center justify-center bg-[#13111a] px-4">
         <div className="text-center max-w-sm">
-          <img src="/logo.svg" alt="Review Jam" width={120} height={30} className="mx-auto mb-6" />
-          <h1 className="text-xl font-bold text-[#4a3828] mb-2">Access restricted</h1>
-          <p className="text-sm text-[#8b7560] mb-1">Signed in as <span className="font-medium text-[#5c4a38]">{user.email}</span></p>
-          <p className="text-sm text-[#8b7560] mb-6">This account doesn&apos;t have access. Contact the admin for an invite.</p>
+          <img src="/logo-dark.svg" alt="Review Jam" width={120} height={30} className="mx-auto mb-6" />
+          <h1 className="text-xl font-bold text-[#e8e4f0] mb-2">Access restricted</h1>
+          <p className="text-sm text-[#8b839e] mb-1">Signed in as <span className="font-medium text-[#cbc5d9]">{user.email}</span></p>
+          <p className="text-sm text-[#8b839e] mb-6">This account doesn&apos;t have access. Contact the admin for an invite.</p>
           <button
             onClick={() => signOut(auth)}
-            className="px-6 py-3 rounded-xl text-sm font-semibold border border-[#f5ddc0] text-[#5c4a38] hover:bg-[#fff0e6] transition w-full"
+            className="px-6 py-3 rounded-xl text-sm font-semibold border border-[#2a2535] text-[#cbc5d9] hover:bg-[#1c1826] transition w-full"
           >
             Sign out
           </button>
 
           {/* Divider */}
           <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px bg-[#f5ddc0]" />
-            <span className="text-xs text-[#b89878]">or</span>
-            <div className="flex-1 h-px bg-[#f5ddc0]" />
+            <div className="flex-1 h-px bg-[#2a2535]" />
+            <span className="text-xs text-[#4a4458]">or</span>
+            <div className="flex-1 h-px bg-[#2a2535]" />
           </div>
 
           {/* Invite code redemption */}
           <div className="space-y-3">
-            <p className="text-sm font-medium text-[#5c4a38]">Have an invite code?</p>
+            <p className="text-sm font-medium text-[#cbc5d9]">Have an invite code?</p>
             <div className="flex gap-2">
               <input
                 type="text"
@@ -121,22 +119,22 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
                 placeholder="RJ-XXXXXX"
                 maxLength={9}
-                className="flex-1 bg-white border border-[#f5ddc0] rounded-lg px-3 py-2.5 text-sm text-[#4a3828] placeholder:text-[#b89878] outline-none focus:border-[#ff8a65] transition font-mono text-center tracking-wider"
+                className="flex-1 bg-[#1c1826] border border-[#2a2535] rounded-lg px-3 py-2.5 text-sm text-[#e8e4f0] placeholder:text-[#4a4458] outline-none focus:border-[#e04c8a] transition font-mono text-center tracking-wider"
               />
               <button
                 type="button"
                 onClick={handleRedeem}
                 disabled={isRedeeming || !inviteCode.trim()}
-                className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#e65100] hover:bg-[#bf360c] disabled:bg-[#f5ddc0] disabled:text-[#b89878] text-white transition shrink-0"
+                className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#e04c8a] hover:bg-[#c0357a] disabled:bg-[#2a2535] disabled:text-[#4a4458] text-white transition shrink-0"
               >
                 {isRedeeming ? "..." : "Redeem"}
               </button>
             </div>
             {redeemError && (
-              <p className="text-[12px] font-medium text-[#ef5350]">{redeemError}</p>
+              <p className="text-[12px] font-medium text-[#f87171]">{redeemError}</p>
             )}
             {redeemSuccess && (
-              <p className="text-[12px] font-medium text-[#66bb6a]">
+              <p className="text-[12px] font-medium text-[#34d399]">
                 Code redeemed! You now have access.
               </p>
             )}
@@ -152,21 +150,21 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {!isMarketingPage && <GlobalSidebar />}
       <div className="flex-1 flex flex-col min-w-0">
         {!isMarketingPage && (
-          <div className="hidden md:flex items-center justify-between sticky top-0 z-30 bg-[#fff8f3]/95 backdrop-blur-sm border-b border-[#f5ddc0] px-4 py-2.5">
+          <div className="hidden md:flex items-center justify-between sticky top-0 z-30 bg-[#13111a]/95 backdrop-blur-sm border-b border-[#2a2535] px-4 py-2.5">
             <Link href="/">
-              <img src="/logo.svg" alt="Review Jam" width={120} height={30} />
+              <img src="/logo-dark.svg" alt="Review Jam" width={120} height={30} />
             </Link>
             <nav className="flex items-center gap-5">
-              <Link href="/feed" className={`text-sm font-medium transition ${pathname === "/feed" ? "text-[#e65100]" : "text-[#8b7560] hover:text-[#4a3828]"}`}>
+              <Link href="/feed" className={`text-sm font-medium transition ${pathname === "/feed" ? "text-[#e04c8a]" : "text-[#8b839e] hover:text-[#e8e4f0]"}`}>
                 Feed
               </Link>
-              <Link href="/c" className={`text-sm font-medium transition ${pathname.startsWith("/c") ? "text-[#e65100]" : "text-[#8b7560] hover:text-[#4a3828]"}`}>
+              <Link href="/c" className={`text-sm font-medium transition ${pathname.startsWith("/c") ? "text-[#e04c8a]" : "text-[#8b839e] hover:text-[#e8e4f0]"}`}>
                 Communities
               </Link>
-              <Link href="/explore" className={`text-sm font-medium transition ${pathname === "/explore" ? "text-[#e65100]" : "text-[#8b7560] hover:text-[#4a3828]"}`}>
+              <Link href="/explore" className={`text-sm font-medium transition ${pathname === "/explore" ? "text-[#e04c8a]" : "text-[#8b839e] hover:text-[#e8e4f0]"}`}>
                 Products
               </Link>
-              <Link href="/collections" className={`text-sm font-medium transition ${pathname.startsWith("/collections") ? "text-[#e65100]" : "text-[#8b7560] hover:text-[#4a3828]"}`}>
+              <Link href="/collections" className={`text-sm font-medium transition ${pathname.startsWith("/collections") ? "text-[#e04c8a]" : "text-[#8b839e] hover:text-[#e8e4f0]"}`}>
                 Collections
               </Link>
             </nav>

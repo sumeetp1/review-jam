@@ -41,12 +41,12 @@ export default function RootLayout({
     >
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-        <meta name="theme-color" content="#fff8f3" />
+        <meta name="theme-color" content="#13111a" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
-      <body className="min-h-full flex flex-col font-sans text-[15px] leading-normal text-[#4a3828] bg-[#fff8f3]">
+      <body className="min-h-full flex flex-col font-sans text-[15px] leading-normal text-[#e8e4f0] bg-[#13111a]">
         <AppShell>{children}</AppShell>
         <VisitorCounter />
         <BottomNav />

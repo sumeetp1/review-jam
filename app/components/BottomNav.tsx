@@ -14,7 +14,7 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-[#fff8f3]/95 backdrop-blur-md border-t border-[#f5ddc0] safe-area-pb">
+    <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-[#13111a]/95 backdrop-blur-md border-t border-[#2a2535] safe-area-pb">
       <div className="flex items-stretch h-[56px]">
         {NAV_ITEMS.map((item) => {
           const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
@@ -25,8 +25,8 @@ export default function BottomNav() {
               href={item.href}
               className={`flex-1 flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors ${
                 isActive
-                  ? "text-[#e65100]"
-                  : "text-[#b89878]"
+                  ? "text-[#e04c8a]"
+                  : "text-[#4a4458]"
               }`}
             >
               <Icon active={isActive} />
@@ -36,7 +36,7 @@ export default function BottomNav() {
         })}
       </div>
       {/* iOS home indicator safe area */}
-      <div className="h-safe-area-inset-bottom bg-[#fff8f3]/95" />
+      <div className="h-safe-area-inset-bottom bg-[#13111a]/95" />
     </nav>
   );
 }

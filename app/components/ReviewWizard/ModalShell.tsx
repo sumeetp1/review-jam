@@ -8,8 +8,8 @@ export default function ModalShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="fixed inset-0 bg-[#4a3828]/50 z-50 flex items-center justify-center p-4 backdrop-blur-[2px]">
-      <div className="bg-white rounded-xl max-w-lg w-full shadow-lg border border-[#f5ddc0] flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-[2px]">
+      <div className="bg-[#1c1826] rounded-xl max-w-lg w-full shadow-lg border border-[#2a2535] flex flex-col max-h-[92vh]">
         {children}
       </div>
     </div>

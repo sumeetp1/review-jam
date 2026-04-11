@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fff8f3;
-  --foreground: #4a3828;
-  --brand: #e65100;
-  --brand-dark: #bf360c;
-  --brand-hover: #ff8a65;
+  --background: #13111a;
+  --foreground: #e8e4f0;
+  --brand: #e04c8a;
+  --brand-dark: #c0357a;
+  --brand-hover: #f472b6;
 }
 
 @theme inline {
@@ -28,9 +28,9 @@ body {
 
 /* Brand gradient button */
 .btn-brand {
-  background: linear-gradient(135deg, #ffab91, #f48fb1);
+  background: linear-gradient(135deg, #e04c8a, #7c3aed);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(255, 171, 145, 0.30);
+  box-shadow: 0 2px 8px rgba(224, 76, 138, 0.25);
   transition: opacity 0.15s, transform 0.1s;
 }
 .btn-brand:hover { opacity: 0.92; }
@@ -38,26 +38,26 @@ body {
 
 /* Glassmorphism card */
 .glass-card {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(74, 56, 40, 0.08);
+  background: rgba(28, 24, 38, 0.8);
+  border: 1px solid #2a2535;
   backdrop-filter: blur(12px);
   border-radius: 16px;
 }
 
 /* Gradient text */
 .text-gradient {
-  background: linear-gradient(135deg, #e65100, #f48fb1, #ce93d8);
+  background: linear-gradient(135deg, #e04c8a, #7c3aed, #38bdf8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 /* Glow effects */
-.glow-coral {
-  box-shadow: 0 0 20px rgba(255, 171, 145, 0.15), 0 0 60px rgba(255, 171, 145, 0.05);
+.glow-berry {
+  box-shadow: 0 0 20px rgba(224, 76, 138, 0.15), 0 0 60px rgba(224, 76, 138, 0.05);
 }
-.glow-rose {
-  box-shadow: 0 0 20px rgba(244, 143, 177, 0.15), 0 0 60px rgba(244, 143, 177, 0.05);
+.glow-purple {
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.15), 0 0 60px rgba(124, 58, 237, 0.05);
 }
 
 /* ─── Animations ──────────────────────────────────────────────────────────── */
