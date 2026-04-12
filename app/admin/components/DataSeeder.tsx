@@ -1692,80 +1692,80 @@ export default function DataSeeder({ user }: DataSeederProps) {
   return (
     <>
       {/* --- ONE-CLICK SEED BUTTON --- */}
-      <div className="bg-gradient-to-r from-[rgba(251,191,36,0.12)] to-[#ffccbc] p-6 rounded-3xl border border-[#2a2535] mb-8 flex justify-between items-center shadow-lg">
+      <div className="bg-gradient-to-r from-indigo-900 to-purple-900 p-6 rounded-3xl border border-indigo-500/30 mb-8 flex justify-between items-center shadow-lg">
         <div>
-          <h2 className="text-xl font-bold text-[#e8e4f0] mb-1">🧪 Test Environment Seeder</h2>
-          <p className="text-[#cbc5d9] text-sm">Populate your UI with highly realistic dummy campaigns and reviews instantly.</p>
+          <h2 className="text-xl font-bold text-white mb-1">🧪 Test Environment Seeder</h2>
+          <p className="text-indigo-200 text-sm">Populate your UI with highly realistic dummy campaigns and reviews instantly.</p>
         </div>
         <button
           onClick={handleSeedDatabase}
           disabled={isProcessing}
-          className="bg-[#e04c8a] hover:bg-[#d84315] text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
+          className="bg-indigo-500 hover:bg-indigo-400 text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
         >
           {isProcessing ? "Injecting Data..." : "Generate Dummy Data"}
         </button>
       </div>
 
       {/* --- WIDGET DEMO SEEDER --- */}
-      <div className="bg-gradient-to-r from-[#1c1826] to-[rgba(251,191,36,0.12)] p-6 rounded-3xl border border-[#2a2535] mb-8 flex justify-between items-center shadow-lg">
+      <div className="bg-gradient-to-r from-amber-950/60 to-orange-950/40 p-6 rounded-3xl border border-amber-700/40 mb-8 flex justify-between items-center shadow-lg">
         <div>
-          <h2 className="text-xl font-bold text-[#e8e4f0] mb-1">🧩 Seed Widget Demo</h2>
-          <p className="text-[#cbc5d9] text-sm">
+          <h2 className="text-xl font-bold text-white mb-1">🧩 Seed Widget Demo</h2>
+          <p className="text-amber-200/70 text-sm">
             Adds a &quot;SonicPulse X1&quot; campaign with 6 rich reviews under{" "}
-            <span className="text-[#e04c8a] font-mono">sumit.pandey75@gmail.com</span> —
+            <span className="text-amber-300 font-mono">sumit.pandey75@gmail.com</span> —
             does <strong>not</strong> delete existing data.
           </p>
         </div>
         <button
           onClick={handleSeedWidgetDemo}
           disabled={isProcessing}
-          className="bg-[#fbbf24] hover:bg-[#ff9800] text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
+          className="bg-amber-500 hover:bg-amber-400 text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
         >
           {isProcessing ? "Seeding…" : "Seed Widget Demo"}
         </button>
       </div>
 
       {/* --- COMMUNITY SLUG MIGRATION --- */}
-      <div className="bg-gradient-to-r from-[rgba(52,211,153,0.12)] to-[#c8e6c9] p-6 rounded-3xl border border-[#6ee7b7] mb-8 flex justify-between items-center shadow-lg">
+      <div className="bg-gradient-to-r from-emerald-950/60 to-teal-950/40 p-6 rounded-3xl border border-emerald-700/40 mb-8 flex justify-between items-center shadow-lg">
         <div>
-          <h2 className="text-xl font-bold text-[#e8e4f0] mb-1">🗂️ Migrate Product Slugs</h2>
-          <p className="text-[#cbc5d9] text-sm">
-            Adds <span className="font-mono text-[#34d399]">slug</span> and{" "}
-            <span className="font-mono text-[#34d399]">communitySlug</span> to all products so they work on{" "}
-            <span className="font-mono text-[#34d399]">/c/[community]/[product]</span> URLs.
+          <h2 className="text-xl font-bold text-white mb-1">🗂️ Migrate Product Slugs</h2>
+          <p className="text-emerald-200/70 text-sm">
+            Adds <span className="font-mono text-emerald-300">slug</span> and{" "}
+            <span className="font-mono text-emerald-300">communitySlug</span> to all products so they work on{" "}
+            <span className="font-mono text-emerald-300">/c/[community]/[product]</span> URLs.
             Safe to run multiple times.
           </p>
         </div>
         <button
           onClick={handleMigrateProductSlugs}
           disabled={isProcessing}
-          className="bg-[#34d399] hover:bg-[#4caf50] text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
+          className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
         >
           {isProcessing ? "Migrating…" : "Run Migration"}
         </button>
       </div>
 
       {/* --- PERSONAL DATA SEEDER --- */}
-      <div className="bg-gradient-to-r from-[#fce4ec] to-[#f8bbd0] p-6 rounded-3xl border border-[#f48fb1] mb-8 flex justify-between items-center shadow-lg">
+      <div className="bg-gradient-to-r from-violet-950/60 to-purple-950/40 p-6 rounded-3xl border border-violet-700/40 mb-8 flex justify-between items-center shadow-lg">
         <div>
-          <h2 className="text-xl font-bold text-[#e8e4f0] mb-1">👤 Seed Personal Data</h2>
-          <p className="text-[#cbc5d9] text-sm">
+          <h2 className="text-xl font-bold text-white mb-1">👤 Seed Personal Data</h2>
+          <p className="text-violet-200/70 text-sm">
             Creates profile + 3 verified reviews (Sony with Ownership Journey, Linear, Whoop 5.0) attributed to{" "}
-            <span className="text-[#e04c8a] font-mono">sumit.pandey75@gmail.com</span>.
+            <span className="text-violet-300 font-mono">sumit.pandey75@gmail.com</span>.
             Sign in as that account first.
           </p>
         </div>
         <button
           onClick={handleSeedPersonalData}
           disabled={isProcessing}
-          className="bg-[#e04c8a] hover:bg-[#d84315] text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
+          className="bg-violet-600 hover:bg-violet-500 text-white font-bold py-3 px-8 rounded-xl transition disabled:opacity-50 whitespace-nowrap"
         >
           {isProcessing ? "Seeding…" : "Seed My Data"}
         </button>
       </div>
 
       {statusMessage && (
-        <div className={`mb-8 p-4 rounded-xl border font-mono text-sm font-bold ${statusMessage.includes("Error") || statusMessage.includes("failed") ? "bg-[#f87171]/10 border-[#f87171]/50 text-[#f87171]" : "bg-[#34d399]/10 border-[#34d399]/50 text-[#34d399]"}`}>
+        <div className={`mb-8 p-4 rounded-xl border font-mono text-sm font-bold ${statusMessage.includes("Error") || statusMessage.includes("failed") ? "bg-red-900/30 border-red-500/50 text-red-400" : "bg-green-900/30 border-green-500/50 text-green-400"}`}>
           {statusMessage}
         </div>
       )}

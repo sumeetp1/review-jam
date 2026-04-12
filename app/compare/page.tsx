@@ -6,6 +6,7 @@ import { useAuth } from "../../lib/hooks/useAuth";
 import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "../../lib/firebase";
 import Avatar from "../components/Avatar";
+import { useState, useEffect } from "react";
 
 const platforms = [
   {
@@ -109,10 +110,10 @@ const featureLabels: Record<string, { label: string; description: string }> = {
 };
 
 const scoreColor = (score: string) => {
-  if (score === "best") return "text-[#34d399] font-medium";
-  if (score === "good") return "text-blue-600";
-  if (score === "mid") return "text-[#fbbf24]";
-  return "text-[#8b839e]";
+  if (score === "best") return "text-emerald-600 dark:text-emerald-400 font-medium";
+  if (score === "good") return "text-blue-600 dark:text-blue-400";
+  if (score === "mid") return "text-amber-600 dark:text-amber-400";
+  return "text-slate-400 dark:text-zinc-600";
 };
 
 const scoreIcon = (score: string) => {
@@ -124,38 +125,60 @@ const scoreIcon = (score: string) => {
 
 export default function ComparePage() {
   const { user } = useAuth();
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  useEffect(() => {
+    setIsDarkMode(document.documentElement.classList.contains("dark"));
+  }, []);
+
+  const toggleDarkMode = () => {
+    const next = !isDarkMode;
+    if (next) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+    setIsDarkMode(next);
+  };
+
   const handleLogin = async () => {
     try { await signInWithPopup(auth, googleProvider); } catch {}
   };
 
   return (
-    <div className="min-h-screen bg-[#13111a]">
+    <div className="min-h-screen bg-white dark:bg-[#09090b]">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 md:px-8 h-14 shrink-0 relative z-10 border-b border-[#2a2535]">
+      <header className="flex items-center justify-between px-4 md:px-8 h-14 shrink-0 relative z-10 border-b border-slate-200 dark:border-white/[0.06]">
         <Link href="/" className="flex items-center">
-          <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} priority />
+          <Image src="/logo.svg" alt="Review Jam" width={110} height={26} priority className="dark:hidden" />
+          <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} priority className="hidden dark:block" />
         </Link>
         <div className="flex items-center gap-3">
-          <Link href="/feed" className="text-sm font-medium text-[#8b839e] hover:text-[#e8e4f0] transition hidden md:inline-block">Feed</Link>
-          <Link href="/c" className="text-sm font-medium text-[#8b839e] hover:text-[#e8e4f0] transition hidden md:inline-block">Communities</Link>
-          <Link href="/explore" className="text-sm font-medium text-[#8b839e] hover:text-[#e8e4f0] transition hidden md:inline-block">Products</Link>
+          <Link href="/feed" className="text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200 transition hidden md:inline-block">Feed</Link>
+          <Link href="/c" className="text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200 transition hidden md:inline-block">Communities</Link>
+          <Link href="/explore" className="text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200 transition hidden md:inline-block">Products</Link>
+          <button type="button" onClick={toggleDarkMode} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 transition text-slate-500 dark:text-zinc-500 text-sm" aria-label="Toggle dark mode">
+            {isDarkMode ? "\u2600\uFE0F" : "\uD83C\uDF19"}
+          </button>
           {user ? (
-            <Link href="/profile" className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-[#231e2e] transition">
+            <Link href="/profile" className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-slate-100 dark:hover:bg-white/5 transition">
               <Avatar name={user.displayName} src={user.photoURL} size="sm" className="w-8 h-8" />
             </Link>
           ) : (
-            <button type="button" onClick={handleLogin} className="text-sm font-medium bg-[#e8e4f0] text-white px-4 py-2 rounded-lg hover:opacity-90 transition">Sign in</button>
+            <button type="button" onClick={handleLogin} className="text-sm font-medium bg-slate-900 dark:bg-white text-white dark:text-zinc-900 px-4 py-2 rounded-lg hover:opacity-90 transition">Sign in</button>
           )}
         </div>
       </header>
 
       {/* Hero */}
       <section className="px-4 md:px-8 pt-16 md:pt-24 pb-12 text-center">
-        <h1 className="text-3xl md:text-5xl font-extrabold text-[#e8e4f0] tracking-tight mb-4">
+        <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 dark:text-zinc-50 tracking-tight mb-4">
           Not another review platform.<br />
           <span className="text-gradient">A fundamentally different model.</span>
         </h1>
-        <p className="text-base md:text-lg text-[#8b839e] max-w-2xl mx-auto leading-relaxed mb-6">
+        <p className="text-base md:text-lg text-slate-500 dark:text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-6">
           See how Review Jam compares to existing review platforms across every dimension that matters for trust, quality, and genuine consumer insight.
         </p>
       </section>
@@ -163,8 +186,8 @@ export default function ComparePage() {
       {/* Core Insight */}
       <section className="px-4 md:px-8 pb-16">
         <div className="max-w-3xl mx-auto glass-card px-6 md:px-8 py-6 text-center">
-          <p className="text-sm md:text-base text-[#cbc5d9] leading-relaxed">
-            <span className="font-bold text-[#e8e4f0]">The core difference:</span> Other platforms measure reviews by star ratings. Review Jam measures reviews by <span className="font-bold text-[#e04c8a]">quality, depth, and engagement</span>. Reviewers are paid to be thorough, not positive. Brand funding is decoupled from review sentiment.
+          <p className="text-sm md:text-base text-slate-600 dark:text-zinc-300 leading-relaxed">
+            <span className="font-bold text-slate-900 dark:text-zinc-100">The core difference:</span> Other platforms measure reviews by star ratings. Review Jam measures reviews by <span className="font-bold text-indigo-600 dark:text-indigo-400">quality, depth, and engagement</span>. Reviewers are paid to be thorough, not positive. Brand funding is decoupled from review sentiment.
           </p>
         </div>
       </section>
@@ -175,7 +198,7 @@ export default function ComparePage() {
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr>
-                <th className="text-left py-4 pr-4 pl-2 text-[#8b839e] font-medium text-[11px] uppercase tracking-wider border-b border-[#2a2535] sticky left-0 bg-[#1c1826] min-w-[160px]">
+                <th className="text-left py-4 pr-4 pl-2 text-slate-400 dark:text-zinc-500 font-medium text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-white/[0.06] sticky left-0 bg-white dark:bg-[#09090b] min-w-[160px]">
                   Feature
                 </th>
                 {platforms.map((p) => (
@@ -183,8 +206,8 @@ export default function ComparePage() {
                     key={p.name}
                     className={`py-4 px-3 text-[11px] uppercase tracking-wider border-b min-w-[140px] ${
                       p.highlight
-                        ? "text-[#e04c8a] font-bold bg-[#e04c8a]/[0.05] border-[#2a2535]"
-                        : "text-[#8b839e] font-medium border-[#2a2535]"
+                        ? "text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-500/[0.03] dark:bg-indigo-500/[0.06] border-indigo-200 dark:border-indigo-500/20"
+                        : "text-slate-400 dark:text-zinc-500 font-medium border-slate-200 dark:border-white/[0.06]"
                     }`}
                   >
                     {p.name}
@@ -195,9 +218,9 @@ export default function ComparePage() {
             <tbody>
               {Object.entries(featureLabels).map(([key, { label, description }]) => (
                 <tr key={key} className="group">
-                  <td className="py-3.5 pr-4 pl-2 border-b border-[#2a2535] sticky left-0 bg-[#1c1826]">
-                    <div className="text-[13px] font-medium text-[#cbc5d9]">{label}</div>
-                    <div className="text-[11px] text-[#8b839e] mt-0.5">{description}</div>
+                  <td className="py-3.5 pr-4 pl-2 border-b border-slate-100 dark:border-white/[0.03] sticky left-0 bg-white dark:bg-[#09090b]">
+                    <div className="text-[13px] font-medium text-slate-700 dark:text-zinc-300">{label}</div>
+                    <div className="text-[11px] text-slate-400 dark:text-zinc-600 mt-0.5">{description}</div>
                   </td>
                   {platforms.map((p) => {
                     const feat = p.features[key as keyof typeof p.features];
@@ -206,8 +229,8 @@ export default function ComparePage() {
                         key={p.name}
                         className={`py-3.5 px-3 border-b text-[13px] leading-relaxed ${
                           p.highlight
-                            ? "bg-[#e04c8a]/[0.05] border-[#2a2535]"
-                            : "border-[#2a2535]"
+                            ? "bg-indigo-500/[0.03] dark:bg-indigo-500/[0.06] border-indigo-100 dark:border-indigo-500/10"
+                            : "border-slate-100 dark:border-white/[0.03]"
                         } ${scoreColor(feat.score)}`}
                       >
                         <span className="mr-1.5">{scoreIcon(feat.score)}</span>
@@ -222,10 +245,10 @@ export default function ComparePage() {
         </div>
 
         {/* Legend */}
-        <div className="max-w-6xl mx-auto mt-4 flex items-center gap-6 text-[11px] text-[#8b839e]">
-          <span><span className="text-[#34d399]">●</span> Best in class</span>
+        <div className="max-w-6xl mx-auto mt-4 flex items-center gap-6 text-[11px] text-slate-400 dark:text-zinc-600">
+          <span><span className="text-emerald-500">●</span> Best in class</span>
           <span><span className="text-blue-500">◐</span> Strong</span>
-          <span><span className="text-[#fbbf24]">○</span> Partial</span>
+          <span><span className="text-amber-500">○</span> Partial</span>
           <span>— Not available</span>
         </div>
       </section>
@@ -236,74 +259,74 @@ export default function ComparePage() {
 
           {/* Why incentives matter */}
           <div className="glass-card px-6 md:px-8 py-8">
-            <h2 className="text-xl font-bold text-[#e8e4f0] mb-3">Why incentive alignment matters</h2>
-            <p className="text-[14px] text-[#cbc5d9] leading-relaxed mb-4">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-zinc-100 mb-3">Why incentive alignment matters</h2>
+            <p className="text-[14px] text-slate-600 dark:text-zinc-400 leading-relaxed mb-4">
               The biggest problem in reviews isn&apos;t fake reviews — it&apos;s misaligned incentives. When influencers are paid per post, they write what brands want. When nobody is paid at all, only the furious bother to write. The honest middle — detailed, balanced ownership experiences — is missing.
             </p>
             <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-[#f87171]/5 rounded-xl px-5 py-4 border border-[#f87171]/10">
-                <div className="text-sm font-semibold text-[#f87171] mb-2">Misaligned incentive</div>
-                <p className="text-[13px] text-[#8b839e]">Paid to be positive. No cons listed. Marketing language. Sounds like an ad — because it is one.</p>
+              <div className="bg-red-500/5 dark:bg-red-500/10 rounded-xl px-5 py-4 border border-red-500/10">
+                <div className="text-sm font-semibold text-red-600 dark:text-red-400 mb-2">Misaligned incentive</div>
+                <p className="text-[13px] text-slate-500 dark:text-zinc-500">Paid to be positive. No cons listed. Marketing language. Sounds like an ad — because it is one.</p>
               </div>
-              <div className="bg-[#34d399]/5 rounded-xl px-5 py-4 border border-[#34d399]/10">
-                <div className="text-sm font-semibold text-[#34d399] mb-2">Review Jam incentive</div>
-                <p className="text-[13px] text-[#8b839e]">Paid to be thorough. Health Score rewards depth, balance, and verification. Bias gets penalized, not rewarded.</p>
+              <div className="bg-emerald-500/5 dark:bg-emerald-500/10 rounded-xl px-5 py-4 border border-emerald-500/10">
+                <div className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 mb-2">Review Jam incentive</div>
+                <p className="text-[13px] text-slate-500 dark:text-zinc-500">Paid to be thorough. Health Score rewards depth, balance, and verification. Bias gets penalized, not rewarded.</p>
               </div>
             </div>
           </div>
 
           {/* Cold start */}
           <div className="glass-card px-6 md:px-8 py-8">
-            <h2 className="text-xl font-bold text-[#e8e4f0] mb-3">The cold start problem</h2>
-            <p className="text-[14px] text-[#cbc5d9] leading-relaxed mb-4">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-zinc-100 mb-3">The cold start problem</h2>
+            <p className="text-[14px] text-slate-600 dark:text-zinc-400 leading-relaxed mb-4">
               New products face a death spiral: no reviews leads to no trust leads to no purchases leads to no reviews. Every platform struggles with this. Here&apos;s how each one tries to solve it — and why most solutions make the trust problem worse.
             </p>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <span className="text-[13px] font-semibold text-[#e04c8a] min-w-[100px] shrink-0">Review Jam</span>
-                <span className="text-[13px] text-[#cbc5d9]">Brands fund bounty pools. Trusted reviewers write genuine, detailed reviews with pros AND cons. The funding is decoupled from sentiment — you can&apos;t buy stars.</span>
+                <span className="text-[13px] font-semibold text-indigo-600 dark:text-indigo-400 min-w-[100px] shrink-0">Review Jam</span>
+                <span className="text-[13px] text-slate-600 dark:text-zinc-400">Brands fund bounty pools. Trusted reviewers write genuine, detailed reviews with pros AND cons. The funding is decoupled from sentiment — you can&apos;t buy stars.</span>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-[13px] font-medium text-[#8b839e] min-w-[100px] shrink-0">Amazon Vine</span>
-                <span className="text-[13px] text-[#8b839e]">Free products sent to Vine reviewers. Creates obligation bias — hard to write negative reviews about gifts.</span>
+                <span className="text-[13px] font-medium text-slate-500 dark:text-zinc-500 min-w-[100px] shrink-0">Amazon Vine</span>
+                <span className="text-[13px] text-slate-500 dark:text-zinc-500">Free products sent to Vine reviewers. Creates obligation bias — hard to write negative reviews about gifts.</span>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-[13px] font-medium text-[#8b839e] min-w-[100px] shrink-0">Trustpilot</span>
-                <span className="text-[13px] text-[#8b839e]">Email solicitation after purchase. Relies on existing customers, so new products with few sales get few invites.</span>
+                <span className="text-[13px] font-medium text-slate-500 dark:text-zinc-500 min-w-[100px] shrink-0">Trustpilot</span>
+                <span className="text-[13px] text-slate-500 dark:text-zinc-500">Email solicitation after purchase. Relies on existing customers, so new products with few sales get few invites.</span>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-[13px] font-medium text-[#8b839e] min-w-[100px] shrink-0">Influencers</span>
-                <span className="text-[13px] text-[#8b839e]">Paid placements generate content, but audiences know it&apos;s sponsored. Trust is low from the start.</span>
+                <span className="text-[13px] font-medium text-slate-500 dark:text-zinc-500 min-w-[100px] shrink-0">Influencers</span>
+                <span className="text-[13px] text-slate-500 dark:text-zinc-500">Paid placements generate content, but audiences know it&apos;s sponsored. Trust is low from the start.</span>
               </div>
             </div>
           </div>
 
           {/* Health Score deep dive */}
           <div className="glass-card px-6 md:px-8 py-8">
-            <h2 className="text-xl font-bold text-[#e8e4f0] mb-3">Quality scoring: stars vs Health Score</h2>
-            <p className="text-[14px] text-[#cbc5d9] leading-relaxed mb-4">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-zinc-100 mb-3">Quality scoring: stars vs Health Score</h2>
+            <p className="text-[14px] text-slate-600 dark:text-zinc-400 leading-relaxed mb-4">
               Star ratings tell you sentiment. Health Score tells you substance. A 3-star review with detailed pros, cons, photos, and 6-month ownership updates is infinitely more useful than a 5-star &quot;Great product!&quot; — and our scoring reflects that.
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="text-center px-3 py-4 rounded-xl bg-[#e04c8a]/5 border border-[#e04c8a]/12">
-                <div className="text-2xl font-extrabold text-[#e04c8a]">40</div>
-                <div className="text-[11px] text-[#8b839e] mt-1 font-medium">Quality</div>
-                <div className="text-[10px] text-[#8b839e] mt-0.5">Content depth, pros/cons, media</div>
+              <div className="text-center px-3 py-4 rounded-xl bg-indigo-500/5 dark:bg-indigo-500/10 border border-indigo-500/10">
+                <div className="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400">40</div>
+                <div className="text-[11px] text-slate-500 dark:text-zinc-500 mt-1 font-medium">Quality</div>
+                <div className="text-[10px] text-slate-400 dark:text-zinc-600 mt-0.5">Content depth, pros/cons, media</div>
               </div>
-              <div className="text-center px-3 py-4 rounded-xl bg-purple-500/5 border border-purple-500/10">
-                <div className="text-2xl font-extrabold text-purple-600">25</div>
-                <div className="text-[11px] text-[#8b839e] mt-1 font-medium">Engagement</div>
-                <div className="text-[10px] text-[#8b839e] mt-0.5">Likes, helpful votes, comments</div>
+              <div className="text-center px-3 py-4 rounded-xl bg-purple-500/5 dark:bg-purple-500/10 border border-purple-500/10">
+                <div className="text-2xl font-extrabold text-purple-600 dark:text-purple-400">25</div>
+                <div className="text-[11px] text-slate-500 dark:text-zinc-500 mt-1 font-medium">Engagement</div>
+                <div className="text-[10px] text-slate-400 dark:text-zinc-600 mt-0.5">Likes, helpful votes, comments</div>
               </div>
-              <div className="text-center px-3 py-4 rounded-xl bg-[#34d399]/5 border border-[#34d399]/10">
-                <div className="text-2xl font-extrabold text-[#34d399]">20</div>
-                <div className="text-[11px] text-[#8b839e] mt-1 font-medium">Credibility</div>
-                <div className="text-[10px] text-[#8b839e] mt-0.5">Badges, verified purchase, history</div>
+              <div className="text-center px-3 py-4 rounded-xl bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/10">
+                <div className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">20</div>
+                <div className="text-[11px] text-slate-500 dark:text-zinc-500 mt-1 font-medium">Credibility</div>
+                <div className="text-[10px] text-slate-400 dark:text-zinc-600 mt-0.5">Badges, verified purchase, history</div>
               </div>
-              <div className="text-center px-3 py-4 rounded-xl bg-[#fbbf24]/5 border border-[#fbbf24]/10">
-                <div className="text-2xl font-extrabold text-[#fbbf24]">15</div>
-                <div className="text-[11px] text-[#8b839e] mt-1 font-medium">Freshness</div>
-                <div className="text-[10px] text-[#8b839e] mt-0.5">Recency, version updates</div>
+              <div className="text-center px-3 py-4 rounded-xl bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/10">
+                <div className="text-2xl font-extrabold text-amber-600 dark:text-amber-400">15</div>
+                <div className="text-[11px] text-slate-500 dark:text-zinc-500 mt-1 font-medium">Freshness</div>
+                <div className="text-[10px] text-slate-400 dark:text-zinc-600 mt-0.5">Recency, version updates</div>
               </div>
             </div>
           </div>
@@ -312,34 +335,35 @@ export default function ComparePage() {
       </section>
 
       {/* CTA */}
-      <section className="px-4 md:px-8 py-16 md:py-20 border-t border-[#2a2535] text-center">
-        <h2 className="text-2xl md:text-3xl font-extrabold text-[#e8e4f0] tracking-tight mb-4">
+      <section className="px-4 md:px-8 py-16 md:py-20 border-t border-slate-100 dark:border-white/[0.04] text-center">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-zinc-50 tracking-tight mb-4">
           Ready to experience the difference?
         </h2>
-        <p className="text-base text-[#8b839e] mb-8 max-w-lg mx-auto">
+        <p className="text-base text-slate-500 dark:text-zinc-400 mb-8 max-w-lg mx-auto">
           Join the review platform where honesty is rewarded, quality is transparent, and trust is built in.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link href="/feed?compose=true" className="btn-brand px-8 py-3.5 rounded-xl text-sm font-semibold">
             Start reviewing
           </Link>
-          <Link href="/brands" className="px-8 py-3.5 rounded-xl text-sm font-semibold border border-[#2a2535] text-[#cbc5d9] hover:bg-[#231e2e] transition">
+          <Link href="/brands" className="px-8 py-3.5 rounded-xl text-sm font-semibold border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition">
             I&apos;m a brand
           </Link>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="px-4 md:px-8 py-8 border-t border-[#2a2535]">
+      <footer className="px-4 md:px-8 py-8 border-t border-slate-200 dark:border-white/[0.06]">
         <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center">
-            <Image src="/logo-dark.svg" alt="Review Jam" width={90} height={22} className="opacity-50 hover:opacity-80 transition" />
+            <Image src="/logo.svg" alt="Review Jam" width={90} height={22} className="dark:hidden opacity-50 hover:opacity-80 transition" />
+            <Image src="/logo-dark.svg" alt="Review Jam" width={90} height={22} className="hidden dark:block opacity-50 hover:opacity-80 transition" />
           </Link>
-          <div className="flex items-center gap-6 text-[13px] text-[#8b839e]">
-            <Link href="/feed" className="hover:text-[#cbc5d9] transition">Feed</Link>
-            <Link href="/explore" className="hover:text-[#cbc5d9] transition">Products</Link>
-            <Link href="/c" className="hover:text-[#cbc5d9] transition">Communities</Link>
-            <Link href="/brands" className="hover:text-[#cbc5d9] transition">For Brands</Link>
+          <div className="flex items-center gap-6 text-[13px] text-slate-400 dark:text-zinc-600">
+            <Link href="/feed" className="hover:text-slate-600 dark:hover:text-zinc-400 transition">Feed</Link>
+            <Link href="/explore" className="hover:text-slate-600 dark:hover:text-zinc-400 transition">Products</Link>
+            <Link href="/c" className="hover:text-slate-600 dark:hover:text-zinc-400 transition">Communities</Link>
+            <Link href="/brands" className="hover:text-slate-600 dark:hover:text-zinc-400 transition">For Brands</Link>
           </div>
         </div>
       </footer>

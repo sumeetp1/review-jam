@@ -167,7 +167,7 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#13111a] text-sm text-[#8b839e]">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#09090b] text-sm text-slate-500 dark:text-zinc-500">
         Loading…
       </div>
     );
@@ -175,9 +175,9 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#13111a] p-8 gap-3">
-        <h2 className="text-base font-semibold text-[#e8e4f0]">Sign in to view your profile</h2>
-        <Link href="/" className="text-sm text-[#8b839e] hover:underline">← Home</Link>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-[#09090b] p-8 gap-3">
+        <h2 className="text-base font-semibold text-slate-900 dark:text-zinc-100">Sign in to view your profile</h2>
+        <Link href="/" className="text-sm text-slate-500 dark:text-zinc-400 hover:underline">← Home</Link>
       </div>
     );
   }
@@ -197,17 +197,18 @@ export default function ProfilePage() {
   ] as const;
 
   return (
-    <main className="min-h-screen bg-[#13111a] text-[#e8e4f0]">
+    <main className="min-h-screen bg-white dark:bg-[#09090b] text-slate-800 dark:text-zinc-200">
       {/* Nav */}
-      <nav className="sticky top-0 z-40 bg-[#13111a]/95 backdrop-blur-md border-b border-[#2a2535]">
+      <nav className="sticky top-0 z-40 bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/[0.06]">
         <div className="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
           <Link href="/" className="shrink-0 md:hidden">
-            <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} />
+            <Image src="/logo.svg" alt="Review Jam" width={110} height={26} className="dark:hidden" />
+            <Image src="/logo-dark.svg" alt="Review Jam" width={110} height={26} className="hidden dark:block" />
           </Link>
           <button
             type="button"
             onClick={handleLogout}
-            className="text-xs font-medium text-[#8b839e] hover:text-[#fca5a5] px-2 py-1 rounded-md hover:bg-[#231e2e]"
+            className="text-xs font-medium text-slate-500 dark:text-zinc-400 hover:text-red-400 px-2 py-1 rounded-md hover:bg-slate-50 dark:hover:bg-white/[0.03]"
           >
             Sign out
           </button>
@@ -216,11 +217,11 @@ export default function ProfilePage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         {/* Identity card */}
-        <div className="bg-[#1c1826] p-5 rounded-xl border border-[#2a2535] flex items-center gap-4">
+        <div className="bg-white dark:bg-white/[0.03] p-5 rounded-xl border border-slate-200 dark:border-white/[0.06] flex items-center gap-4">
           <Avatar name={user.displayName} src={user.photoURL} size="lg" />
           <div className="min-w-0 flex-1">
-            <h2 className="text-base font-semibold text-[#e8e4f0] truncate">{user.displayName}</h2>
-            <p className="text-sm text-[#8b839e] truncate">{user.email}</p>
+            <h2 className="text-base font-semibold text-slate-900 dark:text-zinc-100 truncate">{user.displayName}</h2>
+            <p className="text-sm text-slate-500 dark:text-zinc-500 truncate">{user.email}</p>
             {/* Trust Tier badge */}
             {(() => {
               const { bg, text, emoji } = getTierStyle(trustScore);
@@ -238,14 +239,14 @@ export default function ProfilePage() {
                 {badges.map((bid) => {
                   const b = getBadgeById(bid);
                   return b ? (
-                    <span key={bid} title={b.description} className="inline-flex items-center gap-0.5 text-[11px] bg-[#1c1826] text-[#8b839e] px-2 py-0.5 rounded-md font-medium">
+                    <span key={bid} title={b.description} className="inline-flex items-center gap-0.5 text-[11px] bg-slate-100 dark:bg-white/[0.05] text-slate-500 dark:text-zinc-400 px-2 py-0.5 rounded-md font-medium">
                       {b.emoji} {b.label}
                     </span>
                   ) : null;
                 })}
               </div>
             )}
-            <Link href={`/reviewer/${user.uid}`} className="text-[11px] font-medium text-[#e04c8a] hover:underline mt-1.5 inline-block">
+            <Link href={`/reviewer/${user.uid}`} className="text-[11px] font-medium text-indigo-600 dark:text-indigo-400 hover:underline mt-1.5 inline-block">
               View public profile &rarr;
             </Link>
           </div>
@@ -259,30 +260,30 @@ export default function ProfilePage() {
             { label: "Total earned", value: `$${totalEarned.toFixed(2)}` },
             { label: "Trust score", value: trustScore, sub: getTierLabel(trustScore) },
           ].map((s) => (
-            <div key={s.label} className="bg-[#1c1826] rounded-xl border border-[#2a2535] p-4 text-center">
-              <p className="text-xl font-semibold text-[#e8e4f0] tabular-nums">{s.value}</p>
-              <p className="text-[11px] text-[#8b839e] mt-0.5 uppercase tracking-wide">{s.label}</p>
+            <div key={s.label} className="bg-white dark:bg-white/[0.03] rounded-xl border border-slate-200 dark:border-white/[0.06] p-4 text-center">
+              <p className="text-xl font-semibold text-slate-900 dark:text-zinc-100 tabular-nums">{s.value}</p>
+              <p className="text-[11px] text-slate-500 dark:text-zinc-500 mt-0.5 uppercase tracking-wide">{s.label}</p>
               {"sub" in s && s.sub && (
-                <p className="text-[10px] text-[#e04c8a] font-medium mt-0.5">{s.sub}</p>
+                <p className="text-[10px] text-indigo-600 dark:text-indigo-400 font-medium mt-0.5">{s.sub}</p>
               )}
             </div>
           ))}
         </div>
 
         {/* Wallet */}
-        <div className="bg-[#1c1826] p-4 rounded-xl border border-[#2a2535] flex items-center justify-between">
+        <div className="bg-white dark:bg-white/[0.03] p-4 rounded-xl border border-slate-200 dark:border-white/[0.06] flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-[#8b839e] uppercase tracking-wide mb-0.5">Available balance</p>
-            <p className="text-2xl font-semibold tabular-nums text-[#e8e4f0]">${walletBalance.toFixed(2)}</p>
+            <p className="text-xs font-medium text-slate-500 dark:text-zinc-500 uppercase tracking-wide mb-0.5">Available balance</p>
+            <p className="text-2xl font-semibold tabular-nums text-slate-900 dark:text-zinc-100">${walletBalance.toFixed(2)}</p>
           </div>
-          <span className="text-xs text-[#8b839e] max-w-[140px] text-right leading-relaxed">
+          <span className="text-xs text-slate-400 dark:text-zinc-600 max-w-[140px] text-right leading-relaxed">
             Credited based on engagement
           </span>
         </div>
 
         {/* Tabs */}
-        <div className="bg-[#1c1826] rounded-xl border border-[#2a2535] overflow-hidden">
-          <div className="flex border-b border-[#2a2535] overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="bg-white dark:bg-white/[0.03] rounded-xl border border-slate-200 dark:border-white/[0.06] overflow-hidden">
+          <div className="flex border-b border-slate-200 dark:border-white/[0.06] overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
@@ -290,8 +291,8 @@ export default function ProfilePage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px ${
                   activeTab === tab.id
-                    ? "border-[#e04c8a] text-[#e8e4f0]"
-                    : "border-transparent text-[#8b839e] hover:text-[#cbc5d9]"
+                    ? "border-indigo-500 text-slate-900 dark:text-zinc-100"
+                    : "border-transparent text-slate-500 dark:text-zinc-500 hover:text-slate-700 dark:hover:text-zinc-300"
                 }`}
               >
                 {tab.label}
@@ -303,7 +304,7 @@ export default function ProfilePage() {
             {/* ── Overview ── */}
             {activeTab === "overview" && (
               <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-[#e8e4f0]">Badges</h3>
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-zinc-100">Badges</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {ALL_BADGES.map((b) => {
                     const earned = badges.includes(b.id);
@@ -312,34 +313,34 @@ export default function ProfilePage() {
                         key={b.id}
                         className={`p-3 rounded-lg border text-left transition-colors ${
                           earned
-                            ? "bg-[#1c1826] border-[#2a2535]"
-                            : "opacity-35 border-[#2a2535]"
+                            ? "bg-slate-50 dark:bg-white/[0.05] border-slate-200 dark:border-white/[0.08]"
+                            : "opacity-35 border-slate-100 dark:border-white/[0.04]"
                         }`}
                       >
                         <span className="text-xl block mb-1">{b.emoji}</span>
-                        <p className="text-[12px] font-medium text-[#e8e4f0] leading-tight">{b.label}</p>
-                        <p className="text-[11px] text-[#8b839e] leading-snug mt-0.5">{b.description}</p>
+                        <p className="text-[12px] font-medium text-slate-800 dark:text-zinc-200 leading-tight">{b.label}</p>
+                        <p className="text-[11px] text-slate-500 dark:text-zinc-500 leading-snug mt-0.5">{b.description}</p>
                       </div>
                     );
                   })}
                 </div>
-                <div className="pt-4 border-t border-[#2a2535]">
-                  <h3 className="text-sm font-semibold text-[#e8e4f0] mb-2">Bio</h3>
+                <div className="pt-4 border-t border-slate-200 dark:border-white/[0.06]">
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-zinc-100 mb-2">Bio</h3>
                   <textarea
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
                     placeholder="Write a short bio about yourself..."
                     maxLength={280}
                     rows={3}
-                    className="w-full text-sm bg-[#1c1826] border border-[#2a2535] rounded-lg p-3 text-[#e8e4f0] placeholder:text-[#4a4458] focus:outline-none focus:ring-1 focus:ring-[#e04c8a] resize-none"
+                    className="w-full text-sm bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-lg p-3 text-slate-800 dark:text-zinc-200 placeholder:text-slate-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none"
                   />
                   <div className="flex items-center justify-between mt-2">
-                    <span className="text-[11px] text-[#8b839e]">{bio.length}/280</span>
+                    <span className="text-[11px] text-slate-400 dark:text-zinc-600">{bio.length}/280</span>
                     <button
                       type="button"
                       onClick={handleSaveBio}
                       disabled={isSavingBio}
-                      className="text-xs font-medium bg-[#e04c8a] text-white px-3 py-1.5 rounded-lg hover:bg-[#e04c8a] transition disabled:opacity-50"
+                      className="text-xs font-medium bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-500 transition disabled:opacity-50"
                     >
                       {isSavingBio ? "Saving\u2026" : "Save bio"}
                     </button>
@@ -352,33 +353,33 @@ export default function ProfilePage() {
             {activeTab === "reviews" && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-[#cbc5d9]">Your reviews</p>
+                  <p className="text-sm font-medium text-slate-700 dark:text-zinc-300">Your reviews</p>
                   <button
                     type="button"
                     onClick={() => setShowImportModal(true)}
-                    className="text-[12px] font-medium text-[#e04c8a] px-3 py-1.5 rounded-lg border border-[#e04c8a]/20 hover:bg-[#e04c8a]/12 transition"
+                    className="text-[12px] font-medium text-indigo-600 dark:text-indigo-400 px-3 py-1.5 rounded-lg border border-indigo-500/20 hover:bg-indigo-500/10 transition"
                   >
                     Import Reviews
                   </button>
                 </div>
                 {myReviews.length === 0 ? (
-                  <p className="text-sm text-[#8b839e]">No reviews yet.</p>
+                  <p className="text-sm text-slate-500 dark:text-zinc-500">No reviews yet.</p>
                 ) : (
                   myReviews.map((r) => (
-                    <div key={r.id} className="border border-[#2a2535] rounded-lg p-3">
+                    <div key={r.id} className="border border-slate-200 dark:border-white/[0.06] rounded-lg p-3">
                       <div className="flex items-start justify-between gap-2">
-                        <p className="text-sm font-medium text-[#e8e4f0]">{r.productName}</p>
-                        <span className="text-[11px] text-[#fbbf24] shrink-0">★ {r.rating}</span>
+                        <p className="text-sm font-medium text-slate-900 dark:text-zinc-100">{r.productName}</p>
+                        <span className="text-[11px] text-amber-500 dark:text-amber-400 shrink-0">★ {r.rating}</span>
                       </div>
                       {(r.summary || r.marketingQuote) && (
-                        <p className="text-[13px] text-[#8b839e] mt-0.5 leading-snug">
+                        <p className="text-[13px] text-slate-500 dark:text-zinc-400 mt-0.5 leading-snug">
                           "{r.summary || r.marketingQuote}"
                         </p>
                       )}
-                      <div className="flex items-center gap-3 mt-1.5 text-[11px] text-[#8b839e] flex-wrap">
+                      <div className="flex items-center gap-3 mt-1.5 text-[11px] text-slate-500 dark:text-zinc-500 flex-wrap">
                         <span>👍 {r.likesCount || 0}</span>
                         {r.healthScore != null && (
-                          <span className={`font-medium ${r.healthScore >= 70 ? "text-[#34d399]" : r.healthScore >= 40 ? "text-[#fbbf24]" : "text-[#fca5a5]"}`}>
+                          <span className={`font-medium ${r.healthScore >= 70 ? "text-emerald-600 dark:text-emerald-400" : r.healthScore >= 40 ? "text-amber-500 dark:text-amber-400" : "text-red-400"}`}>
                             Score: {r.healthScore}
                           </span>
                         )}
@@ -389,7 +390,7 @@ export default function ProfilePage() {
                         <button
                           type="button"
                           onClick={() => setUpdatingReview(r)}
-                          className="ml-auto text-[11px] font-medium text-[#cbc5d9] px-2 py-0.5 border border-[#2a2535] rounded hover:bg-[#231e2e] transition"
+                          className="ml-auto text-[11px] font-medium text-slate-700 dark:text-zinc-300 px-2 py-0.5 border border-slate-200 dark:border-white/[0.06] rounded hover:bg-slate-50 dark:hover:bg-white/[0.05] transition"
                         >
                           Post Update
                         </button>
@@ -434,13 +435,13 @@ export default function ProfilePage() {
             {activeTab === "earnings" && (
               <div className="space-y-3">
                 {ledger.length === 0 ? (
-                  <p className="text-sm text-[#8b839e]">No payouts yet. Earn by getting likes on your verified reviews.</p>
+                  <p className="text-sm text-slate-500 dark:text-zinc-500">No payouts yet. Earn by getting likes on your verified reviews.</p>
                 ) : (
                   <>
                     <div className="overflow-x-auto -mx-1">
                       <table className="w-full text-[13px]">
                         <thead>
-                          <tr className="text-left text-[11px] text-[#8b839e] uppercase tracking-wide">
+                          <tr className="text-left text-[11px] text-slate-500 dark:text-zinc-500 uppercase tracking-wide">
                             <th className="pb-2 pr-4 font-medium">Product</th>
                             <th className="pb-2 pr-4 font-medium">Likes</th>
                             <th className="pb-2 pr-4 font-medium">Photo</th>
@@ -448,14 +449,14 @@ export default function ProfilePage() {
                             <th className="pb-2 font-medium">Date</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#2a2535]">
+                        <tbody className="divide-y divide-slate-100 dark:divide-white/[0.06]">
                           {ledger.map((e) => (
                             <tr key={e.id}>
-                              <td className="py-2 pr-4 font-medium text-[#e8e4f0] max-w-[140px] truncate">{e.productName || e.campaignId}</td>
-                              <td className="py-2 pr-4 text-[#8b839e] tabular-nums">{e.rawLikes}</td>
-                              <td className="py-2 pr-4 text-[#8b839e]">{e.hasPhoto ? "1.5×" : "—"}</td>
-                              <td className="py-2 pr-4 text-[#34d399] font-semibold tabular-nums">${e.amount.toFixed(2)}</td>
-                              <td className="py-2 text-[#8b839e] tabular-nums whitespace-nowrap">
+                              <td className="py-2 pr-4 font-medium text-slate-800 dark:text-zinc-200 max-w-[140px] truncate">{e.productName || e.campaignId}</td>
+                              <td className="py-2 pr-4 text-slate-500 dark:text-zinc-400 tabular-nums">{e.rawLikes}</td>
+                              <td className="py-2 pr-4 text-slate-500 dark:text-zinc-400">{e.hasPhoto ? "1.5×" : "—"}</td>
+                              <td className="py-2 pr-4 text-emerald-600 dark:text-emerald-400 font-semibold tabular-nums">${e.amount.toFixed(2)}</td>
+                              <td className="py-2 text-slate-500 dark:text-zinc-500 tabular-nums whitespace-nowrap">
                                 {new Date(e.paidAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
                               </td>
                             </tr>
@@ -463,7 +464,7 @@ export default function ProfilePage() {
                         </tbody>
                       </table>
                     </div>
-                    <p className="text-[11px] text-[#8b839e]">
+                    <p className="text-[11px] text-slate-400 dark:text-zinc-600">
                       Photo reviews earn 1.5× their likes weight in payout calculations.
                     </p>
                   </>
@@ -476,21 +477,21 @@ export default function ProfilePage() {
             {activeTab === "invites" && (
               <div className="space-y-3">
                 {anchorInvites.length === 0 ? (
-                  <p className="text-sm text-[#8b839e] text-center py-8">No anchor review invites yet.</p>
+                  <p className="text-sm text-slate-500 dark:text-zinc-500 text-center py-8">No anchor review invites yet.</p>
                 ) : (
                   anchorInvites.map((inv) => (
                     <div key={inv.id} className={`p-4 rounded-xl border transition ${
                       inv.status === "completed" ? "border-emerald-800 bg-emerald-950/20" :
-                      inv.status === "declined" ? "border-[#2a2535] opacity-60" :
-                      "border-[#2a2535] bg-[#1c1826]"
+                      inv.status === "declined" ? "border-slate-200 dark:border-white/[0.06] opacity-60" :
+                      "border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.03]"
                     }`}>
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-[#e8e4f0]">{inv.productName}</p>
-                          <p className="text-[12px] text-[#8b839e] mt-0.5">
+                          <p className="text-sm font-semibold text-slate-900 dark:text-zinc-100">{inv.productName}</p>
+                          <p className="text-[12px] text-slate-500 dark:text-zinc-400 mt-0.5">
                             {inv.category} · {inv.minUsageDays}-day minimum usage · ${inv.anchorPayoutAmount} payout
                           </p>
-                          <p className="text-[11px] text-[#8b839e] mt-1">
+                          <p className="text-[11px] text-slate-500 dark:text-zinc-500 mt-1">
                             Invited {inv.invitedAt ? new Date(inv.invitedAt).toLocaleDateString() : ""}
                             {inv.acceptedAt && <span> · Accepted {new Date(inv.acceptedAt).toLocaleDateString()}</span>}
                           </p>
@@ -499,28 +500,28 @@ export default function ProfilePage() {
                           {inv.status === "invited" && (
                             <>
                               <button type="button" onClick={() => handleAcceptInvite(inv.id)} disabled={updatingInviteId === inv.id}
-                                className="text-[12px] font-semibold bg-[#34d399] text-white px-3 py-1.5 rounded-lg hover:bg-[#34d399] disabled:opacity-50 transition">
+                                className="text-[12px] font-semibold bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-500 disabled:opacity-50 transition">
                                 Accept
                               </button>
                               <button type="button" onClick={() => handleDeclineInvite(inv.id)} disabled={updatingInviteId === inv.id}
-                                className="text-[12px] font-medium text-[#8b839e] px-3 py-1.5 rounded-lg border border-[#2a2535] hover:bg-[#231e2e] disabled:opacity-50 transition">
+                                className="text-[12px] font-medium text-slate-500 dark:text-zinc-400 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/[0.06] hover:bg-slate-50 dark:hover:bg-white/[0.05] disabled:opacity-50 transition">
                                 Decline
                               </button>
                             </>
                           )}
                           {inv.status === "accepted" && inv.productSlug && inv.communitySlug && (
                             <Link href={`/c/${inv.communitySlug}/${inv.productSlug}`}
-                              className="text-[12px] font-semibold bg-[#e04c8a] text-white px-3 py-1.5 rounded-lg hover:bg-[#e04c8a] transition">
+                              className="text-[12px] font-semibold bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-500 transition">
                               Write Review
                             </Link>
                           )}
                           {inv.status === "completed" && (
-                            <span className="text-[11px] font-bold text-[#34d399] bg-emerald-950/40 px-2 py-1 rounded-full">
+                            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-950/40 px-2 py-1 rounded-full">
                               Completed · ${inv.anchorPayoutAmount}
                             </span>
                           )}
                           {inv.status === "declined" && (
-                            <span className="text-[11px] text-[#8b839e]">Declined</span>
+                            <span className="text-[11px] text-slate-400 dark:text-zinc-600">Declined</span>
                           )}
                         </div>
                       </div>
@@ -541,7 +542,7 @@ export default function ProfilePage() {
 
             {activeTab === "interests" && (
               <div className="space-y-4">
-                <p className="text-sm text-[#8b839e]">Used to personalize your default feed.</p>
+                <p className="text-sm text-slate-500 dark:text-zinc-500">Used to personalize your default feed.</p>
                 <div className="flex flex-wrap gap-2">
                   {availableCategories.map((cat) => (
                     <button
@@ -554,8 +555,8 @@ export default function ProfilePage() {
                       }
                       className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
                         interests.includes(cat)
-                          ? "bg-[#e04c8a] text-white border-[#e04c8a]"
-                          : "bg-[#1c1826] text-[#8b839e] border-[#2a2535] hover:border-[#2a2535]"
+                          ? "bg-indigo-600 text-white border-indigo-600"
+                          : "bg-white dark:bg-white/[0.03] text-slate-500 dark:text-zinc-400 border-slate-200 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/[0.12]"
                       }`}
                     >
                       {cat}
@@ -567,12 +568,12 @@ export default function ProfilePage() {
                     type="button"
                     onClick={handleSaveInterests}
                     disabled={isSaving}
-                    className="bg-[#e04c8a] text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-[#e04c8a] transition disabled:opacity-50"
+                    className="bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-indigo-500 transition disabled:opacity-50"
                   >
                     {isSaving ? "Saving…" : "Save"}
                   </button>
                   {saveMessage && (
-                    <span className="text-sm text-[#34d399]">{saveMessage}</span>
+                    <span className="text-sm text-emerald-600 dark:text-emerald-400">{saveMessage}</span>
                   )}
                 </div>
               </div>

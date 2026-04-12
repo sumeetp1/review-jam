@@ -65,12 +65,12 @@ export default function VisitorCounter() {
   }, []);
 
   return (
-    <div className="text-center py-2 px-4 text-xs text-[#8b839e] border-t border-[#2a2535] bg-[#1c1826]">
+    <div className="text-center py-2 px-4 text-xs text-slate-400 dark:text-zinc-600 border-t border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-[#09090b]">
       {count === null ? (
         <span className="opacity-70">Visitors</span>
       ) : (
         <span>
-          <span className="tabular-nums font-medium text-[#cbc5d9]">
+          <span className="tabular-nums font-medium text-slate-600 dark:text-zinc-400">
             {count.toLocaleString()}
           </span>{" "}
           unique visitors

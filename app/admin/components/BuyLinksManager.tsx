@@ -87,53 +87,53 @@ export default function BuyLinksManager() {
   }
 
   return (
-    <div className="bg-[#1c1826] p-6 rounded-3xl border border-[#2a2535] mt-8 shadow-lg">
+    <div className="bg-slate-800 p-6 rounded-3xl border border-slate-700 mt-8 shadow-lg">
       <div className="flex items-center justify-between mb-1">
-        <h2 className="text-xl font-bold text-[#e8e4f0] flex items-center gap-2">🛒 Retailer Buy Links</h2>
+        <h2 className="text-xl font-bold text-white flex items-center gap-2">🛒 Retailer Buy Links</h2>
         {!isLoaded && (
           <button
             type="button"
             onClick={loadProducts}
             disabled={isLoading}
-            className="text-sm font-bold text-[#f472b6] hover:text-[#f9a8d4] transition disabled:opacity-50"
+            className="text-sm font-bold text-indigo-400 hover:text-indigo-300 transition disabled:opacity-50"
           >
             {isLoading ? "Loading..." : "Load Products"}
           </button>
         )}
       </div>
-      <p className="text-[#8b839e] text-sm mb-4">
+      <p className="text-slate-400 text-sm mb-4">
         Manage where-to-buy links for any product. These appear on each product&apos;s hub page.
       </p>
 
       {!isLoaded ? (
-        <p className="text-[#8b839e] text-sm">Click &quot;Load Products&quot; to manage buy links.</p>
+        <p className="text-slate-500 text-sm">Click &quot;Load Products&quot; to manage buy links.</p>
       ) : products.length === 0 ? (
-        <p className="text-[#8b839e] text-sm">No products found.</p>
+        <p className="text-slate-500 text-sm">No products found.</p>
       ) : (
         <div className="space-y-3 max-h-[600px] overflow-y-auto">
           {products.map((product) => (
-            <div key={product.id} className="bg-[#1c1826]/50 rounded-xl border border-[#2a2535]/50 p-4">
+            <div key={product.id} className="bg-slate-700/50 rounded-xl border border-slate-600/50 p-4">
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <p className="text-sm font-semibold text-[#e8e4f0]">{product.name}</p>
-                  <p className="text-[11px] text-[#8b839e]">{product.brandName}</p>
+                  <p className="text-sm font-semibold text-white">{product.name}</p>
+                  <p className="text-[11px] text-slate-400">{product.brandName}</p>
                 </div>
-                <span className="text-[10px] text-[#8b839e] font-mono">{product.buyLinks.length} link{product.buyLinks.length !== 1 ? "s" : ""}</span>
+                <span className="text-[10px] text-slate-500 font-mono">{product.buyLinks.length} link{product.buyLinks.length !== 1 ? "s" : ""}</span>
               </div>
 
               {product.buyLinks.length > 0 && (
                 <div className="space-y-1.5 mb-2">
                   {product.buyLinks.map((link, i) => (
-                    <div key={i} className="flex items-center justify-between bg-[#1c1826] rounded-lg px-3 py-2 border border-[#2a2535]">
+                    <div key={i} className="flex items-center justify-between bg-slate-800 rounded-lg px-3 py-2 border border-slate-700">
                       <div className="min-w-0 flex-1">
-                        <span className="text-[12px] font-semibold text-[#cbc5d9]">{link.retailer}</span>
-                        {link.price && <span className="ml-2 text-[11px] text-[#6ee7b7] font-medium">{link.price}</span>}
-                        <p className="text-[10px] text-[#8b839e] truncate">{link.url}</p>
+                        <span className="text-[12px] font-semibold text-slate-200">{link.retailer}</span>
+                        {link.price && <span className="ml-2 text-[11px] text-emerald-400 font-medium">{link.price}</span>}
+                        <p className="text-[10px] text-slate-500 truncate">{link.url}</p>
                       </div>
                       <button
                         type="button"
                         onClick={() => handleRemoveLink(product.id, i)}
-                        className="ml-2 text-[11px] text-[#f87171] hover:text-[#fca5a5] font-semibold transition shrink-0"
+                        className="ml-2 text-[11px] text-red-400 hover:text-red-300 font-semibold transition shrink-0"
                       >
                         Remove
                       </button>
@@ -150,21 +150,21 @@ export default function BuyLinksManager() {
                       value={newRetailer}
                       onChange={(e) => setNewRetailer(e.target.value)}
                       placeholder="Retailer name"
-                      className="w-full bg-[#1c1826] border border-[#2a2535] rounded-xl p-2.5 text-[#e8e4f0] text-[12px] outline-none focus:border-[#f472b6] transition placeholder:text-[#4a4458]"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white text-[12px] outline-none focus:border-indigo-500 transition placeholder-slate-500"
                     />
                     <input
                       type="url"
                       value={newUrl}
                       onChange={(e) => setNewUrl(e.target.value)}
                       placeholder="https://..."
-                      className="w-full bg-[#1c1826] border border-[#2a2535] rounded-xl p-2.5 text-[#e8e4f0] text-[12px] outline-none focus:border-[#f472b6] transition placeholder:text-[#4a4458]"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white text-[12px] outline-none focus:border-indigo-500 transition placeholder-slate-500"
                     />
                     <input
                       type="text"
                       value={newPrice}
                       onChange={(e) => setNewPrice(e.target.value)}
                       placeholder="$29.99 (optional)"
-                      className="w-full bg-[#1c1826] border border-[#2a2535] rounded-xl p-2.5 text-[#e8e4f0] text-[12px] outline-none focus:border-[#f472b6] transition placeholder:text-[#4a4458]"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white text-[12px] outline-none focus:border-indigo-500 transition placeholder-slate-500"
                     />
                   </div>
                   <div className="flex gap-2">
@@ -172,14 +172,14 @@ export default function BuyLinksManager() {
                       type="button"
                       onClick={() => handleAddLink(product.id)}
                       disabled={isSaving || !newRetailer.trim() || !newUrl.trim()}
-                      className="text-[11px] font-bold px-4 py-2 rounded-xl bg-[#e04c8a] hover:bg-[#d84315] disabled:opacity-50 text-white transition"
+                      className="text-[11px] font-bold px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white transition"
                     >
                       {isSaving ? "Saving..." : "Save Link"}
                     </button>
                     <button
                       type="button"
                       onClick={() => { setFormOpen(null); setNewRetailer(""); setNewUrl(""); setNewPrice(""); }}
-                      className="text-[11px] font-medium px-4 py-2 rounded-xl text-[#8b839e] hover:text-[#e8e4f0] hover:bg-[#231e2e] transition"
+                      className="text-[11px] font-medium px-4 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700 transition"
                     >
                       Cancel
                     </button>
@@ -189,7 +189,7 @@ export default function BuyLinksManager() {
                 <button
                   type="button"
                   onClick={() => { setFormOpen(product.id); setNewRetailer(""); setNewUrl(""); setNewPrice(""); }}
-                  className="text-[11px] font-bold text-[#f472b6] hover:text-[#f9a8d4] transition"
+                  className="text-[11px] font-bold text-indigo-400 hover:text-indigo-300 transition"
                 >
                   + Add Link
                 </button>

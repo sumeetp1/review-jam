@@ -96,13 +96,13 @@ export default function CommentThread({
       <div className="flex gap-2">
         <Avatar name={c.userName} size="xs" />
         <div className="flex-1 min-w-0">
-          <span className="text-[12px] font-medium text-[#cbc5d9] mr-1">{c.userName}</span>
-          <span className="text-[12px] text-[#cbc5d9]">{c.content}</span>
+          <span className="text-[12px] font-medium text-slate-700 dark:text-slate-300 mr-1">{c.userName}</span>
+          <span className="text-[12px] text-slate-600 dark:text-slate-400">{c.content}</span>
           {currentUserId && depth < 2 && (
             <button
               type="button"
               onClick={() => setReplyingTo({ id: c.id, userName: c.userName })}
-              className="ml-2 text-[10px] text-[#8b839e] hover:text-[#cbc5d9]"
+              className="ml-2 text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
             >
               Reply
             </button>
@@ -114,13 +114,13 @@ export default function CommentThread({
   );
 
   return (
-    <div className="mt-2 border-t border-[#2a2535] pt-2">
+    <div className="mt-2 border-t border-slate-100 dark:border-slate-800 pt-2">
       {loading ? (
-        <p className="text-[12px] text-[#8b839e]">Loading comments...</p>
+        <p className="text-[12px] text-slate-400 dark:text-slate-500">Loading comments...</p>
       ) : (
         <div className="space-y-2">
           {comments.length === 0 && (
-            <p className="text-[12px] text-[#8b839e]">No comments yet.</p>
+            <p className="text-[12px] text-slate-400 dark:text-slate-600">No comments yet.</p>
           )}
           {topLevel.map((c) => renderComment(c, 0))}
 
@@ -128,8 +128,8 @@ export default function CommentThread({
             <div className="pt-1">
               {replyingTo && (
                 <div className="flex items-center gap-1 mb-1">
-                  <span className="text-[10px] text-[#8b839e]">Replying to {replyingTo.userName}</span>
-                  <button type="button" onClick={() => setReplyingTo(null)} className="text-[10px] text-[#8b839e] hover:text-[#cbc5d9]">&#x2715;</button>
+                  <span className="text-[10px] text-slate-500">Replying to {replyingTo.userName}</span>
+                  <button type="button" onClick={() => setReplyingTo(null)} className="text-[10px] text-slate-400 hover:text-slate-600">&#x2715;</button>
                 </div>
               )}
               <div className="flex gap-2">
@@ -139,13 +139,13 @@ export default function CommentThread({
                   onChange={(e) => setNewComment(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleSubmitComment(); } }}
                   placeholder={replyingTo ? `Reply to ${replyingTo.userName}...` : "Add a comment..."}
-                  className="flex-1 bg-[#1c1826] border border-[#2a2535] rounded-lg px-3 py-2.5 md:px-2.5 md:py-1.5 text-sm md:text-[12px] focus:outline-none focus:ring-1 focus:ring-[#3a3348] text-[#e8e4f0] placeholder:text-[#4a4458]"
+                  className="flex-1 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 md:px-2.5 md:py-1.5 text-sm md:text-[12px] focus:outline-none focus:ring-1 focus:ring-slate-300 dark:text-slate-100 dark:placeholder-slate-500"
                 />
                 <button
                   type="button"
                   onClick={handleSubmitComment}
                   disabled={!newComment.trim() || submitting}
-                  className="px-3 py-2.5 md:px-2.5 md:py-1.5 bg-[#e04c8a] text-white rounded-lg text-sm md:text-[12px] font-medium disabled:opacity-40 hover:opacity-90 transition"
+                  className="px-3 py-2.5 md:px-2.5 md:py-1.5 bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-900 rounded-lg text-sm md:text-[12px] font-medium disabled:opacity-40 hover:opacity-90 transition"
                 >
                   {submitting ? "..." : "Post"}
                 </button>

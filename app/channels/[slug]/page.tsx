@@ -8,7 +8,7 @@ export default function ChannelSlugRedirect({ params }: { params: Promise<{ slug
   const router = useRouter();
   useEffect(() => { router.replace(`/c/${slug}`); }, [slug, router]);
   return (
-    <div className="min-h-screen bg-[#13111a] flex items-center justify-center text-sm text-[#8b839e]">
+    <div className="min-h-screen bg-white dark:bg-slate-950 flex items-center justify-center text-sm text-slate-400">
       Redirecting…
     </div>
   );

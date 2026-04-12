@@ -82,12 +82,12 @@ export default function CreateChannelModal({ userId, userName, onClose, onCreate
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-[2px]">
-      <div className="bg-[#1c1826] rounded-xl max-w-lg w-full shadow-lg border border-[#2a2535] flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 bg-slate-900/50 dark:bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-[2px]">
+      <div className="bg-white dark:bg-slate-900 rounded-xl max-w-lg w-full shadow-lg border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh]">
         {/* Header */}
-        <div className="flex justify-between items-start px-5 pt-5 pb-4 border-b border-[#2a2535] shrink-0">
-          <h2 className="text-base font-semibold text-[#e8e4f0]">Create a Community</h2>
-          <button type="button" onClick={onClose} className="text-[#8b839e] hover:text-[#cbc5d9] p-1 rounded-md hover:bg-[#231e2e] text-sm">
+        <div className="flex justify-between items-start px-5 pt-5 pb-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
+          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Create a Community</h2>
+          <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-sm">
             ✕
           </button>
         </div>
@@ -95,48 +95,48 @@ export default function CreateChannelModal({ userId, userName, onClose, onCreate
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
           <div>
-            <label className="block text-[12px] font-medium text-[#cbc5d9] mb-1.5">Community name</label>
+            <label className="block text-[12px] font-medium text-slate-700 dark:text-slate-300 mb-1.5">Community name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
               placeholder="e.g. Smartphones"
-              className="w-full bg-[#1c1826] border border-[#2a2535] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#3a3348] text-[#e8e4f0]"
+              className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-slate-100"
             />
           </div>
 
           <div>
-            <label className="block text-[12px] font-medium text-[#cbc5d9] mb-1.5">
-              Slug <span className="text-[#8b839e] font-normal">rj/{slug || "..."}</span>
+            <label className="block text-[12px] font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Slug <span className="text-slate-400 font-normal">rj/{slug || "..."}</span>
             </label>
             <input
               type="text"
               value={slug}
               onChange={(e) => setSlug(slugify(e.target.value))}
-              className="w-full bg-[#1c1826] border border-[#2a2535] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#3a3348] text-[#e8e4f0]"
+              className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-slate-100"
             />
           </div>
 
           <div>
-            <label className="block text-[12px] font-medium text-[#cbc5d9] mb-1.5">Description</label>
+            <label className="block text-[12px] font-medium text-slate-700 dark:text-slate-300 mb-1.5">Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
               placeholder="What is this community about?"
-              className="w-full bg-[#1c1826] border border-[#2a2535] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#3a3348] text-[#e8e4f0] resize-none"
+              className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-slate-100 resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-[12px] font-medium text-[#cbc5d9] mb-1.5">Category</label>
+            <label className="block text-[12px] font-medium text-slate-700 dark:text-slate-300 mb-1.5">Category</label>
             <input
               type="text"
               list="channel-category-suggestions"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               placeholder="e.g. Tech, EV Charging, Street Food..."
-              className="w-full bg-[#1c1826] border border-[#2a2535] rounded-lg px-3 py-2 text-sm outline-none text-[#e8e4f0]"
+              className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none dark:text-slate-100"
             />
             <datalist id="channel-category-suggestions">
               {SUGGESTED_CATEGORIES.map((cat) => (
@@ -146,26 +146,26 @@ export default function CreateChannelModal({ userId, userName, onClose, onCreate
           </div>
 
           <div>
-            <label className="block text-[12px] font-medium text-[#cbc5d9] mb-1.5">Icon emoji (optional)</label>
+            <label className="block text-[12px] font-medium text-slate-700 dark:text-slate-300 mb-1.5">Icon emoji (optional)</label>
             <input
               type="text"
               value={iconEmoji}
               onChange={(e) => setIconEmoji(e.target.value.slice(0, 2))}
               placeholder="📦"
-              className="w-20 bg-[#1c1826] border border-[#2a2535] rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:ring-1 focus:ring-[#3a3348]"
+              className="w-20 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:ring-1 focus:ring-slate-400"
             />
           </div>
 
-          {error && <p className="text-[12px] text-[#f87171]">{error}</p>}
+          {error && <p className="text-[12px] text-red-600 dark:text-red-400">{error}</p>}
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-4 border-t border-[#2a2535] shrink-0">
+        <div className="px-5 py-4 border-t border-slate-100 dark:border-slate-800 shrink-0">
           <button
             type="button"
             onClick={handleSubmit}
             disabled={submitting}
-            className="w-full py-2.5 bg-[#e04c8a] text-white rounded-lg text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition"
+            className="w-full py-2.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition"
           >
             {submitting ? "Creating..." : "Create Community"}
           </button>

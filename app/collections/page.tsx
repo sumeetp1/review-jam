@@ -56,14 +56,14 @@ export default function CollectionsPage() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-[#13111a] flex items-center justify-center text-[#8b839e] text-sm animate-pulse">
+      <div className="min-h-screen bg-white dark:bg-[#09090b] flex items-center justify-center text-slate-500 dark:text-zinc-500 text-sm animate-pulse">
         Loading...
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#13111a] text-[#e8e4f0]">
+    <main className="min-h-screen bg-white dark:bg-[#09090b] text-slate-800 dark:text-zinc-200">
       {showCreate && (
         <CreateCollectionModal
           isOpen={showCreate}
@@ -74,11 +74,11 @@ export default function CollectionsPage() {
       )}
 
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-[#13111a]/95 backdrop-blur-md border-b border-[#2a2535]">
+      <div className="sticky top-0 z-40 bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/[0.06]">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-4">
           <div className="flex-1 min-w-0">
-            <h1 className="text-base font-semibold text-[#e8e4f0] leading-tight">Collections</h1>
-            <p className="text-[12px] text-[#8b839e] hidden sm:block">
+            <h1 className="text-base font-semibold text-slate-900 dark:text-zinc-100 leading-tight">Collections</h1>
+            <p className="text-[12px] text-slate-500 dark:text-zinc-500 hidden sm:block">
               Curated product lists by the community
             </p>
           </div>
@@ -96,10 +96,10 @@ export default function CollectionsPage() {
 
       <div className="max-w-5xl mx-auto px-4 py-5">
         {isLoading ? (
-          <div className="py-12 text-center text-[#8b839e] text-sm animate-pulse">Loading...</div>
+          <div className="py-12 text-center text-slate-500 dark:text-zinc-500 text-sm animate-pulse">Loading...</div>
         ) : collections.length === 0 ? (
           <div className="py-12 text-center">
-            <p className="text-[#8b839e] text-sm">No collections yet. Be the first to create one!</p>
+            <p className="text-slate-500 dark:text-zinc-500 text-sm">No collections yet. Be the first to create one!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -107,31 +107,31 @@ export default function CollectionsPage() {
               <Link
                 key={c.id}
                 href={`/collections/${c.slug}`}
-                className="group glass-card flex flex-col overflow-hidden hover:border-[#2a2535] hover:shadow-md hover:shadow-[#2a2535]/50 transition"
+                className="group glass-card flex flex-col overflow-hidden hover:border-slate-200 dark:hover:border-white/10 hover:shadow-md hover:shadow-slate-200/50 dark:hover:shadow-black/20 transition"
               >
                 <div className="p-5 flex flex-col gap-3 flex-1">
                   <div className="flex items-start gap-3">
                     <span className="text-3xl leading-none shrink-0">{c.emoji}</span>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-[14px] font-semibold text-[#e8e4f0] group-hover:text-[#e04c8a] leading-snug transition-colors">
+                      <h3 className="text-[14px] font-semibold text-slate-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 leading-snug transition-colors">
                         {c.name}
                       </h3>
-                      <p className="text-[12px] text-[#8b839e] mt-0.5">
+                      <p className="text-[12px] text-slate-500 dark:text-zinc-500 mt-0.5">
                         by {c.creatorName}
                       </p>
                     </div>
                   </div>
 
                   {c.description && (
-                    <p className="text-[12px] text-[#8b839e] leading-relaxed line-clamp-2">
+                    <p className="text-[12px] text-slate-500 dark:text-zinc-500 leading-relaxed line-clamp-2">
                       {c.description}
                     </p>
                   )}
 
-                  <div className="flex items-center gap-3 text-[11px] text-[#8b839e] mt-auto pt-2 border-t border-[#2a2535]">
+                  <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-zinc-500 mt-auto pt-2 border-t border-slate-200 dark:border-white/[0.06]">
                     <span>{c.productIds.length} product{c.productIds.length !== 1 ? "s" : ""}</span>
                     {c.isOfficial && (
-                      <span className="text-[10px] font-semibold text-[#e04c8a] bg-[#e04c8a]/12 px-1.5 py-0.5 rounded-full">
+                      <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded-full">
                         Official
                       </span>
                     )}

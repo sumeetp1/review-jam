@@ -35,7 +35,7 @@ export default function CompareProductsWrapper() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#13111a] flex items-center justify-center text-[#8b839e] text-sm animate-pulse">
+        <div className="min-h-screen bg-white dark:bg-[#09090b] flex items-center justify-center text-slate-500 dark:text-zinc-500 text-sm animate-pulse">
           Loading...
         </div>
       }
@@ -138,14 +138,14 @@ function CompareProductsPage() {
 
   if (!isLoading && ids.length === 0) {
     return (
-      <main className="min-h-screen bg-[#13111a] text-[#e8e4f0] flex flex-col items-center justify-center gap-4 px-4">
-        <h1 className="text-xl font-bold text-[#e8e4f0]">Compare Products</h1>
-        <p className="text-[#8b839e] text-sm text-center max-w-md">
+      <main className="min-h-screen bg-white dark:bg-[#09090b] text-slate-800 dark:text-zinc-200 flex flex-col items-center justify-center gap-4 px-4">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-zinc-100">Compare Products</h1>
+        <p className="text-slate-500 dark:text-zinc-500 text-sm text-center max-w-md">
           Select products to compare from the explore page. You can compare up to 3 products side by side.
         </p>
         <Link
           href="/explore"
-          className="text-sm font-semibold text-[#e04c8a] hover:underline"
+          className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
         >
           Go to Explore
         </Link>
@@ -155,7 +155,7 @@ function CompareProductsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#13111a] flex items-center justify-center text-[#8b839e] text-sm animate-pulse">
+      <div className="min-h-screen bg-white dark:bg-[#09090b] flex items-center justify-center text-slate-500 dark:text-zinc-500 text-sm animate-pulse">
         Loading comparison...
       </div>
     );
@@ -187,7 +187,7 @@ function CompareProductsPage() {
 
   function winnerBg(idx: number, bestIdx: number): string {
     if (products.length < 2) return "";
-    return idx === bestIdx ? "bg-[#34d399]/5" : "";
+    return idx === bestIdx ? "bg-emerald-500/5 dark:bg-emerald-500/10" : "";
   }
 
   // ─── Stars ────────────────────────────────────────────────────────────────
@@ -199,13 +199,13 @@ function CompareProductsPage() {
           {[1, 2, 3, 4, 5].map((star) => (
             <span
               key={star}
-              className={`text-sm ${star <= Math.round(rating) ? "text-[#fde68a]" : "text-[#3a3348]"}`}
+              className={`text-sm ${star <= Math.round(rating) ? "text-amber-400" : "text-slate-300 dark:text-zinc-700"}`}
             >
               &#9733;
             </span>
           ))}
         </div>
-        <span className="text-[12px] font-semibold text-[#cbc5d9]">
+        <span className="text-[12px] font-semibold text-slate-700 dark:text-zinc-300">
           {rating.toFixed(1)}
         </span>
       </div>
@@ -215,21 +215,21 @@ function CompareProductsPage() {
   // ─── Render ───────────────────────────────────────────────────────────────
 
   return (
-    <main className="min-h-screen bg-[#13111a] text-[#e8e4f0]">
+    <main className="min-h-screen bg-white dark:bg-[#09090b] text-slate-800 dark:text-zinc-200">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-[#13111a]/95 backdrop-blur-md border-b border-[#2a2535]">
+      <div className="sticky top-0 z-40 bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/[0.06]">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-4">
           <Link
             href="/explore"
-            className="text-sm text-[#8b839e] hover:text-[#e8e4f0] transition shrink-0"
+            className="text-sm text-slate-500 dark:text-zinc-500 hover:text-slate-900 dark:hover:text-zinc-200 transition shrink-0"
           >
             &larr; Explore
           </Link>
           <div className="flex-1 min-w-0">
-            <h1 className="text-base font-semibold text-[#e8e4f0] leading-tight">
+            <h1 className="text-base font-semibold text-slate-900 dark:text-zinc-100 leading-tight">
               Product Comparison
             </h1>
-            <p className="text-[12px] text-[#8b839e] hidden sm:block">
+            <p className="text-[12px] text-slate-500 dark:text-zinc-500 hidden sm:block">
               {products.length} product{products.length !== 1 ? "s" : ""} side by side
             </p>
           </div>
@@ -244,13 +244,13 @@ function CompareProductsPage() {
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr>
-                <th className="text-left py-3 pr-4 pl-2 text-[#8b839e] font-medium text-[11px] uppercase tracking-wider border-b border-[#2a2535] sticky left-0 bg-[#1c1826] min-w-[140px]">
+                <th className="text-left py-3 pr-4 pl-2 text-slate-400 dark:text-zinc-500 font-medium text-[11px] uppercase tracking-wider border-b border-slate-200 dark:border-white/[0.06] sticky left-0 bg-white dark:bg-[#09090b] min-w-[140px]">
                   &nbsp;
                 </th>
                 {products.map((p) => (
                   <th
                     key={p.id}
-                    className="py-3 px-4 border-b border-[#2a2535] min-w-[200px]"
+                    className="py-3 px-4 border-b border-slate-200 dark:border-white/[0.06] min-w-[200px]"
                   >
                     <Link
                       href={
@@ -258,12 +258,12 @@ function CompareProductsPage() {
                           ? `/c/${p.communitySlug}/${p.slug}`
                           : `/product/${p.id}`
                       }
-                      className="block text-left hover:text-[#e04c8a] transition"
+                      className="block text-left hover:text-indigo-600 dark:hover:text-indigo-400 transition"
                     >
-                      <div className="text-[14px] font-semibold text-[#e8e4f0]">
+                      <div className="text-[14px] font-semibold text-slate-900 dark:text-zinc-100">
                         {p.name}
                       </div>
-                      <div className="text-[12px] text-[#8b839e] font-normal mt-0.5">
+                      <div className="text-[12px] text-slate-500 dark:text-zinc-500 font-normal mt-0.5">
                         {p.brandName}
                       </div>
                     </Link>
@@ -274,7 +274,7 @@ function CompareProductsPage() {
             <tbody>
               {/* Health Score */}
               <tr>
-                <td className="py-4 pr-4 pl-2 text-[13px] font-medium text-[#cbc5d9] border-b border-[#2a2535] sticky left-0 bg-[#1c1826]">
+                <td className="py-4 pr-4 pl-2 text-[13px] font-medium text-slate-700 dark:text-zinc-300 border-b border-slate-100 dark:border-white/[0.03] sticky left-0 bg-white dark:bg-[#09090b]">
                   Health Score
                 </td>
                 {products.map((p, i) => {
@@ -282,12 +282,12 @@ function CompareProductsPage() {
                   return (
                     <td
                       key={p.id}
-                      className={`py-4 px-4 border-b border-[#2a2535] ${winnerBg(i, bestHealth)}`}
+                      className={`py-4 px-4 border-b border-slate-100 dark:border-white/[0.03] ${winnerBg(i, bestHealth)}`}
                     >
                       {s && s.avgHealthScore > 0 ? (
                         <HealthRing score={s.avgHealthScore} size={72} />
                       ) : (
-                        <span className="text-[12px] text-[#8b839e]">No data</span>
+                        <span className="text-[12px] text-slate-400 dark:text-zinc-600">No data</span>
                       )}
                     </td>
                   );
@@ -296,7 +296,7 @@ function CompareProductsPage() {
 
               {/* Rating */}
               <tr>
-                <td className="py-3 pr-4 pl-2 text-[13px] font-medium text-[#cbc5d9] border-b border-[#2a2535] sticky left-0 bg-[#1c1826]">
+                <td className="py-3 pr-4 pl-2 text-[13px] font-medium text-slate-700 dark:text-zinc-300 border-b border-slate-100 dark:border-white/[0.03] sticky left-0 bg-white dark:bg-[#09090b]">
                   Average Rating
                 </td>
                 {products.map((p, i) => {
@@ -304,12 +304,12 @@ function CompareProductsPage() {
                   return (
                     <td
                       key={p.id}
-                      className={`py-3 px-4 border-b border-[#2a2535] ${winnerBg(i, bestRating)}`}
+                      className={`py-3 px-4 border-b border-slate-100 dark:border-white/[0.03] ${winnerBg(i, bestRating)}`}
                     >
                       {s && s.avgRating > 0 ? (
                         <Stars rating={s.avgRating} />
                       ) : (
-                        <span className="text-[12px] text-[#8b839e]">No ratings</span>
+                        <span className="text-[12px] text-slate-400 dark:text-zinc-600">No ratings</span>
                       )}
                     </td>
                   );
@@ -318,7 +318,7 @@ function CompareProductsPage() {
 
               {/* Review Count */}
               <tr>
-                <td className="py-3 pr-4 pl-2 text-[13px] font-medium text-[#cbc5d9] border-b border-[#2a2535] sticky left-0 bg-[#1c1826]">
+                <td className="py-3 pr-4 pl-2 text-[13px] font-medium text-slate-700 dark:text-zinc-300 border-b border-slate-100 dark:border-white/[0.03] sticky left-0 bg-white dark:bg-[#09090b]">
                   Review Count
                 </td>
                 {products.map((p, i) => {
@@ -326,7 +326,7 @@ function CompareProductsPage() {
                   return (
                     <td
                       key={p.id}
-                      className={`py-3 px-4 border-b border-[#2a2535] text-[14px] font-semibold text-[#cbc5d9] ${winnerBg(i, bestReviews)}`}
+                      className={`py-3 px-4 border-b border-slate-100 dark:border-white/[0.03] text-[14px] font-semibold text-slate-700 dark:text-zinc-300 ${winnerBg(i, bestReviews)}`}
                     >
                       {s?.reviewCount ?? 0}
                     </td>
@@ -336,7 +336,7 @@ function CompareProductsPage() {
 
               {/* Top Pros */}
               <tr>
-                <td className="py-3 pr-4 pl-2 text-[13px] font-medium text-[#cbc5d9] border-b border-[#2a2535] sticky left-0 bg-[#1c1826]">
+                <td className="py-3 pr-4 pl-2 text-[13px] font-medium text-slate-700 dark:text-zinc-300 border-b border-slate-100 dark:border-white/[0.03] sticky left-0 bg-white dark:bg-[#09090b]">
                   Top Pros
                 </td>
                 {products.map((p) => {
@@ -344,21 +344,21 @@ function CompareProductsPage() {
                   return (
                     <td
                       key={p.id}
-                      className="py-3 px-4 border-b border-[#2a2535]"
+                      className="py-3 px-4 border-b border-slate-100 dark:border-white/[0.03]"
                     >
                       {s && s.topPros.length > 0 ? (
                         <div className="flex flex-wrap gap-1.5">
                           {s.topPros.map((item) => (
                             <span
                               key={item.text}
-                              className="text-[11px] font-medium bg-[#34d399]/10 text-emerald-700 px-2 py-0.5 rounded-full border border-[#34d399]/20"
+                              className="text-[11px] font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20"
                             >
                               {item.text}
                             </span>
                           ))}
                         </div>
                       ) : (
-                        <span className="text-[12px] text-[#8b839e]">None</span>
+                        <span className="text-[12px] text-slate-400 dark:text-zinc-600">None</span>
                       )}
                     </td>
                   );
@@ -367,7 +367,7 @@ function CompareProductsPage() {
 
               {/* Top Cons */}
               <tr>
-                <td className="py-3 pr-4 pl-2 text-[13px] font-medium text-[#cbc5d9] border-b border-[#2a2535] sticky left-0 bg-[#1c1826]">
+                <td className="py-3 pr-4 pl-2 text-[13px] font-medium text-slate-700 dark:text-zinc-300 border-b border-slate-100 dark:border-white/[0.03] sticky left-0 bg-white dark:bg-[#09090b]">
                   Top Cons
                 </td>
                 {products.map((p) => {
@@ -375,21 +375,21 @@ function CompareProductsPage() {
                   return (
                     <td
                       key={p.id}
-                      className="py-3 px-4 border-b border-[#2a2535]"
+                      className="py-3 px-4 border-b border-slate-100 dark:border-white/[0.03]"
                     >
                       {s && s.topCons.length > 0 ? (
                         <div className="flex flex-wrap gap-1.5">
                           {s.topCons.map((item) => (
                             <span
                               key={item.text}
-                              className="text-[11px] font-medium bg-[#f87171]/10 text-red-700 px-2 py-0.5 rounded-full border border-[#f87171]/20"
+                              className="text-[11px] font-medium bg-red-500/10 text-red-700 dark:text-red-400 px-2 py-0.5 rounded-full border border-red-500/20"
                             >
                               {item.text}
                             </span>
                           ))}
                         </div>
                       ) : (
-                        <span className="text-[12px] text-[#8b839e]">None</span>
+                        <span className="text-[12px] text-slate-400 dark:text-zinc-600">None</span>
                       )}
                     </td>
                   );
@@ -398,7 +398,7 @@ function CompareProductsPage() {
 
               {/* Verified Owners */}
               <tr>
-                <td className="py-3 pr-4 pl-2 text-[13px] font-medium text-[#cbc5d9] border-b border-[#2a2535] sticky left-0 bg-[#1c1826]">
+                <td className="py-3 pr-4 pl-2 text-[13px] font-medium text-slate-700 dark:text-zinc-300 border-b border-slate-100 dark:border-white/[0.03] sticky left-0 bg-white dark:bg-[#09090b]">
                   Verified Owners
                 </td>
                 {products.map((p, i) => {
@@ -406,7 +406,7 @@ function CompareProductsPage() {
                   return (
                     <td
                       key={p.id}
-                      className={`py-3 px-4 border-b border-[#2a2535] text-[14px] font-semibold text-[#cbc5d9] ${winnerBg(i, bestVerified)}`}
+                      className={`py-3 px-4 border-b border-slate-100 dark:border-white/[0.03] text-[14px] font-semibold text-slate-700 dark:text-zinc-300 ${winnerBg(i, bestVerified)}`}
                     >
                       {s?.verifiedCount ?? 0}
                     </td>
@@ -416,7 +416,7 @@ function CompareProductsPage() {
 
               {/* Category */}
               <tr>
-                <td className="py-3 pr-4 pl-2 text-[13px] font-medium text-[#cbc5d9] sticky left-0 bg-[#1c1826]">
+                <td className="py-3 pr-4 pl-2 text-[13px] font-medium text-slate-700 dark:text-zinc-300 sticky left-0 bg-white dark:bg-[#09090b]">
                   Category
                 </td>
                 {products.map((p) => (
@@ -424,7 +424,7 @@ function CompareProductsPage() {
                     key={p.id}
                     className="py-3 px-4"
                   >
-                    <span className="text-[11px] bg-[#1c1826] text-[#8b839e] px-2 py-0.5 rounded-full font-medium border border-[#2a2535]">
+                    <span className="text-[11px] bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-zinc-400 px-2 py-0.5 rounded-full font-medium border border-slate-200 dark:border-white/[0.06]">
                       {p.category}
                     </span>
                   </td>
@@ -435,7 +435,7 @@ function CompareProductsPage() {
         </div>
 
         {/* Mobile: stacked cards */}
-        <div className="md space-y-6">
+        <div className="md:hidden space-y-6">
           {products.map((p, i) => {
             const s = stats.get(p.id);
             return (
@@ -451,10 +451,10 @@ function CompareProductsPage() {
                   }
                   className="block"
                 >
-                  <h3 className="text-[15px] font-semibold text-[#e8e4f0] hover:text-[#e04c8a] transition">
+                  <h3 className="text-[15px] font-semibold text-slate-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
                     {p.name}
                   </h3>
-                  <p className="text-[12px] text-[#8b839e]">{p.brandName}</p>
+                  <p className="text-[12px] text-slate-500 dark:text-zinc-500">{p.brandName}</p>
                 </Link>
 
                 {s && s.avgHealthScore > 0 && (
@@ -465,33 +465,33 @@ function CompareProductsPage() {
 
                 <div className="grid grid-cols-3 gap-3 text-center">
                   <div>
-                    <div className="text-[18px] font-bold text-[#e8e4f0]">
+                    <div className="text-[18px] font-bold text-slate-900 dark:text-zinc-100">
                       {s?.avgRating ? s.avgRating.toFixed(1) : "--"}
                     </div>
-                    <div className="text-[10px] text-[#8b839e] font-medium uppercase">Rating</div>
+                    <div className="text-[10px] text-slate-500 dark:text-zinc-500 font-medium uppercase">Rating</div>
                   </div>
                   <div>
-                    <div className="text-[18px] font-bold text-[#e8e4f0]">
+                    <div className="text-[18px] font-bold text-slate-900 dark:text-zinc-100">
                       {s?.reviewCount ?? 0}
                     </div>
-                    <div className="text-[10px] text-[#8b839e] font-medium uppercase">Reviews</div>
+                    <div className="text-[10px] text-slate-500 dark:text-zinc-500 font-medium uppercase">Reviews</div>
                   </div>
                   <div>
-                    <div className="text-[18px] font-bold text-[#e8e4f0]">
+                    <div className="text-[18px] font-bold text-slate-900 dark:text-zinc-100">
                       {s?.verifiedCount ?? 0}
                     </div>
-                    <div className="text-[10px] text-[#8b839e] font-medium uppercase">Verified</div>
+                    <div className="text-[10px] text-slate-500 dark:text-zinc-500 font-medium uppercase">Verified</div>
                   </div>
                 </div>
 
                 {s && s.topPros.length > 0 && (
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#8b839e] mb-1.5">Pros</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-600 mb-1.5">Pros</p>
                     <div className="flex flex-wrap gap-1.5">
                       {s.topPros.map((item) => (
                         <span
                           key={item.text}
-                          className="text-[11px] font-medium bg-[#34d399]/10 text-emerald-700 px-2 py-0.5 rounded-full border border-[#34d399]/20"
+                          className="text-[11px] font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20"
                         >
                           {item.text}
                         </span>
@@ -502,12 +502,12 @@ function CompareProductsPage() {
 
                 {s && s.topCons.length > 0 && (
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#8b839e] mb-1.5">Cons</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-600 mb-1.5">Cons</p>
                     <div className="flex flex-wrap gap-1.5">
                       {s.topCons.map((item) => (
                         <span
                           key={item.text}
-                          className="text-[11px] font-medium bg-[#f87171]/10 text-red-700 px-2 py-0.5 rounded-full border border-[#f87171]/20"
+                          className="text-[11px] font-medium bg-red-500/10 text-red-700 dark:text-red-400 px-2 py-0.5 rounded-full border border-red-500/20"
                         >
                           {item.text}
                         </span>
@@ -516,8 +516,8 @@ function CompareProductsPage() {
                   </div>
                 )}
 
-                <div className="pt-2 border-t border-[#2a2535]">
-                  <span className="text-[11px] bg-[#1c1826] text-[#8b839e] px-2 py-0.5 rounded-full font-medium border border-[#2a2535]">
+                <div className="pt-2 border-t border-slate-200 dark:border-white/[0.06]">
+                  <span className="text-[11px] bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-zinc-400 px-2 py-0.5 rounded-full font-medium border border-slate-200 dark:border-white/[0.06]">
                     {p.category}
                   </span>
                 </div>

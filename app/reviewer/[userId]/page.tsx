@@ -90,7 +90,7 @@ export default function ReviewerProfilePage({
   // ── Loading state ──────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#13111a] text-sm text-[#8b839e]">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#09090b] text-sm text-slate-500 dark:text-zinc-500">
         Loading...
       </div>
     );
@@ -99,13 +99,13 @@ export default function ReviewerProfilePage({
   // ── Not found ──────────────────────────────────────────────────────────────
   if (notFound || !userData) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#13111a] p-8 gap-3">
-        <h2 className="text-base font-semibold text-[#e8e4f0]">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-[#09090b] p-8 gap-3">
+        <h2 className="text-base font-semibold text-slate-900 dark:text-zinc-100">
           Reviewer not found
         </h2>
         <Link
           href="/feed"
-          className="text-sm text-[#8b839e] hover:underline"
+          className="text-sm text-slate-500 dark:text-zinc-400 hover:underline"
         >
           &larr; Back to feed
         </Link>
@@ -125,29 +125,29 @@ export default function ReviewerProfilePage({
   const { bg, text, emoji } = getTierStyle(trustScore);
 
   return (
-    <main className="min-h-screen bg-[#13111a] text-[#e8e4f0]">
+    <main className="min-h-screen bg-white dark:bg-[#09090b] text-slate-800 dark:text-zinc-200">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         {/* Back link */}
         <Link
           href="/feed"
-          className="text-sm text-[#8b839e] hover:underline inline-block"
+          className="text-sm text-slate-500 dark:text-zinc-400 hover:underline inline-block"
         >
           &larr; Back to feed
         </Link>
 
         {/* Identity card */}
-        <div className="bg-[#1c1826] p-5 rounded-xl border border-[#2a2535] flex items-center gap-4">
+        <div className="bg-white dark:bg-white/[0.03] p-5 rounded-xl border border-slate-200 dark:border-white/[0.06] flex items-center gap-4">
           <Avatar
             name={userData.displayName}
             src={userData.photoURL}
             size="lg"
           />
           <div className="min-w-0 flex-1">
-            <h1 className="text-base font-semibold text-[#e8e4f0] truncate">
+            <h1 className="text-base font-semibold text-slate-900 dark:text-zinc-100 truncate">
               {userData.displayName || "Anonymous"}
             </h1>
             {userData.bio && (
-              <p className="text-sm text-[#8b839e] mt-0.5 line-clamp-2">
+              <p className="text-sm text-slate-500 dark:text-zinc-500 mt-0.5 line-clamp-2">
                 {userData.bio}
               </p>
             )}
@@ -171,7 +171,7 @@ export default function ReviewerProfilePage({
                     <span
                       key={bid}
                       title={b.description}
-                      className="inline-flex items-center gap-0.5 text-[11px] bg-[#1c1826] text-[#8b839e] px-2 py-0.5 rounded-md font-medium"
+                      className="inline-flex items-center gap-0.5 text-[11px] bg-slate-100 dark:bg-white/[0.05] text-slate-500 dark:text-zinc-400 px-2 py-0.5 rounded-md font-medium"
                     >
                       {b.emoji} {b.label}
                     </span>
@@ -205,16 +205,16 @@ export default function ReviewerProfilePage({
           ].map((s) => (
             <div
               key={s.label}
-              className="bg-[#1c1826] rounded-xl border border-[#2a2535] p-4 text-center"
+              className="bg-white dark:bg-white/[0.03] rounded-xl border border-slate-200 dark:border-white/[0.06] p-4 text-center"
             >
-              <p className="text-xl font-semibold text-[#e8e4f0] tabular-nums">
+              <p className="text-xl font-semibold text-slate-900 dark:text-zinc-100 tabular-nums">
                 {s.value}
               </p>
-              <p className="text-[11px] text-[#8b839e] mt-0.5 uppercase tracking-wide">
+              <p className="text-[11px] text-slate-500 dark:text-zinc-500 mt-0.5 uppercase tracking-wide">
                 {s.label}
               </p>
               {"sub" in s && s.sub && (
-                <p className="text-[10px] text-[#e04c8a] font-medium mt-0.5">
+                <p className="text-[10px] text-indigo-600 dark:text-indigo-400 font-medium mt-0.5">
                   {s.sub}
                 </p>
               )}
@@ -224,12 +224,12 @@ export default function ReviewerProfilePage({
 
         {/* Reviews section */}
         <div>
-          <h2 className="text-sm font-semibold text-[#e8e4f0] mb-3">
+          <h2 className="text-sm font-semibold text-slate-900 dark:text-zinc-100 mb-3">
             Reviews
           </h2>
           {reviews.length === 0 ? (
-            <div className="bg-[#1c1826] rounded-xl border border-[#2a2535] p-8 text-center">
-              <p className="text-sm text-[#8b839e]">
+            <div className="bg-white dark:bg-white/[0.03] rounded-xl border border-slate-200 dark:border-white/[0.06] p-8 text-center">
+              <p className="text-sm text-slate-500 dark:text-zinc-500">
                 No reviews yet.
               </p>
             </div>

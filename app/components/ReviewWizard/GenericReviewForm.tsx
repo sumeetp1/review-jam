@@ -83,17 +83,17 @@ export default function GenericReviewForm({
   return (
     <ModalShell onClose={onClose}>
       {/* Header */}
-      <div className="flex justify-between items-start px-5 pt-5 pb-4 border-b border-[#2a2535] shrink-0">
+      <div className="flex justify-between items-start px-5 pt-5 pb-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
         <div>
-          <h2 className="text-base font-semibold text-[#e8e4f0]">Quick review</h2>
-          <p className="text-[11px] text-[#fbbf24] mt-0.5">
+          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Quick review</h2>
+          <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-0.5">
             Generic reviews are not eligible for payouts
           </p>
         </div>
         <button
           type="button"
           onClick={onClose}
-          className="text-[#8b839e] hover:text-[#cbc5d9] p-1 rounded-md hover:bg-[#231e2e] text-sm shrink-0"
+          className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-sm shrink-0"
         >
           ✕
         </button>
@@ -104,7 +104,7 @@ export default function GenericReviewForm({
         {/* Subject type picker */}
         {!productInfo && (
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-[#cbc5d9]">
+            <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
               What type of thing are you reviewing?
             </label>
             <div className="flex gap-1.5 flex-wrap">
@@ -123,29 +123,29 @@ export default function GenericReviewForm({
 
         {!productInfo && (
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-[#cbc5d9]">
-              {cfg.nameLabel} <span className="text-[#fca5a5]">*</span>
+            <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+              {cfg.nameLabel} <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
               placeholder={cfg.namePlaceholder}
-              className="w-full bg-[#1c1826] border border-[#2a2535] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#3a3348] text-[#e8e4f0] placeholder:text-[#4a4458]"
+              className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-slate-100 dark:placeholder-slate-500"
             />
           </div>
         )}
 
         {!productInfo && (
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-[#cbc5d9]">Category</label>
+            <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Category</label>
             <input
               type="text"
               list="category-suggestions"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               placeholder="e.g. Tech, Roads & Routes, Restaurants..."
-              className="w-full bg-[#1c1826] border border-[#2a2535] rounded-lg px-3 py-2 text-sm outline-none text-[#e8e4f0]"
+              className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none dark:text-slate-100"
             />
             <datalist id="category-suggestions">
               {SUGGESTED_CATEGORIES.map((cat) => (
@@ -156,31 +156,31 @@ export default function GenericReviewForm({
         )}
 
         {productInfo && (
-          <div className="bg-[#1c1826] rounded-lg px-3 py-2.5">
-            <p className="text-[11px] text-[#8b839e] mb-0.5">Reviewing</p>
-            <p className="text-sm font-medium text-[#e8e4f0]">{productInfo.name}</p>
+          <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg px-3 py-2.5">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-0.5">Reviewing</p>
+            <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{productInfo.name}</p>
           </div>
         )}
 
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-[#cbc5d9]">
-            Overall rating <span className="text-[#fca5a5]">*</span>
+          <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+            Overall rating <span className="text-red-400">*</span>
           </label>
           <StarPicker value={overallRating} onChange={setOverallRating} />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-[#cbc5d9]">
-            Your review <span className="text-[#fca5a5]">*</span>
+          <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+            Your review <span className="text-red-400">*</span>
           </label>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder={`Share your experience with this ${cfg.label.toLowerCase()}...`}
-            className="w-full bg-[#1c1826] border border-[#2a2535] rounded-lg px-3 py-2 text-sm h-28 resize-y focus:outline-none focus:ring-1 focus:ring-[#3a3348] text-[#e8e4f0] placeholder:text-[#4a4458]"
+            className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm h-28 resize-y focus:outline-none focus:ring-1 focus:ring-slate-400 dark:focus:ring-slate-600 dark:text-slate-100 dark:placeholder-slate-500"
           />
           <p className={`text-right text-[11px] tabular-nums ${
-            content.trim().length >= 20 ? "text-[#34d399]" : "text-[#8b839e]"
+            content.trim().length >= 20 ? "text-emerald-500 dark:text-emerald-400" : "text-slate-400"
           }`}>
             {content.trim().length} chars
           </p>
@@ -191,26 +191,26 @@ export default function GenericReviewForm({
             type="checkbox"
             checked={isHonest}
             onChange={(e) => setIsHonest(e.target.checked)}
-            className="mt-0.5 accent-[#e04c8a] shrink-0"
+            className="mt-0.5 accent-slate-900 shrink-0"
           />
-          <span className="text-xs text-[#cbc5d9] leading-relaxed">
-            I confirm this is my honest, independent opinion. <span className="text-[#fca5a5]">*</span>
+          <span className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            I confirm this is my honest, independent opinion. <span className="text-red-400">*</span>
           </span>
         </label>
 
         {error && (
-          <p className="text-xs text-[#f87171] px-3 py-2 bg-red-950/30 rounded-lg border border-red-900">
+          <p className="text-xs text-red-500 dark:text-red-400 px-3 py-2 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-100 dark:border-red-900/40">
             {error}
           </p>
         )}
       </div>
 
       {/* Footer */}
-      <div className="px-5 py-4 border-t border-[#2a2535] flex gap-2 shrink-0">
+      <div className="px-5 py-4 border-t border-slate-100 dark:border-slate-800 flex gap-2 shrink-0">
         <button
           type="button"
           onClick={onClose}
-          className="flex-1 border border-[#2a2535] text-[#cbc5d9] py-2 rounded-lg text-sm font-medium hover:bg-[#231e2e] transition"
+          className="flex-1 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition"
         >
           Cancel
         </button>
@@ -218,7 +218,7 @@ export default function GenericReviewForm({
           type="button"
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="flex-[1.4] bg-[#e04c8a] text-white py-2 rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50"
+          className="flex-[1.4] bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50"
         >
           {isSubmitting ? "Posting..." : "Post review"}
         </button>

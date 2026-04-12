@@ -201,17 +201,17 @@ export default function CommunityPage({ params }: { params: Promise<{ communityS
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#13111a] flex items-center justify-center">
-        <p className="text-sm text-[#8b839e]">Loading...</p>
+      <div className="min-h-screen bg-white dark:bg-[#09090b] flex items-center justify-center">
+        <p className="text-sm text-slate-500 dark:text-zinc-500">Loading...</p>
       </div>
     );
   }
 
   if (!community) {
     return (
-      <div className="min-h-screen bg-[#13111a] flex flex-col items-center justify-center gap-3 px-4">
-        <p className="text-[#8b839e]">Community not found</p>
-        <button type="button" onClick={() => router.push("/c")} className="text-sm text-[#cbc5d9] underline">
+      <div className="min-h-screen bg-white dark:bg-[#09090b] flex flex-col items-center justify-center gap-3 px-4">
+        <p className="text-slate-500 dark:text-zinc-400">Community not found</p>
+        <button type="button" onClick={() => router.push("/c")} className="text-sm text-slate-700 dark:text-zinc-300 underline">
           Browse communities
         </button>
       </div>
@@ -219,35 +219,36 @@ export default function CommunityPage({ params }: { params: Promise<{ communityS
   }
 
   return (
-    <div className="min-h-screen bg-[#13111a] pb-24">
+    <div className="min-h-screen bg-white dark:bg-[#09090b] pb-24">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#13111a]/95 backdrop-blur-md border-b border-[#2a2535]">
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/[0.06]">
         <div className="max-w-5xl mx-auto px-4 py-3">
           <div className="flex items-center gap-3">
             <Link href="/" className="shrink-0 mr-1 md:hidden">
-              <Image src="/logo-dark.svg" alt="Review Jam" width={90} height={22} />
+              <Image src="/logo.svg" alt="Review Jam" width={90} height={22} className="dark:hidden" />
+              <Image src="/logo-dark.svg" alt="Review Jam" width={90} height={22} className="hidden dark:block" />
             </Link>
-            <button type="button" onClick={() => router.push("/c")} className="text-[#8b839e] hover:text-[#cbc5d9] shrink-0 text-lg leading-none">
+            <button type="button" onClick={() => router.push("/c")} className="text-slate-500 dark:text-zinc-500 hover:text-slate-700 dark:hover:text-zinc-300 shrink-0 text-lg leading-none">
               ←
             </button>
             <span className="text-2xl leading-none">{community.iconEmoji}</span>
             <div className="flex-1 min-w-0">
-              <h1 className="text-base font-bold text-[#e8e4f0] truncate">rj/{community.slug}</h1>
-              <p className="text-[11px] text-[#8b839e]">{community.memberCount} members · {products.length} products · {community.reviewCount} reviews</p>
+              <h1 className="text-base font-bold text-slate-900 dark:text-zinc-100 truncate">rj/{community.slug}</h1>
+              <p className="text-[11px] text-slate-500 dark:text-zinc-500">{community.memberCount} members · {products.length} products · {community.reviewCount} reviews</p>
             </div>
             <button
               type="button"
               onClick={handleJoinLeave}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition shrink-0 ${
                 isMember
-                  ? "border border-[#2a2535] text-[#8b839e] hover:bg-[#231e2e]"
-                  : "bg-[#e04c8a]/20 text-[#e04c8a] border border-[#e04c8a]/30 hover:bg-[#e04c8a]/30"
+                  ? "border border-slate-200 dark:border-white/[0.06] text-slate-500 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-white/[0.04]"
+                  : "bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/30"
               }`}
             >
               {isMember ? "Joined" : "Join"}
             </button>
           </div>
-          <p className="text-[12px] text-[#8b839e] mt-2 line-clamp-2">{community.description}</p>
+          <p className="text-[12px] text-slate-500 dark:text-zinc-400 mt-2 line-clamp-2">{community.description}</p>
 
           {/* Tab bar */}
           <div className="flex gap-4 mt-3">
@@ -258,8 +259,8 @@ export default function CommunityPage({ params }: { params: Promise<{ communityS
                 onClick={() => setActiveTab(tab)}
                 className={`text-[12px] font-medium pb-1 border-b-2 transition capitalize ${
                   activeTab === tab
-                    ? "border-[#f472b6] text-[#e8e4f0]"
-                    : "border-transparent text-[#8b839e] hover:text-[#cbc5d9]"
+                    ? "border-indigo-400 text-slate-900 dark:text-zinc-100"
+                    : "border-transparent text-slate-500 dark:text-zinc-500 hover:text-slate-700 dark:hover:text-zinc-300"
                 }`}
               >
                 {tab === "products" ? `Products (${products.length})` : `Reviews (${reviews.length})`}
@@ -274,8 +275,8 @@ export default function CommunityPage({ params }: { params: Promise<{ communityS
         {activeTab === "products" && (
           products.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-[#8b839e] text-sm mb-1">No products in this community yet</p>
-              <p className="text-[12px] text-[#8b839e]">Admins can assign products here from the admin panel.</p>
+              <p className="text-slate-500 dark:text-zinc-500 text-sm mb-1">No products in this community yet</p>
+              <p className="text-[12px] text-slate-400 dark:text-zinc-600">Admins can assign products here from the admin panel.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -285,28 +286,28 @@ export default function CommunityPage({ params }: { params: Promise<{ communityS
                   <Link
                     key={p.id}
                     href={`/c/${p.communitySlug}/${p.slug}`}
-                    className="group glass-card p-4 flex flex-col gap-2.5 hover:border-[#2a2535] hover:shadow-md hover:shadow-[#2a2535]/50 transition"
+                    className="group glass-card p-4 flex flex-col gap-2.5 hover:border-slate-200 dark:hover:border-white/10 hover:shadow-md hover:shadow-slate-200/50 dark:hover:shadow-black/20 transition"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
-                        <h3 className="text-[14px] font-semibold text-[#e8e4f0] group-hover:text-[#e04c8a] leading-snug transition-colors">{p.name}</h3>
-                        <p className="text-[12px] text-[#8b839e] mt-0.5">{p.brandName}</p>
+                        <h3 className="text-[14px] font-semibold text-slate-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 leading-snug transition-colors">{p.name}</h3>
+                        <p className="text-[12px] text-slate-500 dark:text-zinc-500 mt-0.5">{p.brandName}</p>
                       </div>
                       {isTagged && (
-                        <span className="text-[9px] font-bold uppercase tracking-wide text-[#e04c8a] bg-[#231e2e] border border-[#e04c8a]/20 px-1.5 py-0.5 rounded shrink-0">
+                        <span className="text-[9px] font-bold uppercase tracking-wide text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-500/20 px-1.5 py-0.5 rounded shrink-0">
                           #{p.communitySlug}
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] bg-[#1c1826] text-[#8b839e] px-2 py-0.5 rounded-md font-medium border border-[#2a2535]">{p.category}</span>
+                      <span className="text-[11px] bg-slate-50 dark:bg-white/[0.04] text-slate-500 dark:text-zinc-400 px-2 py-0.5 rounded-md font-medium border border-slate-200 dark:border-white/[0.06]">{p.category}</span>
                       {p.avgRating && p.avgRating > 0 && (
-                        <span className="text-[11px] text-[#fbbf24] font-medium">★ {p.avgRating.toFixed(1)}</span>
+                        <span className="text-[11px] text-amber-500 dark:text-amber-400 font-medium">★ {p.avgRating.toFixed(1)}</span>
                       )}
                     </div>
-                    <div className="flex items-center gap-3 text-[11px] text-[#8b839e] mt-auto pt-1 border-t border-[#2a2535]">
+                    <div className="flex items-center gap-3 text-[11px] text-zinc-500 mt-auto pt-1 border-t border-white/[0.06]">
                       <span>{p.reviewCount ?? 0} review{(p.reviewCount ?? 0) !== 1 ? "s" : ""}</span>
-                      <span className="text-[10px] text-[#4a4458] font-mono">rj/{p.communitySlug}/{p.slug}</span>
+                      <span className="text-[10px] text-zinc-600 font-mono">rj/{p.communitySlug}/{p.slug}</span>
                     </div>
                   </Link>
                 );
@@ -327,8 +328,8 @@ export default function CommunityPage({ params }: { params: Promise<{ communityS
                   onClick={() => setSortBy(s)}
                   className={`text-[12px] font-medium pb-1 border-b-2 transition ${
                     sortBy === s
-                      ? "border-[#f472b6] text-[#e8e4f0]"
-                      : "border-transparent text-[#8b839e] hover:text-[#cbc5d9]"
+                      ? "border-indigo-400 text-zinc-100"
+                      : "border-transparent text-zinc-500 hover:text-zinc-300"
                   }`}
                 >
                   {s === "newest" ? "Newest" : s === "likes" ? "Most Liked" : "Top Score"}
@@ -336,11 +337,11 @@ export default function CommunityPage({ params }: { params: Promise<{ communityS
               ))}
             </div>
 
-            <div className="divide-y divide-[#2a2535]">
+            <div className="divide-y divide-white/[0.06]">
               {sorted.length === 0 ? (
                 <div className="text-center py-16">
-                  <p className="text-[#8b839e] text-sm mb-2">No community reviews yet</p>
-                  <button type="button" onClick={() => user ? setShowReviewWizard(true) : handleLogin()} className="text-sm text-[#cbc5d9] underline">
+                  <p className="text-zinc-500 text-sm mb-2">No community reviews yet</p>
+                  <button type="button" onClick={() => user ? setShowReviewWizard(true) : handleLogin()} className="text-sm text-zinc-300 underline">
                     Be the first to post
                   </button>
                 </div>
@@ -365,7 +366,7 @@ export default function CommunityPage({ params }: { params: Promise<{ communityS
       <button
         type="button"
         onClick={() => user ? setShowReviewWizard(true) : handleLogin()}
-        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 w-14 h-14 bg-[#e04c8a] text-white rounded-full shadow-lg shadow-[#e04c8a]/20 flex items-center justify-center text-2xl font-light hover:bg-[#f472b6] transition z-40"
+        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 w-14 h-14 bg-indigo-500 text-white rounded-full shadow-lg shadow-indigo-500/20 flex items-center justify-center text-2xl font-light hover:bg-indigo-400 transition z-40"
         title="Write a review"
       >
         +

@@ -57,21 +57,21 @@ export default function CampaignCreator() {
   };
 
   return (
-    <div className="bg-[#1c1826] p-8 rounded-3xl border border-[#2a2535] shadow-2xl">
+    <div className="bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl">
       <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">🚀 Launch New Campaign</h2>
       <form onSubmit={handleCreateCampaign} className="space-y-4">
         <div>
-          <label className="block text-sm font-bold text-[#8b839e] mb-1">Product Name</label>
-          <input type="text" required value={newProdName} onChange={e => setNewProdName(e.target.value)} className="w-full bg-[#1c1826] border border-[#2a2535] rounded-xl p-3 text-[#e8e4f0] focus:ring-2 focus:ring-[#e04c8a] outline-none" />
+          <label className="block text-sm font-bold text-slate-400 mb-1">Product Name</label>
+          <input type="text" required value={newProdName} onChange={e => setNewProdName(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none" />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-bold text-[#8b839e] mb-1">Brand Name</label>
-            <input type="text" required value={newBrandName} onChange={e => setNewBrandName(e.target.value)} className="w-full bg-[#1c1826] border border-[#2a2535] rounded-xl p-3 text-[#e8e4f0] outline-none" />
+            <label className="block text-sm font-bold text-slate-400 mb-1">Brand Name</label>
+            <input type="text" required value={newBrandName} onChange={e => setNewBrandName(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none" />
           </div>
           <div>
-            <label className="block text-sm font-bold text-[#8b839e] mb-1">Category</label>
-            <select value={newCategory} onChange={e => setNewCategory(e.target.value)} className="w-full bg-[#1c1826] border border-[#2a2535] rounded-xl p-3 text-[#e8e4f0] outline-none">
+            <label className="block text-sm font-bold text-slate-400 mb-1">Category</label>
+            <select value={newCategory} onChange={e => setNewCategory(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none">
               <option value="Tech">Tech</option>
               <option value="Home">Home</option>
               <option value="SaaS">SaaS</option>
@@ -86,39 +86,39 @@ export default function CampaignCreator() {
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-bold text-[#8b839e] mb-1">Brand Email (for dashboard access)</label>
-            <input type="email" value={newBrandEmail} onChange={e => setNewBrandEmail(e.target.value)} placeholder="brand@company.com" className="w-full bg-[#1c1826] border border-[#2a2535] rounded-xl p-3 text-[#e8e4f0] outline-none" />
+            <label className="block text-sm font-bold text-slate-400 mb-1">Brand Email (for dashboard access)</label>
+            <input type="email" value={newBrandEmail} onChange={e => setNewBrandEmail(e.target.value)} placeholder="brand@company.com" className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none" />
           </div>
           <div>
-            <label className="block text-sm font-bold text-[#8b839e] mb-1">Pool Budget ($)</label>
-            <input type="number" value={newBudget} onChange={e => setNewBudget(e.target.value)} placeholder="e.g. 500" className="w-full bg-[#1c1826] border border-[#2a2535] rounded-xl p-3 text-[#e8e4f0] outline-none" />
+            <label className="block text-sm font-bold text-slate-400 mb-1">Pool Budget ($)</label>
+            <input type="number" value={newBudget} onChange={e => setNewBudget(e.target.value)} placeholder="e.g. 500" className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none" />
           </div>
         </div>
         <div>
-          <label className="block text-sm font-bold text-[#8b839e] mb-1">Campaign Description (shown to applicants)</label>
-          <textarea value={newDescription} onChange={e => setNewDescription(e.target.value)} placeholder="What reviewers should know about this product\u2026" rows={2} className="w-full bg-[#1c1826] border border-[#2a2535] rounded-xl p-3 text-[#e8e4f0] outline-none resize-none" />
+          <label className="block text-sm font-bold text-slate-400 mb-1">Campaign Description (shown to applicants)</label>
+          <textarea value={newDescription} onChange={e => setNewDescription(e.target.value)} placeholder="What reviewers should know about this product…" rows={2} className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none resize-none" />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-bold text-[#8b839e] mb-1">Campaign ID</label>
-            <input type="text" required value={newCampaignId} onChange={e => setNewCampaignId(e.target.value)} className="w-full bg-[#1c1826] border border-[#2a2535] rounded-xl p-3 text-[#e8e4f0] outline-none" placeholder="e.g. camp_123" />
+            <label className="block text-sm font-bold text-slate-400 mb-1">Campaign ID</label>
+            <input type="text" required value={newCampaignId} onChange={e => setNewCampaignId(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none" placeholder="e.g. camp_123" />
           </div>
           <div>
-            <label className="block text-sm font-bold text-[#8b839e] mb-1">End Date & Time</label>
-            <input type="datetime-local" required value={endDateLocal} onChange={e => setEndDateLocal(e.target.value)} className="w-full bg-[#1c1826] border border-[#2a2535] rounded-xl p-3 text-[#e8e4f0] outline-none" />
+            <label className="block text-sm font-bold text-slate-400 mb-1">End Date & Time</label>
+            <input type="datetime-local" required value={endDateLocal} onChange={e => setEndDateLocal(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none" />
           </div>
         </div>
         {/* Variants / SKUs */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="block text-sm font-bold text-[#8b839e]">
+            <label className="block text-sm font-bold text-slate-400">
               Variants / SKUs{" "}
-              <span className="font-normal text-[#4a4458] text-xs">(optional — e.g. "Black 256GB", "Blue 128GB")</span>
+              <span className="font-normal text-slate-500 text-xs">(optional — e.g. "Black 256GB", "Blue 128GB")</span>
             </label>
             <button
               type="button"
               onClick={() => setVariantRows((rows) => [...rows, ""])}
-              className="text-xs text-[#f472b6] hover:text-[#f9a8d4] font-semibold"
+              className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold"
             >
               + Add variant
             </button>
@@ -130,14 +130,14 @@ export default function CampaignCreator() {
                   type="text"
                   value={v}
                   onChange={(e) => setVariantRows((rows) => rows.map((r, i) => (i === idx ? e.target.value : r)))}
-                  placeholder={`Variant ${idx + 1} — e.g. Blue \u00B7 128GB`}
-                  className="flex-1 bg-[#1c1826] border border-[#2a2535] rounded-xl p-3 text-[#e8e4f0] outline-none text-sm placeholder:text-[#4a4458]"
+                  placeholder={`Variant ${idx + 1} — e.g. Blue · 128GB`}
+                  className="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none text-sm placeholder-slate-600"
                 />
                 {variantRows.length > 1 && (
                   <button
                     type="button"
                     onClick={() => setVariantRows((rows) => rows.filter((_, i) => i !== idx))}
-                    className="px-3 text-[#8b839e] hover:text-[#f87171] transition"
+                    className="px-3 text-slate-500 hover:text-red-400 transition"
                   >
                     ✕
                   </button>
@@ -147,7 +147,7 @@ export default function CampaignCreator() {
           </div>
         </div>
 
-        <button type="submit" disabled={isCreating} className="w-full bg-[#e04c8a] text-white py-4 rounded-xl font-black mt-2 hover:bg-[#d84315] transition disabled:opacity-50">
+        <button type="submit" disabled={isCreating} className="w-full bg-indigo-600 text-white py-4 rounded-xl font-black mt-2 hover:bg-indigo-500 transition disabled:opacity-50">
           {isCreating ? "Publishing..." : "Launch Campaign Live"}
         </button>
       </form>

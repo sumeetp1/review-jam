@@ -72,16 +72,16 @@ function Identicon({ seed, className }: { seed: string; className: string }) {
 // ── Community avatar (emoji-based with gradient ring) ─────────────────────────
 
 const COMMUNITY_GRADIENTS = [
-  ["from-[#fbbf24]", "to-[#fb7185]"],
-  ["from-[#a78bfa]", "to-[#e04c8a]"],
-  ["from-[#38bdf8]", "to-[#60a5fa]"],
-  ["from-[#34d399]", "to-[#2dd4bf]"],
-  ["from-[#fb7185]", "to-[#f9a8d4]"],
-  ["from-[#e04c8a]", "to-[#7c3aed]"],
-  ["from-[#a78bfa]", "to-[#e04c8a]"],
-  ["from-[#86efac]", "to-[#34d399]"],
-  ["from-[#67e8f9]", "to-[#2dd4bf]"],
-  ["from-[#fb7185]", "to-[#f87171]"],
+  ["from-amber-400", "to-orange-500"],
+  ["from-violet-500", "to-purple-600"],
+  ["from-sky-400",   "to-blue-500"],
+  ["from-emerald-400","to-teal-500"],
+  ["from-rose-400",  "to-pink-500"],
+  ["from-indigo-400","to-blue-600"],
+  ["from-fuchsia-400","to-pink-600"],
+  ["from-lime-400",  "to-green-500"],
+  ["from-cyan-400",  "to-sky-500"],
+  ["from-red-400",   "to-rose-600"],
 ];
 
 function CommunityIcon({ emoji, seed, className }: { emoji?: string | null; seed: string; className: string }) {

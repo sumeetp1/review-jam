@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import VisitorCounter from "./components/VisitorCounter";
 import BottomNav from "./components/BottomNav";
+import ThemeProvider from "./components/ThemeProvider";
 import AppShell from "./components/AppShell";
 
 const geistSans = Geist({
@@ -37,16 +38,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-        <meta name="theme-color" content="#13111a" />
+        <meta name="theme-color" content="#09090b" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
-      <body className="min-h-full flex flex-col font-sans text-[15px] leading-normal text-[#e8e4f0] bg-[#13111a]">
+      <body className="min-h-full flex flex-col font-sans text-[15px] leading-normal text-slate-900 dark:text-slate-100 bg-white dark:bg-[#09090b]">
+        <ThemeProvider />
         <AppShell>{children}</AppShell>
         <VisitorCounter />
         <BottomNav />

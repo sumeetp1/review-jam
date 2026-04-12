@@ -17,7 +17,7 @@ export default function HealthRing({ score, size = 92 }: { score: number; size?:
   return (
     <div className="flex flex-col items-center gap-1">
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
-        <circle cx={half} cy={half} r={r} fill="none" stroke="#2a2535" strokeWidth="7" />
+        <circle cx={half} cy={half} r={r} fill="none" stroke="#27272a" strokeWidth="7" />
         <circle
           cx={half} cy={half} r={r} fill="none" stroke={col.ring} strokeWidth="7" strokeLinecap="round"
           strokeDasharray={`${fill} ${circ}`} style={{ transition: "stroke-dasharray .6s ease" }}

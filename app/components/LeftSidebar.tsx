@@ -16,6 +16,8 @@ import type { SidebarProduct as Product, Channel } from "../../lib/types";
 type Props = {
   user: User | null;
   products: Product[];
+  isDarkMode: boolean;
+  onToggleDark: () => void;
   onPostReview: () => void;
   onQuickReview?: () => void;
   onLogin: () => void;
@@ -27,14 +29,14 @@ type Props = {
 
 function SectionHeader({ label }: { label: string }) {
   return (
-    <p className="px-2 pt-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-[#8b839e] select-none">
+    <p className="px-2 pt-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-600 select-none">
       {label}
     </p>
   );
 }
 
 function Divider() {
-  return <div className="border-t border-[#2a2535] mx-2 my-1" />;
+  return <div className="border-t border-slate-200 dark:border-white/[0.06] mx-2 my-1" />;
 }
 
 // ─── Single nav row ─────────────────────────────────────────────────────────
@@ -56,8 +58,8 @@ function NavRow({
 }) {
   const cls = `flex items-center gap-2.5 px-2 py-1.5 rounded-md text-[13px] transition select-none cursor-pointer ${
     active
-      ? "text-[#e04c8a] bg-[#e04c8a]/12 font-semibold"
-      : "text-[#8b839e] hover:bg-[#231e2e] font-medium"
+      ? "text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 dark:bg-indigo-500/10 font-semibold"
+      : "text-slate-500 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-white/[0.04] font-medium"
   }`;
 
   const inner = (
@@ -85,7 +87,7 @@ function NavRow({
 // ─── Main ───────────────────────────────────────────────────────────────────
 
 export default function LeftSidebar({
-  user, products,
+  user, products, isDarkMode, onToggleDark,
   onPostReview, onQuickReview, onLogin,
   activeCategoryFilter, onClearFilter,
 }: Props) {
@@ -132,12 +134,13 @@ export default function LeftSidebar({
 
   return (
     <>
-      <aside className="hidden md:flex flex-col w-[240px] xl:w-[256px] h-screen sticky top-0 border-r border-[#2a2535] bg-[#1c1826] overflow-y-auto pb-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <aside className="hidden md:flex flex-col w-[240px] xl:w-[256px] h-screen sticky top-0 border-r border-slate-200 dark:border-white/[0.06] bg-white dark:bg-[#09090b] overflow-y-auto pb-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
 
         {/* Logo */}
         <div className="px-3 pt-4 pb-2 shrink-0">
           <Link href="/" onClick={onClearFilter}>
-            <img src="/logo-dark.svg" alt="Review Jam" width={130} height={32} />
+            <img src="/logo.svg" alt="Review Jam" width={130} height={32} className="dark:hidden" />
+            <img src="/logo-dark.svg" alt="Review Jam" width={130} height={32} className="hidden dark:block" />
           </Link>
         </div>
 
@@ -166,22 +169,22 @@ export default function LeftSidebar({
         <SectionHeader label="Your communities" />
         <div className="px-1">
           {joinedChannels.length === 0 && !user && (
-            <p className="px-2 py-1 text-[12px] text-[#8b839e]">
-              <button type="button" onClick={onLogin} className="text-[#e04c8a] hover:underline">Sign in</button> to join communities
+            <p className="px-2 py-1 text-[12px] text-slate-500 dark:text-zinc-500">
+              <button type="button" onClick={onLogin} className="text-indigo-600 dark:text-indigo-400 hover:underline">Sign in</button> to join communities
             </p>
           )}
           {joinedChannels.length === 0 && user && (
-            <p className="px-2 py-1 text-[12px] text-[#8b839e]">No communities joined yet.</p>
+            <p className="px-2 py-1 text-[12px] text-slate-500 dark:text-zinc-500">No communities joined yet.</p>
           )}
           {visibleJoined.map((ch) => (
             <NavRow key={ch.id} href={`/c/${ch.slug}`} icon={ch.iconEmoji} label={`rj/${ch.slug}`}
               active={pathname === `/c/${ch.slug}`}
-              right={<span className="text-[10px] text-[#8b839e] tabular-nums">{ch.memberCount.toLocaleString()}</span>}
+              right={<span className="text-[10px] text-slate-400 dark:text-zinc-600 tabular-nums">{ch.memberCount.toLocaleString()}</span>}
             />
           ))}
           {joinedChannels.length > 5 && (
             <button type="button" onClick={() => setShowAllChannels((v) => !v)}
-              className="w-full text-left px-2 py-1 text-[11px] text-[#8b839e] hover:text-[#cbc5d9] transition">
+              className="w-full text-left px-2 py-1 text-[11px] text-slate-500 dark:text-zinc-500 hover:text-slate-700 dark:hover:text-zinc-300 transition">
               {showAllChannels ? "Show less" : `See ${joinedChannels.length - 5} more…`}
             </button>
           )}
@@ -197,7 +200,7 @@ export default function LeftSidebar({
               active={pathname === `/c/${ch.slug}`}
               right={
                 <button type="button" onClick={(e) => handleJoin(e, ch)} disabled={joining === ch.id}
-                  className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full border border-[#e04c8a]/40 text-[#e04c8a] hover:bg-[#e04c8a]/12 disabled:opacity-50 transition">
+                  className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full border border-indigo-500/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/10 dark:hover:bg-indigo-500/10 disabled:opacity-50 transition">
                   {joining === ch.id ? "…" : "+ Join"}
                 </button>
               }
@@ -205,14 +208,14 @@ export default function LeftSidebar({
           ))}
           {popularChannels.length > (user ? 3 : 5) && (
             <button type="button" onClick={() => setShowAllChannels((v) => !v)}
-              className="w-full text-left px-2 py-1 text-[11px] text-[#8b839e] hover:text-[#cbc5d9] transition">
+              className="w-full text-left px-2 py-1 text-[11px] text-slate-500 dark:text-zinc-500 hover:text-slate-700 dark:hover:text-zinc-300 transition">
               {showAllChannels ? "Show less" : `See ${popularChannels.length - (user ? 3 : 5)} more…`}
             </button>
           )}
           <div className="flex gap-2 px-2 py-1">
-            <Link href="/c" className="text-[11px] text-[#e04c8a] hover:underline font-medium">All communities</Link>
+            <Link href="/c" className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline font-medium">All communities</Link>
             {user && (
-              <button type="button" onClick={() => setShowCreate(true)} className="text-[11px] text-[#8b839e] hover:text-[#cbc5d9] transition">
+              <button type="button" onClick={() => setShowCreate(true)} className="text-[11px] text-slate-500 dark:text-zinc-500 hover:text-slate-700 dark:hover:text-zinc-300 transition">
                 + Create
               </button>
             )}
@@ -226,17 +229,18 @@ export default function LeftSidebar({
         <nav className="px-1">
           <NavRow href="/brands" icon="📈" label="Advertise on Review Jam" />
           <NavRow href="/brands/dashboard" icon="📊" label="Brand dashboard" />
+          <NavRow icon={isDarkMode ? "☀️" : "🌙"} label={isDarkMode ? "Light mode" : "Dark mode"} onClick={onToggleDark} />
         </nav>
 
         <Divider />
 
         {/* ── Footer ──────────────────────────────────── */}
-        <div className="px-3 pt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-[#8b839e]">
-          <span className="cursor-pointer hover:text-[#cbc5d9]">Terms</span>
-          <span className="cursor-pointer hover:text-[#cbc5d9]">Privacy</span>
-          <Link href="/brands" className="hover:text-[#cbc5d9]">Brands</Link>
+        <div className="px-3 pt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-slate-400 dark:text-zinc-600">
+          <span className="cursor-pointer hover:text-slate-500 dark:hover:text-zinc-400">Terms</span>
+          <span className="cursor-pointer hover:text-slate-500 dark:hover:text-zinc-400">Privacy</span>
+          <Link href="/brands" className="hover:text-slate-500 dark:hover:text-zinc-400">Brands</Link>
           <p className="w-full mt-1 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#e04c8a]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
             © 2026 Review Jam
           </p>
         </div>
